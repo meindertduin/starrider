@@ -1,0 +1,6 @@
+build
+compile_commands.json
+.vimspector.json
+debug/
+run.sh
+debug.sh
