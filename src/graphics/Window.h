@@ -9,6 +9,9 @@ public:
     GWindow();
     ~GWindow();
     bool initialize();
+    Display* get_display();
+    Window get_window();
+    int get_screen_num();
 private:
     Display* p_display;
     Window m_window;

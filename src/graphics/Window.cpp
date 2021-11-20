@@ -18,10 +18,22 @@ bool GWindow::initialize() {
 
     int black_color = BlackPixel(p_display, m_screen);
     int white_color = WhitePixel(p_display, m_screen);
-
     m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 10, 10, 200, 100, 0, black_color, black_color);
 
+    XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(p_display , m_window);
 
     return true;
+}
+
+Display* GWindow::get_display() {
+    return p_display;
+}
+
+Window GWindow::get_window() {
+    return m_window;
+}
+
+int GWindow::get_screen_num() {
+    return m_screen;
 }

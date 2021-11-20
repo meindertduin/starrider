@@ -1,53 +1,24 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 
-int main() {
-    Display *display;
-    Window window;
-    XEvent event;
-    int screen;
+#include "graphics/Renderer.h"
 
-    display = XOpenDisplay(NULL);
-    if (display == NULL) {
+int main() {
+    GWindow window;
+    if (!window.initialize()) {
+        printf("Graphics Error: Something went wrong while creating the main window\n");
         return 1;
     }
 
-    screen = DefaultScreen(display);
+    Renderer renderer {&window};
+    renderer.set_background_color({ 0xFF, 0x00, 0x00 });
 
-    int black_color = BlackPixel(display, screen);
-    int white_color = WhitePixel(display, screen);
-
-    window = XCreateSimpleWindow(display, RootWindow(display, screen), 10, 10, 200, 100, 0, black_color, black_color);
-    XSelectInput(display, window, ExposureMask | KeyPressMask | ButtonPressMask);
-    XMapWindow(display , window);
-
-    GC gc = XCreateGC(display, window, 0, nullptr);
-    XSetForeground(display, gc, white_color);
-    XSetBackground(display, gc,  black_color);
-    XSetFillStyle(display, gc, FillSolid);
-    XSetLineAttributes(display, gc, 2, LineSolid, CapRound, JoinRound);
-    XSync(display, false);
-
+    XEvent event;
     for (;;) {
-        XNextEvent(display, &event);
+        XNextEvent(window.get_display(), &event);
 
-        if (event.type == ButtonPress) {
-            int x = event.xbutton.x;
-            int y = event.xbutton.y;
-
-            switch (event.xbutton.button) {
-                case Button1:
-                    XDrawPoint(display, window, gc, x, y);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        if (event.type == Expose) {
-            XFillRectangle(display, window, gc, 20, 20, 40, 40);
-            XDrawLine(display, window, gc, 50, 50, 100, 100);
-            XFlush(display);
+        if (event.type == Expose)  {
+           renderer.render();
         }
 
         if (event.type == KeyPress) {
@@ -55,6 +26,6 @@ int main() {
         }
     }
 
-    XCloseDisplay(display);
     return 0;
 }
+
