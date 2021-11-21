@@ -18,4 +18,4 @@ include_directories(src)
 set(PROJECT_TEST_NAME ${PROJECT_NAME}_test)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADER})
-target_link_libraries(${PROJECT_NAME} X11)
+target_link_libraries(${PROJECT_NAME} X11 Xext)

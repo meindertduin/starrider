@@ -1,7 +1,8 @@
 #include "Renderer.h"
 #include <stdio.h>
-#include <X11/extensions/XShm.h>
-#include <X11/Xutil.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
 
 Renderer::Renderer(GWindow* window) : p_window(window) {
     m_gc = XCreateGC(window->get_display(), window->get_window(), 0, nullptr);
@@ -15,19 +16,28 @@ Renderer::Renderer(GWindow* window) : p_window(window) {
 
     Visual* default_visual = DefaultVisual(window->get_display(), DefaultScreen(window->get_display()));
     m_colormap = XCreateColormap(window->get_display(), window->get_window(), default_visual, AllocNone);
-    XSync(window->get_display(), false);
 
     XMatchVisualInfo(p_window->get_display(), p_window->get_screen_num(), 32, DirectColor, &m_visual_info);
     p_visual = m_visual_info.visual;
 
+
     m_framebuffer = new int[m_width * m_height];
     for (auto i = 0u; i < m_width * m_height; ++i) {
-		*(m_framebuffer+i) = 0xF0F0F06F;
+		*(m_framebuffer+i) = 0x000000ff;
 	}
+
+    setup_shared_memory();
+
+    XSync(window->get_display(), false);
 }
 
 Renderer::~Renderer() {
     XFreeColormap(p_window->get_display(), m_colormap);
+    XShmDetach(p_window->get_display(), &m_shm_info);
+    shmdt(m_shm_info.shmaddr);
+    shmctl(m_shm_info.shmid, IPC_RMID, 0);
+
+    XDestroyImage(p_screen_image);
 
     delete[] m_framebuffer;
     p_visual = nullptr;
@@ -39,11 +49,17 @@ void Renderer::set_color(const Color &color) {
 }
 
 void Renderer::render() {
-    Visual *xvisual;
-    Visual pixmap;
 
-    auto image = XCreateImage(p_window->get_display(), xvisual, 24, ZPixmap, 0, (char*) m_framebuffer, m_width, m_height, 32, 0);
-    XPutImage(p_window->get_display(), p_window->get_window(), m_gc, image, 0, 0, 0, 0, m_width, m_height);
+    // copy all the data from the frame_buffer to the shm buffer
+    for (auto i = 0u; i < m_width *m_height; i++) {
+		*((int*) m_shm_info.shmaddr+i) = *(m_framebuffer + 1);
+	}
+
+    Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
+
+    if (status == 0) {
+        printf("Something went wrong with rendering the shm Image\n");
+    }
 }
 
 void Renderer::set_background_color(const Color &color) {
@@ -62,4 +78,29 @@ void Renderer::set_background_color(const Color &color) {
     XSync(p_window->get_display(), false);
 }
 
+bool Renderer::setup_shared_memory() {
+    auto shm_available = XShmQueryExtension(p_window->get_display());
+    if (shm_available == 0) {
+        printf("Shared memory not available\n");
+        return false;
+    }
 
+    p_screen_image = XShmCreateImage(p_window->get_display(), nullptr, 24, ZPixmap, nullptr, &m_shm_info, m_width, m_height);
+
+    m_shm_info.shmid = shmget(IPC_PRIVATE, p_screen_image->bytes_per_line * p_screen_image->height, IPC_CREAT | 0777);
+    if (m_shm_info.shmid == -1) {
+        printf("Failed to get shmid\n");
+        return false;
+    }
+
+    m_shm_info.shmaddr = p_screen_image->data = (char*) shmat(m_shm_info.shmid, nullptr, 0);
+    m_shm_info.readOnly = false;
+
+    auto shm_attach = XShmAttach(p_window->get_display(), &m_shm_info);
+    if (shm_attach == 0) {
+        printf("Failed to attach shm_info\n");
+        return false;
+    }
+
+    return true;
+}
