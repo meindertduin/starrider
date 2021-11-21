@@ -14,15 +14,12 @@ int main() {
 
     XEvent event;
     for (;;) {
-        XNextEvent(window.get_display(), &event);
+        window.poll_event(event);
 
         if (event.type == Expose)  {
-           renderer.render();
+            renderer.render();
         }
 
-        if (event.type == KeyPress) {
-            break;
-        }
     }
 
     return 0;

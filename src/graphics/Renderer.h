@@ -3,7 +3,7 @@
 #include "Window.h"
 
 #include <X11/Xutil.h>
-#include <X11/extensions/XShm.h>
+#include <X11/extensions/dbe.h>
 
 struct Color {
     u_int8_t r, g, b;
