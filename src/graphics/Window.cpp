@@ -18,7 +18,7 @@ bool GWindow::initialize() {
 
     int black_color = BlackPixel(p_display, m_screen);
     int white_color = WhitePixel(p_display, m_screen);
-    m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 10, 10, 200, 100, 0, black_color, black_color);
+    m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 10, 10, 800, 800, 0, black_color, black_color);
 
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(p_display , m_window);
