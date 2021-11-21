@@ -48,8 +48,7 @@ void Renderer::set_color(const Color &color) {
 
 }
 
-void Renderer::render() {
-
+bool Renderer::render() {
     // copy all the data from the frame_buffer to the shm buffer
     for (auto i = 0u; i < m_width *m_height; i++) {
 		*((int*) m_shm_info.shmaddr+i) = *(m_framebuffer + 1);
@@ -59,7 +58,10 @@ void Renderer::render() {
 
     if (status == 0) {
         printf("Something went wrong with rendering the shm Image\n");
+        return false;
     }
+
+    return true;
 }
 
 void Renderer::set_background_color(const Color &color) {

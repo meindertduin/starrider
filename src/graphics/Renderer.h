@@ -15,7 +15,7 @@ public:
     ~Renderer();
     void set_color(const Color &color);
     void set_background_color(const Color &color);
-    void render();
+    bool render();
 private:
     GWindow *p_window;
     XShmSegmentInfo m_shm_info;
