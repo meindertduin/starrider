@@ -11,7 +11,6 @@ int main() {
     }
 
     Renderer renderer {&window};
-    renderer.set_background_color({ 0xFF, 0x00, 0x00 });
 
     XEvent event;
     for (;;) {

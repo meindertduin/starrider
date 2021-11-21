@@ -6,20 +6,11 @@
 
 Renderer::Renderer(GWindow* window) : p_window(window) {
     m_gc = XCreateGC(window->get_display(), window->get_window(), 0, nullptr);
-    auto white_color = XWhitePixel(p_window->get_display(), p_window->get_screen_num());
     auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen_num());
 
     XSetBackground(p_window->get_display(), m_gc, black_color);
-    XSetForeground(p_window->get_display(), m_gc, white_color);
-    XSetFillStyle(window->get_display(), m_gc, FillSolid);
-    XSetLineAttributes(window->get_display(), m_gc, 2, LineSolid, CapRound, JoinRound);
 
-    Visual* default_visual = DefaultVisual(window->get_display(), DefaultScreen(window->get_display()));
-    m_colormap = XCreateColormap(window->get_display(), window->get_window(), default_visual, AllocNone);
-
-    XMatchVisualInfo(p_window->get_display(), p_window->get_screen_num(), 32, DirectColor, &m_visual_info);
-    p_visual = m_visual_info.visual;
-
+    p_visual = DefaultVisual(window->get_display(), DefaultScreen(window->get_display()));
 
     m_framebuffer = new int[m_width * m_height];
     for (auto i = 0u; i < m_width * m_height; ++i) {
@@ -32,7 +23,6 @@ Renderer::Renderer(GWindow* window) : p_window(window) {
 }
 
 Renderer::~Renderer() {
-    XFreeColormap(p_window->get_display(), m_colormap);
     XShmDetach(p_window->get_display(), &m_shm_info);
     shmdt(m_shm_info.shmaddr);
     shmctl(m_shm_info.shmid, IPC_RMID, 0);
@@ -64,22 +54,6 @@ bool Renderer::render() {
     return true;
 }
 
-void Renderer::set_background_color(const Color &color) {
-    XColor x_color;
-    x_color.red = color.r;
-    x_color.green = color.g;
-    x_color.blue = color.b;
-
-    Status rc = XAllocColor(p_window->get_display(), m_colormap, &x_color);
-    XSetBackground(p_window->get_display(), m_gc, x_color.pixel);
-
-    if (rc == 0) {
-        printf("Failed to allocate color\n");
-    }
-
-    XSync(p_window->get_display(), false);
-}
-
 bool Renderer::setup_shared_memory() {
     auto shm_available = XShmQueryExtension(p_window->get_display());
     if (shm_available == 0) {
@@ -87,7 +61,7 @@ bool Renderer::setup_shared_memory() {
         return false;
     }
 
-    p_screen_image = XShmCreateImage(p_window->get_display(), nullptr, 24, ZPixmap, nullptr, &m_shm_info, m_width, m_height);
+    p_screen_image = XShmCreateImage(p_window->get_display(), p_visual, 24, ZPixmap, nullptr, &m_shm_info, m_width, m_height);
 
     m_shm_info.shmid = shmget(IPC_PRIVATE, p_screen_image->bytes_per_line * p_screen_image->height, IPC_CREAT | 0777);
     if (m_shm_info.shmid == -1) {
