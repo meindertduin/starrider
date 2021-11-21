@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <math.h>
 
 
 Renderer::Renderer(GWindow* window) : p_window(window) {
@@ -14,7 +15,7 @@ Renderer::Renderer(GWindow* window) : p_window(window) {
 
     m_framebuffer = new int[m_width * m_height];
     for (auto i = 0u; i < m_width * m_height; ++i) {
-		*(m_framebuffer+i) = 0x000000ff;
+		*(m_framebuffer+i) = 0x00000000;
 	}
 
     setup_shared_memory();
@@ -45,7 +46,7 @@ bool Renderer::render() {
 
     // copy all the data from the frame_buffer to the shm buffer
     for (auto i = 0u; i < m_width *m_height; i++) {
-		*((int*) m_shm_info.shmaddr+i) = *(m_framebuffer + 1);
+		*((int*) m_shm_info.shmaddr+i) = *(m_framebuffer + i);
 	}
 
     Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
@@ -58,6 +59,8 @@ bool Renderer::render() {
 
     return true;
 }
+
+
 
 bool Renderer::setup_shared_memory() {
     auto shm_available = XShmQueryExtension(p_window->get_display());
@@ -85,3 +88,60 @@ bool Renderer::setup_shared_memory() {
 
     return true;
 }
+
+void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
+    if (p1.x > m_width || p1.y > m_height || p2.x > m_width || p2.y > m_height) {
+        return;
+    }
+
+    int dx = p2.x - p1.x;
+    int dy = p2.y - p1.y;
+
+    u_int32_t p_code = get_pixel_code(color);
+
+    if (dx == 0 && dy == 0) {
+        m_framebuffer[m_width * p1.y + p1.x] = p_code;
+    }
+
+    if (dx > dy) {
+        int xmin, xmax;
+
+        if (p1.x < p2.x) {
+            xmin = p1.x;
+            xmax = p2.x;
+        } else {
+            xmin = p2.x;
+            xmax = p1.x;
+        }
+
+        float slope = (float) dy / (float) dx;
+        for (auto x = xmin; x <= xmax; x++) {
+            int y = std::floor(p1.y + ((x - p1.x) * slope));
+            *(m_framebuffer + ((m_width * y) + x)) = p_code;
+        }
+    } else {
+        int ymin, ymax;
+
+        if (p1.y < p2.y) {
+            ymin = p1.y;
+            ymax = p2.y;
+        } else {
+            ymin = p2.y;
+            ymax = p1.y;
+        }
+
+        float slope = (float) dx / (float) dy;
+        for (auto y = ymin; y <= ymax; y++) {
+            int x = std::floor(p1.x + ((y - p1.y) * slope));
+            *(m_framebuffer + ((m_width * y) + x)) = p_code;
+        }
+    }
+}
+
+u_int32_t Renderer::get_pixel_code(const Color &color) {
+    u_int32_t code = 0x00000000;
+    code |= (color.r << 16) | (color.g << 8) | color.b;
+
+    return code;
+}
+

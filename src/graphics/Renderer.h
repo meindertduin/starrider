@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Window.h"
+#include "Core.h"
 
 #include <X11/Xutil.h>
-#include <X11/extensions/dbe.h>
 
 struct Color {
     u_int8_t r, g, b;
@@ -14,6 +14,7 @@ public:
     Renderer(GWindow* window);
     ~Renderer();
     void set_color(const Color &color);
+    void draw_line(const Point &p1, const Point &p2, const Color &color);
     bool render();
 private:
     GWindow *p_window;
@@ -27,4 +28,5 @@ private:
     int m_width = 800;
 
     bool setup_shared_memory();
+    u_int32_t get_pixel_code(const Color &color);
 };
