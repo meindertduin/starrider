@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 struct Point {
     int x, y;
 };
@@ -41,10 +43,48 @@ struct Matrix4F {
     }
 
     void init_screen_space_transform(float half_width, float half_height) {
-        m[0][0] = half_height;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = half_width;
-		m[1][0] = 0;	m[1][1] = -half_width;	m[1][2] = 0;	m[1][3] = half_height;
+        m[0][0] = half_width;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = half_width;
+		m[1][0] = 0;	m[1][1] = -half_height;	m[1][2] = 0;	m[1][3] = half_height;
 		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
 		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
+    }
+
+    void init_translation(const float &x, const float &y, const float &z) {
+        m[0][0] = 1;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = x;
+		m[1][0] = 0;	m[1][1] = 1;	m[1][2] = 0;	m[1][3] = y;
+		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = z;
+		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
+    }
+
+    void init_rotation(float x, float y, float z, float angle) {
+        float sin = std::sin(angle);
+        float cos = std::cos(angle);
+
+        m[0][0] = cos+x*x*(1-cos);      m[0][1] = x*y*(1-cos)-z*sin;    m[0][2] = x*z*(1-cos)+y*sin;    m[0][3] = 0;
+		m[1][0] = y*x*(1-cos)+z*sin;    m[1][1] = cos+y*y*(1-cos);	    m[1][2] = y*z*(1-cos)-x*sin;    m[1][3] = 0;
+		m[2][0] = z*x*(1-cos)-y*sin;    m[2][1] = z*y*(1-cos)+x*sin;    m[2][2] = cos+z*z*(1-cos);      m[2][3] = 0;
+		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
+    }
+
+    void init_rotation_x(float x) {
+        m[0][0] = 1;	m[0][1] = 0;			m[0][2] = 0;				m[0][3] = 0;
+        m[1][0] = 0;	m[1][1] = std::cos(x);  m[1][2] = - std::sin(x);    m[1][3] = 0;
+        m[2][0] = 0;	m[2][1] = std::sin(x);  m[2][2] = std::cos(x);      m[2][3] = 0;
+        m[3][0] = 0;	m[3][1] = 0;			m[3][2] = 0;				m[3][3] = 1;
+    }
+
+    void init_rotation_y(float y) {
+        m[0][0] = std::cos(y);      m[0][1] = 0;	m[0][2] = - std::sin(y);    m[0][3] = 0;
+		m[1][0] = 0;			    m[1][1] = 1;	m[1][2] = 0;				m[1][3] = 0;
+		m[2][0] = std::sin(y);      m[2][1] = 0;	m[2][2] = std::cos(y);      m[2][3] = 0;
+		m[3][0] = 0;			    m[3][1] = 0;	m[3][2] = 0;			    m[3][3] = 1;
+    }
+
+    void init_rotation_z(float z) {
+        m[0][0] = std::cos(z);  m[0][1] = - std::sin(z);    m[0][2] = 0;	m[0][3] = 0;
+		m[1][0] = std::sin(z);  m[1][1] = std::cos(z);      m[1][2] = 0;	m[1][3] = 0;
+		m[2][0] = 0;			m[2][1] = 0;				m[2][2] = 1;	m[2][3] = 0;
+		m[3][0] = 0;			m[3][1] = 0;				m[3][2] = 0;	m[3][3] = 1;
     }
 
     V3F transform(const V3F &r) const {
