@@ -149,8 +149,8 @@ void Renderer::draw_triangle(const Triangle &triangle) {
     edges[1] = Edge(triangle.p[1], triangle.p[2]);
     edges[2] = Edge(triangle.p[2], triangle.p[0]);
 
-    int max_len;
-    int long_edge;
+    int max_len = 0;
+    int long_edge = 0;
 
     for (auto i = 0u; i < 3; i++) {
        int length = edges[i].p[1].y - edges[i].p[0].y;
