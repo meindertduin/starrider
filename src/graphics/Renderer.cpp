@@ -139,9 +139,6 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 u_int32_t Renderer::get_pixel_code(const Color &color) {
-    u_int32_t code = 0x00000000;
-    code |= (color.r << 16) | (color.g << 8) | color.b;
-
-    return code;
+    return 0x00000000 | (color.r << 16) | (color.g << 8) | color.b;
 }
 

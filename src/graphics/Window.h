@@ -13,7 +13,7 @@ public:
     bool ready_for_render = true;
 
     bool initialize();
-    void poll_event(XEvent &event);
+    bool poll_event(XEvent &event);
 
     Display* get_display();
     Window get_window();
