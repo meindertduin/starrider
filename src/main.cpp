@@ -12,6 +12,12 @@ int main() {
 
     Renderer renderer {&window};
 
+    Triangle tri;
+
+    tri.p[0] = { 10, 10 };
+    tri.p[1] = { 200, 10 };
+    tri.p[2] = { 10, 300 };
+
     XEvent event;
     for (;;) {
         while(window.poll_event(event)) {
@@ -19,7 +25,9 @@ int main() {
             }
         }
 
-        renderer.draw_line({ 20, 20 }, { 400, 400 }, { 0x00, 0xFF, 0x00 });
+
+        renderer.draw_triangle(tri);
+        renderer.draw_line({ 100, 100 }, { 400, 400 }, { 0x00, 0xFF, 0x00 });
         renderer.render();
     }
 

@@ -2,7 +2,6 @@
 
 #include "Window.h"
 #include "Core.h"
-
 #include <X11/Xutil.h>
 
 struct Color {
@@ -15,6 +14,7 @@ public:
     ~Renderer();
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);
+    void draw_triangle(const Triangle &triangle);
     bool render();
 private:
     GWindow *p_window;
@@ -29,4 +29,6 @@ private:
 
     bool setup_shared_memory();
     u_int32_t get_pixel_code(const Color &color);
+    void draw_between_edges(const Edge &e1, const Edge &e2);
+    void draw_span(const Span &span, const int &y);
 };

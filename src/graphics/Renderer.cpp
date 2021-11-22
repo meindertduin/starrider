@@ -142,3 +142,64 @@ u_int32_t Renderer::get_pixel_code(const Color &color) {
     return 0x00000000 | (color.r << 16) | (color.g << 8) | color.b;
 }
 
+void Renderer::draw_triangle(const Triangle &triangle) {
+    Edge edges[3];
+
+    edges[0] = Edge(triangle.p[0], triangle.p[1]);
+    edges[1] = Edge(triangle.p[1], triangle.p[2]);
+    edges[2] = Edge(triangle.p[2], triangle.p[0]);
+
+    int max_len;
+    int long_edge;
+
+    for (auto i = 0u; i < 3; i++) {
+       int length = edges[i].p[1].y - edges[i].p[0].y;
+
+        if (length > max_len) {
+            max_len = length;
+            long_edge = i;
+        }
+    }
+
+    int short_edge1 = (long_edge + 1) % 3;
+    int short_edge2 = (long_edge + 2) % 3;
+    draw_between_edges(edges[long_edge], edges[short_edge1]);
+    draw_between_edges(edges[long_edge], edges[short_edge2]);
+}
+
+void Renderer::draw_between_edges(const Edge &e1, const Edge &e2) {
+    float e1dy = (float) (e1.p[1].y - e1.p[0].y);
+    if (e1dy == 0.0f) return;
+
+    float e2dy = (float) (e2.p[1].y - e2.p[0].y);
+    if (e2dy == 0.0f) return;
+
+    float e1dx = (float) (e1.p[1].x - e1.p[0].x);
+    float e2dx = (float) (e2.p[1].x - e2.p[0].x);
+
+    float f1 = (float) (e2.p[0].y - e1.p[0].y) / e1dy;
+    float fstep1 = 1.0f / e1dy;
+
+    float f2 = 0.0f;
+    float fstep2 = 1.0f / e2dy;
+
+    for (int y = e2.p[0].y; y < e2.p[1].y; y++) {
+        auto span = Span(e1.p[0].x + (int) (e1dx * f1), e2.p[0].x + (int)(e2dx * f2));
+
+        draw_span(span, y);
+
+        f1 += fstep1;
+        f2 += fstep2;
+    }
+}
+
+void Renderer::draw_span(const Span &span, const int &y) {
+    int dx = span.x2 - span.x1;
+    if (dx == 0) {
+        return;
+    }
+
+    for (auto x = span.x1; x < span.x2; x++) {
+        *(m_framebuffer + ((m_width * y) + x)) = 0xffffffff;
+    }
+}
