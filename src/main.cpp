@@ -14,9 +14,9 @@ int main() {
 
     Triangle tri;
 
-    tri.p[0] = { 10, 10 };
-    tri.p[1] = { 200, 10 };
-    tri.p[2] = { 10, 300 };
+    tri.p[0] = V3F(10, 10, 0);
+    tri.p[1] = V3F(200, 10, 0);
+    tri.p[2] = V3F(10, 300, 0);
 
     XEvent event;
     for (;;) {
@@ -25,9 +25,8 @@ int main() {
             }
         }
 
-
-        renderer.draw_triangle(tri);
         renderer.draw_line({ 100, 100 }, { 400, 400 }, { 0x00, 0xFF, 0x00 });
+        renderer.draw_triangle(tri);
         renderer.render();
     }
 
