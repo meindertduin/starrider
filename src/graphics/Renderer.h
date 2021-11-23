@@ -4,10 +4,6 @@
 #include "Core.h"
 #include <X11/Xutil.h>
 
-struct Color {
-    u_int8_t r, g, b;
-};
-
 class Renderer {
 public:
     Renderer(GWindow* window);

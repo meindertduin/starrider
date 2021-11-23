@@ -2,6 +2,31 @@
 
 #include <math.h>
 
+struct Color {
+    u_int8_t r, g, b;
+    Color() {
+        r = g = b = 0;
+    }
+    Color(u_int8_t in_r, u_int8_t in_g, u_int8_t in_b) {
+        r = in_r;
+        g = in_g;
+        b = in_b;
+    }
+
+    Color operator-(const Color &c) const {
+        return Color(r - c.r, g - c.g, b - c.b);
+    }
+
+    Color operator+(const Color &c) const {
+        return Color(r + c.r, g + c.g, b + c.b);
+    }
+
+    Color operator*(float f) const {
+        return Color(r + f, g + f, b + f);
+    }
+};
+
+
 struct Point {
     int x, y;
 };
@@ -10,6 +35,7 @@ struct Matrix4F;
 
 struct V3F {
     float x, y, z, w;
+    Color color;
     V3F() {
         x = y = z = 0;
         w = 1;
@@ -38,6 +64,12 @@ struct V3F {
 
         return *this;
     }
+};
+
+struct Gradients {
+    Color color;
+    Color x_step;
+    Color y_step;
 };
 
 struct Matrix4F {
@@ -131,34 +163,48 @@ struct Triangle {
 
 struct Edge {
     Point p[2];
+    Color c1, c2;
     Edge() {}
-    Edge(const V3F &p1, const V3F &p2) {
+    Edge(const V3F &p1, const V3F &p2, const Color &in_c1, const Color &in_c2) {
         if (p1.y < p2.y) {
             p[0].x = p1.x;
             p[0].y = p1.y;
 
             p[1].x = p2.x;
             p[1].y = p2.y;
+
+            c1 = in_c1;
+            c2 = in_c2;
         } else {
             p[0].x = p2.x;
             p[0].y = p2.y;
 
             p[1].x = p1.x;
             p[1].y = p1.y;
+
+            c1 = in_c2;
+            c2 = in_c1;
         }
     }
 };
 
 struct Span {
     int x1, x2;
+    Color c1, c2;
 
-    Span(const int &in_x1, const int &in_x2) {
+    Span(const int &in_x1, const int &in_x2, const Color &in_c1, const Color &in_c2) {
         if (in_x1 < in_x2) {
             x1 = in_x1;
             x2 = in_x2;
+
+            c1 = in_c1;
+            c2 = in_c2;
         } else {
             x1 = in_x2;
             x2 = in_x1;
+
+            c1 = in_c2;
+            c2 = in_c1;
         }
     }
 };
