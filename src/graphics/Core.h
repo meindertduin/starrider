@@ -80,7 +80,7 @@ struct Matrix4F {
 
     void init_rotation_z(float z) {
         m[0][0] = std::cos(z);  m[0][1] = - std::sin(z);    m[0][2] = 0;	m[0][3] = 0;
-		m[1][0] = -std::sin(z);  m[1][1] = std::cos(z);      m[1][2] = 0;	m[1][3] = 0;
+		m[1][0] = std::sin(z);  m[1][1] = std::cos(z);      m[1][2] = 0;	m[1][3] = 0;
 		m[2][0] = 0;			m[2][1] = 0;				m[2][2] = 1;	m[2][3] = 0;
 		m[3][0] = 0;			m[3][1] = 0;				m[3][2] = 0;	m[3][3] = 1;
     }
@@ -92,7 +92,7 @@ struct Matrix4F {
         rot_y.init_rotation_y(y);
         rot_z.init_rotation_z(z);
 
-        auto matrix = (rot_x * rot_y * rot_y);
+        auto matrix = (rot_x * rot_y * rot_z);
 
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
