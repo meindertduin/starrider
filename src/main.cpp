@@ -22,9 +22,7 @@ int main() {
     identity.init_identity();
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
-    translation.init_translation(0.0f, 0.0f, -8.0f);
-
-    identity = projection * translation * identity;
+    identity = identity;
 
     XEvent event;
 
@@ -38,10 +36,16 @@ int main() {
 
         renderer.clear_screen();
 
+        Triangle translated_tri;
+        translation.init_translation(0.0f, 0.0f, 3.0f);
+
         Triangle proj_tri;
         Matrix4F rotation_y;
+
         rotation_y.init_rotation(0, time, 0);
-        Matrix4F transform = identity * rotation_y;
+        Matrix4F transform = identity * rotation_y * translation * projection;
+
+        Triangle transformed_triangle;
 
         proj_tri.p[0] = tri.p[0].transform(transform);
         proj_tri.p[1] = tri.p[1].transform(transform);
@@ -51,20 +55,9 @@ int main() {
 
         screen_space.init_screen_space_transform(400.0f, 400.0f);
 
-        proj_tri.p[0].x += 1.0f; proj_tri.p[0].y += 1.0f;
-        proj_tri.p[1].x += 1.0f; proj_tri.p[1].y += 1.0f;
-        proj_tri.p[2].x += 1.0f; proj_tri.p[2].y += 1.0f;
-
-        proj_tri.p[0].x *= 0.5f * (float)800;
-        proj_tri.p[0].y *= 0.5f * (float)800;
-        proj_tri.p[1].x *= 0.5f * (float)800;
-        proj_tri.p[1].y *= 0.5f * (float)800;
-        proj_tri.p[2].x *= 0.5f * (float)800;
-        proj_tri.p[2].y *= 0.5f * (float)800;
-
-        proj_tri.p[0] = proj_tri.p[0].perspective_divide();
-        proj_tri.p[1] = proj_tri.p[1].perspective_divide();
-        proj_tri.p[2] = proj_tri.p[2].perspective_divide();
+        proj_tri.p[0] = proj_tri.p[0].transform(screen_space).perspective_divide();
+        proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();
+        proj_tri.p[2] = proj_tri.p[2].transform(screen_space).perspective_divide();
 
         renderer.draw_triangle(proj_tri);
         renderer.render();
