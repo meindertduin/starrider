@@ -200,6 +200,14 @@ void Renderer::draw_span(const Span &span, const int &y) {
     }
 
     for (auto x = span.x1; x < span.x2; x++) {
-        *(m_framebuffer + ((m_width * y) + x)) = 0xffffffff;
+        if (x > 0 && x <= m_width && y > 0 && y<= m_height) {
+            *(m_framebuffer + ((m_width * y) + x)) = 0xffffffff;
+        }
     }
+}
+
+void Renderer::clear_screen() {
+    for (auto i = 0u; i < m_width * m_height; ++i) {
+		*(m_framebuffer+i) = 0x00000000;
+	}
 }

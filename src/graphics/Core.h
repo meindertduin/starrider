@@ -30,6 +30,14 @@ struct V3F {
     }
 
     V3F transform(const Matrix4F &m);
+
+    V3F& perspective_divide() {
+        if (w != 0.0) {
+            x /= w; y /= w; z/= w;
+        }
+
+        return *this;
+    }
 };
 
 struct Matrix4F {
@@ -56,16 +64,6 @@ struct Matrix4F {
 		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
     }
 
-    void init_rotation(float x, float y, float z, float angle) {
-        float sin = std::sin(angle);
-        float cos = std::cos(angle);
-
-        m[0][0] = cos+x*x*(1-cos);      m[0][1] = x*y*(1-cos)-z*sin;    m[0][2] = x*z*(1-cos)+y*sin;    m[0][3] = 0;
-		m[1][0] = y*x*(1-cos)+z*sin;    m[1][1] = cos+y*y*(1-cos);	    m[1][2] = y*z*(1-cos)-x*sin;    m[1][3] = 0;
-		m[2][0] = z*x*(1-cos)-y*sin;    m[2][1] = z*y*(1-cos)+x*sin;    m[2][2] = cos+z*z*(1-cos);      m[2][3] = 0;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
     void init_rotation_x(float x) {
         m[0][0] = 1;	m[0][1] = 0;			m[0][2] = 0;				m[0][3] = 0;
         m[1][0] = 0;	m[1][1] = std::cos(x);  m[1][2] = - std::sin(x);    m[1][3] = 0;
@@ -87,11 +85,44 @@ struct Matrix4F {
 		m[3][0] = 0;			m[3][1] = 0;				m[3][2] = 0;	m[3][3] = 1;
     }
 
+    void init_rotation(float x, float y, float z) {
+        Matrix4F rot_x, rot_y, rot_z;
+
+        rot_x.init_rotation_x(x);
+        rot_y.init_rotation_y(y);
+        rot_z.init_rotation_z(z);
+
+        auto matrix = (rot_x * rot_y * rot_y);
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                m[i][j] = matrix.m[i][j];
+    }
+
+    void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
+        float tan_half_fov  = std::tan(fov / 2.0f);
+        float zrange = znear - zfar;
+
+        m[0][0] = 1.0f / (tan_half_fov * aspect_ratio);	m[0][1] = 0.0f;	            m[0][2] = 0.0f;	m[0][3] = 0.0f;
+		m[1][0] = 0.0f;                             m[1][1] = 1.0f / tan_half_fov;	m[1][2] = 0;	m[1][3] = 0.0f;
+		m[2][0] = 0.0f;	                            m[2][1] = 0.0f;				m[2][2] = (-znear -zfar)/zrange;	m[2][3] = 2.0f * zfar * znear / zrange;
+		m[3][0] = 0.0f;	                            m[3][1] = 0.0f;				m[3][2] = 1.0f;	m[3][3] = 0.0f;
+
+    }
+
     V3F transform(const V3F &r) const {
         return V3F(m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.z,
-		                    m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3] * r.w,
-		                    m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3] * r.w,
-							m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w);
+            m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3] * r.w,
+            m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3] * r.w,
+            m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w);
+    }
+
+    Matrix4F operator*(const Matrix4F &m1) {
+        Matrix4F matrix;
+		for (int c = 0; c < 4; c++)
+			for (int r = 0; r < 4; r++)
+				matrix.m[r][c] = m1.m[r][0] * m[0][c] + m1.m[r][1] * m[1][c] + m1.m[r][2] * m[2][c] + m1.m[r][3] * m[3][c];
+		return matrix;
     }
 };
 

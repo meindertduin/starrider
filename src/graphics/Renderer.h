@@ -15,6 +15,7 @@ public:
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);
     void draw_triangle(const Triangle &triangle);
+    void clear_screen();
     bool render();
 private:
     GWindow *p_window;
