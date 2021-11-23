@@ -100,12 +100,11 @@ struct Matrix4F {
     }
 
     void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
-        float tan_half_fov  = std::tan(fov / 2.0f);
         float zrange = znear - zfar;
 
-        m[0][0] = 1.0f / (tan_half_fov * aspect_ratio);	m[0][1] = 0.0f;	            m[0][2] = 0.0f;	m[0][3] = 0.0f;
-		m[1][0] = 0.0f;                             m[1][1] = 1.0f / tan_half_fov;	m[1][2] = 0;	m[1][3] = 0.0f;
-		m[2][0] = 0.0f;	                            m[2][1] = 0.0f;				m[2][2] = (-znear -zfar)/zrange;	m[2][3] = 2.0f * zfar * znear / zrange;
+        m[0][0] = fov * aspect_ratio;	            m[0][1] = 0.0f;	            m[0][2] = 0.0f;	m[0][3] = 0.0f;
+		m[1][0] = 0.0f;                             m[1][1] = 1.0f / fov;	m[1][2] = 0;	m[1][3] = 0.0f;
+		m[2][0] = 0.0f;	                            m[2][1] = 0.0f;				m[2][2] = (-znear -zfar)/zrange;	m[2][3] = zfar * znear / zrange;
 		m[3][0] = 0.0f;	                            m[3][1] = 0.0f;				m[3][2] = 1.0f;	m[3][3] = 0.0f;
 
     }
