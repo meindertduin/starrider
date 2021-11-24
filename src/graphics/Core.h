@@ -67,9 +67,29 @@ struct V3F {
 };
 
 struct Gradients {
-    Color color;
+    Color color[3];
     Color x_step;
     Color y_step;
+
+    Gradients(const V3F& min_y_vert, const V3F mid_y_vert, const V3F max_y_vert) {
+		color[0] = min_y_vert.color;
+		color[1] = mid_y_vert.color;
+		color[2] = max_y_vert.color;
+
+		float oneOverdX = 1.0f /
+			(((mid_y_vert.x - max_y_vert.x) *
+			(min_y_vert.y - max_y_vert.y)) -
+			((min_y_vert.x - max_y_vert.x) *
+			(mid_y_vert.y - max_y_vert.y)));
+
+		float oneOverdY = -oneOverdX;
+
+        x_step = (((color[1] - color[2]) * (min_y_vert.y - max_y_vert.y)) -
+             ((color[0] - color[2]) * (mid_y_vert.y - max_y_vert.y))) * oneOverdX;
+
+        y_step = (((color[1] - color[2]) * (min_y_vert.x - max_y_vert.x)) -
+                ((color[0] - color[2]) * (mid_y_vert.x - max_y_vert.x))) * oneOverdY;
+    }
 };
 
 struct Matrix4F {
@@ -163,27 +183,20 @@ struct Triangle {
 
 struct Edge {
     Point p[2];
-    Color c1, c2;
     Edge() {}
-    Edge(const V3F &p1, const V3F &p2, const Color &in_c1, const Color &in_c2) {
+    Edge(const V3F &p1, const V3F &p2) {
         if (p1.y < p2.y) {
             p[0].x = p1.x;
             p[0].y = p1.y;
 
             p[1].x = p2.x;
             p[1].y = p2.y;
-
-            c1 = in_c1;
-            c2 = in_c2;
         } else {
             p[0].x = p2.x;
             p[0].y = p2.y;
 
             p[1].x = p1.x;
             p[1].y = p1.y;
-
-            c1 = in_c2;
-            c2 = in_c1;
         }
     }
 };
@@ -192,19 +205,15 @@ struct Span {
     int x1, x2;
     Color c1, c2;
 
-    Span(const int &in_x1, const int &in_x2, const Color &in_c1, const Color &in_c2) {
+    Span(const int &in_x1, const int &in_x2) {
         if (in_x1 < in_x2) {
             x1 = in_x1;
             x2 = in_x2;
-
-            c1 = in_c1;
-            c2 = in_c2;
         } else {
             x1 = in_x2;
             x2 = in_x1;
 
-            c1 = in_c2;
-            c2 = in_c1;
         }
+
     }
 };

@@ -163,6 +163,8 @@ void Renderer::draw_triangle(const Triangle &triangle) {
 
     int short_edge1 = (long_edge + 1) % 3;
     int short_edge2 = (long_edge + 2) % 3;
+
+
     draw_between_edges(edges[long_edge], edges[short_edge1]);
     draw_between_edges(edges[long_edge], edges[short_edge2]);
 }
