@@ -1,16 +1,25 @@
 #pragma once
 
 #include <math.h>
+#include <stdint.h>
 
 struct Color {
-    u_int8_t r, g, b;
+    float r, g, b;
     Color() {
         r = g = b = 0;
     }
-    Color(u_int8_t in_r, u_int8_t in_g, u_int8_t in_b) {
+    Color(float in_r, float in_g, float in_b) {
         r = in_r;
         g = in_g;
         b = in_b;
+    }
+
+    u_int32_t to_uint32() const {
+        uint32_t rr = (uint32_t)(r * 255.0f);
+    	uint32_t rg = (uint32_t)(g * 255.0f);
+	    uint32_t rb = (uint32_t)(b * 255.0f);
+
+        return (rr << 16 ) | (rg << 8) | rb;
     }
 
     Color operator-(const Color &c) const {

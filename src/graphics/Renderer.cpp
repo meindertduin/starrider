@@ -97,7 +97,7 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
     int dx = p2.x - p1.x;
     int dy = p2.y - p1.y;
 
-    u_int32_t p_code = get_pixel_code(color);
+    u_int32_t p_code = color.to_uint32();
 
     if (dx == 0 && dy == 0) {
         m_framebuffer[m_width * p1.y + p1.x] = p_code;
@@ -136,10 +136,6 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
             *(m_framebuffer + ((m_width * y) + x)) = p_code;
         }
     }
-}
-
-u_int32_t Renderer::get_pixel_code(const Color &color) {
-    return 0x00000000 | (color.r << 16) | (color.g << 8) | color.b;
 }
 
 void Renderer::draw_triangle(const Triangle &triangle) {
@@ -203,7 +199,8 @@ void Renderer::draw_span(const Span &span, const int &y) {
 
     for (auto x = span.x1; x < span.x2; x++) {
         if (x > 0 && x <= m_width && y > 0 && y<= m_height) {
-            *(m_framebuffer + ((m_width * y) + x)) = 0xffffffff;
+            Color c = Color(1 , 0, 0);
+            *(m_framebuffer + ((m_width * y) + x)) = c.to_uint32();
         }
     }
 }

@@ -25,7 +25,6 @@ private:
     int m_width = 800;
 
     bool setup_shared_memory();
-    u_int32_t get_pixel_code(const Color &color);
     void draw_between_edges(const Edge &e1, const Edge &e2);
     void draw_span(const Span &span, const int &y);
 };
