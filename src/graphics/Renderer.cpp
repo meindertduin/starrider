@@ -139,74 +139,85 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 void Renderer::draw_triangle(const Triangle &triangle) {
-    Edge edges[3];
+    V3F min_y_vert = triangle.p[0];
+	V3F mid_y_vert = triangle.p[1];
+	V3F max_y_vert = triangle.p[2];
 
-    edges[0] = Edge(triangle.p[0], triangle.p[1]);
-    edges[1] = Edge(triangle.p[1], triangle.p[2]);
-    edges[2] = Edge(triangle.p[2], triangle.p[0]);
+	if(max_y_vert.y < mid_y_vert.y)
+	{
+		V3F temp = max_y_vert;
+		max_y_vert = mid_y_vert;
+		mid_y_vert = temp;
+	}
 
-    int max_len = 0;
-    int long_edge = 0;
+	if(mid_y_vert.y < min_y_vert.y)
+	{
+		V3F temp = mid_y_vert;
+		mid_y_vert = min_y_vert;
+		min_y_vert = temp;
+	}
 
-    for (auto i = 0u; i < 3; i++) {
-       int length = edges[i].p[1].y - edges[i].p[0].y;
+	if(max_y_vert.y < mid_y_vert.y)
+	{
+		V3F temp = max_y_vert;
+		max_y_vert = mid_y_vert;
+		mid_y_vert = temp;
+	}
 
-        if (length > max_len) {
-            max_len = length;
-            long_edge = i;
-        }
-    }
+    float x1 = max_y_vert.x - min_y_vert.x;
+    float y1 = max_y_vert.y - min_y_vert.y;
 
-    int short_edge1 = (long_edge + 1) % 3;
-    int short_edge2 = (long_edge + 2) % 3;
+    float x2 = mid_y_vert.x - min_y_vert.x;
+    float y2 = mid_y_vert.y - min_y_vert.y;
 
+    bool handedness =  (x1 * y2 - x2 * y1) >= 0.0f;
 
-    draw_between_edges(edges[long_edge], edges[short_edge1]);
-    draw_between_edges(edges[long_edge], edges[short_edge2]);
-}
-
-void Renderer::draw_between_edges(const Edge &e1, const Edge &e2) {
-    float e1dy = (float) (e1.p[1].y - e1.p[0].y);
-    if (e1dy == 0.0f) return;
-
-    float e2dy = (float) (e2.p[1].y - e2.p[0].y);
-    if (e2dy == 0.0f) return;
-
-    float e1dx = (float) (e1.p[1].x - e1.p[0].x);
-    float e2dx = (float) (e2.p[1].x - e2.p[0].x);
-
-    float f1 = (float) (e2.p[0].y - e1.p[0].y) / e1dy;
-    float fstep1 = 1.0f / e1dy;
-
-    float f2 = 0.0f;
-    float fstep2 = 1.0f / e2dy;
-
-    for (int y = e2.p[0].y; y < e2.p[1].y; y++) {
-        auto span = Span(e1.p[0].x + (int) (e1dx * f1), e2.p[0].x + (int)(e2dx * f2));
-
-        draw_span(span, y);
-
-        f1 += fstep1;
-        f2 += fstep2;
-    }
-}
-
-void Renderer::draw_span(const Span &span, const int &y) {
-    int dx = span.x2 - span.x1;
-    if (dx == 0) {
-        return;
-    }
-
-    for (auto x = span.x1; x < span.x2; x++) {
-        if (x > 0 && x <= m_width && y > 0 && y<= m_height) {
-            Color c = Color(1 , 0, 0);
-            *(m_framebuffer + ((m_width * y) + x)) = c.to_uint32();
-        }
-    }
+	scan_triangle(min_y_vert, mid_y_vert, max_y_vert, handedness);
 }
 
 void Renderer::clear_screen() {
     for (auto i = 0u; i < m_width * m_height; ++i) {
 		*(m_framebuffer+i) = 0x00000000;
 	}
+}
+
+void Renderer::scan_triangle(const V3F &min_y_vert, const V3F &mid_y_vert, const V3F &max_y_vert, bool handedness) {
+    Edge bottom_to_top = Edge(min_y_vert, max_y_vert);
+    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert);
+    Edge middle_to_top = Edge(mid_y_vert, max_y_vert);
+
+    scan_edges(bottom_to_top, bottom_to_middle, handedness);
+    scan_edges(bottom_to_top, middle_to_top, handedness);
+}
+
+void Renderer::scan_edges(Edge &a, Edge &b, bool handedness) {
+    int y_start = b.y_start;
+    int y_end   = b.y_end;
+
+    if (handedness) {
+        for(int j = y_start; j < y_end; j++)
+        {
+            draw_scanline(b, a, j);
+            a.x += a.x_step;
+            b.x += b.x_step;
+        }
+    } else {
+        for(int j = y_start; j < y_end; j++)
+        {
+            draw_scanline(a, b, j);
+            a.x += a.x_step;
+            b.x += b.x_step;
+        }
+    }
+}
+
+void Renderer::draw_scanline(const Edge &left, const Edge &right, int j) {
+    int xMin = (int)std::ceil(left.x);
+    int xMax = (int)std::ceil(right.x);
+
+    for(int i = xMin; i < xMax; i++)
+    {
+        Color c = Color(1 , 0, 0);
+        *(m_framebuffer + ((m_width * j) + i)) = c.to_uint32();
+    }
 }

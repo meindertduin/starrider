@@ -25,6 +25,8 @@ private:
     int m_width = 800;
 
     bool setup_shared_memory();
-    void draw_between_edges(const Edge &e1, const Edge &e2);
-    void draw_span(const Span &span, const int &y);
+
+    void scan_triangle(const V3F &min_y_vert, const V3F &mid_y_vert, const V3F &max_y_vert, bool handedness);
+    void scan_edges(Edge &a, Edge &b, bool handedness);
+    void draw_scanline(const Edge &left, const Edge &right, int j);
 };

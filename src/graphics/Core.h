@@ -191,38 +191,21 @@ struct Triangle {
 };
 
 struct Edge {
-    Point p[2];
+    float x;
+    float x_step;
+    int y_start;
+    int y_end;
+
     Edge() {}
-    Edge(const V3F &p1, const V3F &p2) {
-        if (p1.y < p2.y) {
-            p[0].x = p1.x;
-            p[0].y = p1.y;
+    Edge(const V3F &min_y_vert, const V3F &max_y_vert) {
+    	y_start = (int)std::ceil(min_y_vert.y);
+		y_end = (int)std::ceil(max_y_vert.y);
 
-            p[1].x = p2.x;
-            p[1].y = p2.y;
-        } else {
-            p[0].x = p2.x;
-            p[0].y = p2.y;
+		float y_dist = max_y_vert.y - min_y_vert.y;
+		float x_dist = max_y_vert.x- min_y_vert.x;
 
-            p[1].x = p1.x;
-            p[1].y = p1.y;
-        }
-    }
-};
-
-struct Span {
-    int x1, x2;
-    Color c1, c2;
-
-    Span(const int &in_x1, const int &in_x2) {
-        if (in_x1 < in_x2) {
-            x1 = in_x1;
-            x2 = in_x2;
-        } else {
-            x1 = in_x2;
-            x2 = in_x1;
-
-        }
-
+		float y_pre_step = (float) y_start - min_y_vert.y;
+		x_step = (float)x_dist/(float)y_dist;
+		x = min_y_vert.x + y_pre_step * x_step;
     }
 };

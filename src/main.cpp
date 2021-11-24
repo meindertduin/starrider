@@ -14,15 +14,14 @@ int main() {
 
     Triangle tri;
 
-    tri.p[0] = V3F(0, 1, 0);
-    tri.p[1] = V3F(-1, -1, 0);
+    tri.p[0] = V3F(-1, -1, 0);
+    tri.p[1] = V3F(0, 1, 0);
     tri.p[2] = V3F(1, -1, 0);
 
     Matrix4F identity, projection, translation, rotation_y;
     identity.init_identity();
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
-    identity = identity;
 
     XEvent event;
 
@@ -37,12 +36,12 @@ int main() {
         renderer.clear_screen();
 
         Triangle translated_tri;
-        translation.init_translation(0.0f, 0.0f, 3.0f);
+        translation.init_translation(0.0001f, 0.0f, 3.0f);
 
         Triangle proj_tri;
         Matrix4F rotation_y;
 
-        rotation_y.init_rotation(0, time, 0);
+        rotation_y.init_rotation_y(time);
         Matrix4F transform = identity * rotation_y * translation * projection;
 
         Triangle transformed_triangle;
