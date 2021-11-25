@@ -26,7 +26,7 @@ private:
 
     bool setup_shared_memory();
 
-    void scan_triangle(const V3F &min_y_vert, const V3F &mid_y_vert, const V3F &max_y_vert, bool handedness);
+    void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness);
     void scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients);
     void draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients);
 };

@@ -139,36 +139,36 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 void Renderer::draw_triangle(const Triangle &triangle) {
-    V3F min_y_vert = triangle.p[0];
-	V3F mid_y_vert = triangle.p[1];
-	V3F max_y_vert = triangle.p[2];
+    Vertex min_y_vert = triangle.p[0];
+	Vertex mid_y_vert = triangle.p[1];
+	Vertex max_y_vert = triangle.p[2];
 
-	if(max_y_vert.y < mid_y_vert.y)
+	if(max_y_vert.pos.y < mid_y_vert.pos.y)
 	{
-		V3F temp = max_y_vert;
+		Vertex temp = max_y_vert;
 		max_y_vert = mid_y_vert;
 		mid_y_vert = temp;
 	}
 
-	if(mid_y_vert.y < min_y_vert.y)
+	if(mid_y_vert.pos.y < min_y_vert.pos.y)
 	{
-		V3F temp = mid_y_vert;
+		Vertex temp = mid_y_vert;
 		mid_y_vert = min_y_vert;
 		min_y_vert = temp;
 	}
 
-	if(max_y_vert.y < mid_y_vert.y)
+	if(max_y_vert.pos.y < mid_y_vert.pos.y)
 	{
-		V3F temp = max_y_vert;
+		Vertex temp = max_y_vert;
 		max_y_vert = mid_y_vert;
 		mid_y_vert = temp;
 	}
 
-    float x1 = max_y_vert.x - min_y_vert.x;
-    float y1 = max_y_vert.y - min_y_vert.y;
+    float x1 = max_y_vert.pos.x - min_y_vert.pos.x;
+    float y1 = max_y_vert.pos.y - min_y_vert.pos.y;
 
-    float x2 = mid_y_vert.x - min_y_vert.x;
-    float y2 = mid_y_vert.y - min_y_vert.y;
+    float x2 = mid_y_vert.pos.x - min_y_vert.pos.x;
+    float y2 = mid_y_vert.pos.y - min_y_vert.pos.y;
 
     bool handedness =  (x1 * y2 - x2 * y1) >= 0.0f;
 
@@ -181,7 +181,7 @@ void Renderer::clear_screen() {
 	}
 }
 
-void Renderer::scan_triangle(const V3F &min_y_vert, const V3F &mid_y_vert, const V3F &max_y_vert, bool handedness) {
+void Renderer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness) {
   Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
     Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);

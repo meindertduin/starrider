@@ -14,9 +14,9 @@ int main() {
 
     Triangle tri;
 
-    tri.p[0] = V3F(-1, -1, 0);
-    tri.p[1] = V3F(0, 1, 0);
-    tri.p[2] = V3F(1, -1, 0);
+    tri.p[0] = Vertex(-1, -1, 0);
+    tri.p[1] = Vertex(0, 1, 0);
+    tri.p[2] = Vertex(1, -1, 0);
 
     Matrix4F identity, projection, translation, rotation_y;
     identity.init_identity();

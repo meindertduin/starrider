@@ -15,7 +15,7 @@ struct Color {
     }
 
     u_int32_t to_uint32() const {
-        uint32_t rr = (uint32_t)(r * 255.0f + 0.5f);
+        uint32_t rr = (uint32_t)(r * 255.0f);
     	uint32_t rg = (uint32_t)(g * 255.0f + 0.5f);
 	    uint32_t rb = (uint32_t)(b * 255.0f + 0.5f);
 
@@ -58,33 +58,51 @@ struct Point {
 
 struct Matrix4F;
 
-struct V3F {
+struct V4F {
     float x, y, z, w;
-    Color color;
-    V3F() {
+    V4F() {
         x = y = z = 0;
         w = 1;
     }
 
-    V3F(const float &in_x, const float &in_y, const float &in_z) {
+    V4F(const float &in_x, const float &in_y, const float &in_z) {
         x = in_x;
         y = in_y;
         z = in_z;
         w = 1;
     }
 
-    V3F(const float &in_x, const float &in_y, const float &in_z, const float &in_w) {
+    V4F(const float &in_x, const float &in_y, const float &in_z, const float &in_w) {
         x = in_x;
         y = in_y;
         z = in_z;
         w = in_w;
     }
+};
 
-    V3F transform(const Matrix4F &m);
+struct Vertex {
+    V4F pos;
+    V4F text_coords;
+    Color color;
 
-    V3F& perspective_divide() {
-        if (w != 0.0) {
-            x /= w; y /= w; z/= w;
+    Vertex() {}
+    Vertex(float x, float y, float z) {
+        pos = V4F(x, y, z);
+    }
+
+    Vertex(float x, float y, float z, float w) {
+        pos = V4F(x, y, z, w);
+    }
+
+    Vertex(const V4F &in_pos) {
+        pos = in_pos;
+    }
+
+    Vertex transform(const Matrix4F &m);
+
+    Vertex& perspective_divide() {
+        if (pos.w != 0.0) {
+            pos.x /= pos.w; pos.y /= pos.w; pos.z/= pos.w;
         }
 
         return *this;
@@ -96,24 +114,24 @@ struct Gradients {
     Color x_step;
     Color y_step;
 
-    Gradients(const V3F& min_y_vert, const V3F mid_y_vert, const V3F max_y_vert) {
+    Gradients(const Vertex& min_y_vert, const Vertex mid_y_vert, const Vertex max_y_vert) {
 		color[0] = min_y_vert.color;
 		color[1] = mid_y_vert.color;
 		color[2] = max_y_vert.color;
 
 		float oneOverdX = 1.0f /
-			(((mid_y_vert.x - max_y_vert.x) *
-			(min_y_vert.y - max_y_vert.y)) -
-			((min_y_vert.x - max_y_vert.x) *
-			(mid_y_vert.y - max_y_vert.y)));
+			(((mid_y_vert.pos.x - max_y_vert.pos.x) *
+			(min_y_vert.pos.y - max_y_vert.pos.y)) -
+			((min_y_vert.pos.x - max_y_vert.pos.x) *
+			(mid_y_vert.pos.y - max_y_vert.pos.y)));
 
 		float oneOverdY = -oneOverdX;
 
-        x_step = (((color[1] - color[2]) * (min_y_vert.y - max_y_vert.y)) -
-             ((color[0] - color[2]) * (mid_y_vert.y - max_y_vert.y))) * oneOverdX;
+        x_step = (((color[1] - color[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+             ((color[0] - color[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
 
-        y_step = (((color[1] - color[2]) * (min_y_vert.x - max_y_vert.x)) -
-                ((color[0] - color[2]) * (mid_y_vert.x - max_y_vert.x))) * oneOverdY;
+        y_step = (((color[1] - color[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((color[0] - color[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
     }
 };
 
@@ -186,8 +204,8 @@ struct Matrix4F {
 
     }
 
-    V3F transform(const V3F &r) const {
-        return V3F(m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.z,
+    V4F transform(const V4F &r) const {
+        return V4F(m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.z,
             m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3] * r.w,
             m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3] * r.w,
             m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w);
@@ -203,7 +221,7 @@ struct Matrix4F {
 };
 
 struct Triangle {
-    V3F p[3];
+    Vertex p[3];
 };
 
 struct Edge {
@@ -216,18 +234,18 @@ struct Edge {
     Color color_step;
 
     Edge() {}
-    Edge(const V3F &min_y_vert, const V3F &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
-    	y_start = (int)std::ceil(min_y_vert.y);
-		y_end = (int)std::ceil(max_y_vert.y);
+    Edge(const Vertex &min_y_vert, const Vertex &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
+    	y_start = (int)std::ceil(min_y_vert.pos.y);
+		y_end = (int)std::ceil(max_y_vert.pos.y);
 
-		float y_dist = max_y_vert.y - min_y_vert.y;
-		float x_dist = max_y_vert.x- min_y_vert.x;
+		float y_dist = max_y_vert.pos.y - min_y_vert.pos.y;
+		float x_dist = max_y_vert.pos.x- min_y_vert.pos.x;
 
-		float y_prestep = (float) y_start - min_y_vert.y;
+		float y_prestep = (float) y_start - min_y_vert.pos.y;
 		x_step = (float)x_dist/(float)y_dist;
-		x = min_y_vert.x + y_prestep * x_step;
+		x = min_y_vert.pos.x + y_prestep * x_step;
 
-        float x_prestep = x - min_y_vert.x;
+        float x_prestep = x - min_y_vert.pos.x;
 
         color = gradients.color[min_y_vert_index] + (gradients.y_step * y_prestep) + (gradients.x_step * x_prestep);
         color_step = gradients.y_step + gradients.x_step * x_step;
