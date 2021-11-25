@@ -2,6 +2,7 @@
 #include <X11/Xlib.h>
 
 #include "graphics/Renderer.h"
+#include "graphics/Rasterizer.h"
 
 int main() {
     GWindow window;
@@ -11,6 +12,8 @@ int main() {
     }
 
     Bitmap texture;
+    Renderer renderer {&window};
+    Rasterizer rasterizer {&renderer};
 
     texture.bitmap = new uint32_t[32 * 32];
     texture.width = 32;
@@ -24,7 +27,6 @@ int main() {
         texture.bitmap[i] = color.to_uint32();
     }
 
-    Renderer renderer {&window};
 
     Triangle tri;
 
@@ -76,7 +78,7 @@ int main() {
         proj_tri.p[1].color = Color(0, 1, 0);
         proj_tri.p[2].color = Color(0, 0, 1);
 
-        renderer.draw_triangle(proj_tri, texture);
+        rasterizer.draw_triangle(proj_tri, texture);
         renderer.render();
 
         time += 1.0f / 300.0f;
