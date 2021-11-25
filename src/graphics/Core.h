@@ -3,6 +3,16 @@
 #include <math.h>
 #include <stdint.h>
 
+struct Bitmap {
+    uint32_t *bitmap;
+    int width;
+    int height;
+
+    uint32_t get_value(int x_pos, int y_pos) const {
+        return bitmap[width * y_pos + x_pos];
+    }
+};
+
 struct Color {
     float r, g, b;
     Color() {
@@ -94,8 +104,9 @@ struct Vertex {
         pos = V4F(x, y, z, w);
     }
 
-    Vertex(const V4F &in_pos) {
+    Vertex(const V4F &in_pos, const V4F &in_text_coords) {
         pos = in_pos;
+        text_coords = in_text_coords;
     }
 
     Vertex transform(const Matrix4F &m);
@@ -110,14 +121,18 @@ struct Vertex {
 };
 
 struct Gradients {
-    Color color[3];
-    Color x_step;
-    Color y_step;
+    V4F text_coords[3];
+
+    float text_coord_x_xstep;
+    float text_coord_x_ystep;
+
+    float text_coord_y_xstep;
+    float text_coord_y_ystep;
 
     Gradients(const Vertex& min_y_vert, const Vertex mid_y_vert, const Vertex max_y_vert) {
-		color[0] = min_y_vert.color;
-		color[1] = mid_y_vert.color;
-		color[2] = max_y_vert.color;
+		text_coords[0] = min_y_vert.text_coords;
+		text_coords[1] = mid_y_vert.text_coords;
+		text_coords[2] = max_y_vert.text_coords;
 
 		float oneOverdX = 1.0f /
 			(((mid_y_vert.pos.x - max_y_vert.pos.x) *
@@ -127,11 +142,17 @@ struct Gradients {
 
 		float oneOverdY = -oneOverdX;
 
-        x_step = (((color[1] - color[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((color[0] - color[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+        text_coord_x_xstep = (((text_coords[1].x - text_coords[2].x) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+             ((text_coords[0].x - text_coords[2].x) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
 
-        y_step = (((color[1] - color[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((color[0] - color[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        text_coord_x_ystep = (((text_coords[1].x - text_coords[2].x) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((text_coords[0].x - text_coords[2].x) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+
+        text_coord_y_xstep = (((text_coords[1].y - text_coords[2].y) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+             ((text_coords[0].y - text_coords[2].y) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+
+        text_coord_y_ystep = (((text_coords[1].y - text_coords[2].y) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((text_coords[0].y - text_coords[2].y) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
     }
 };
 
@@ -230,8 +251,10 @@ struct Edge {
     int y_start;
     int y_end;
 
-    Color color;
-    Color color_step;
+    float text_coord_x;
+    float text_coord_xstep;
+    float text_coord_y;
+    float text_coord_ystep;
 
     Edge() {}
     Edge(const Vertex &min_y_vert, const Vertex &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
@@ -247,12 +270,18 @@ struct Edge {
 
         float x_prestep = x - min_y_vert.pos.x;
 
-        color = gradients.color[min_y_vert_index] + (gradients.y_step * y_prestep) + (gradients.x_step * x_prestep);
-        color_step = gradients.y_step + gradients.x_step * x_step;
+        text_coord_x = gradients.text_coords[min_y_vert_index].x +
+            gradients.text_coord_x_xstep * x_prestep + gradients.text_coord_x_ystep * y_prestep;
+        text_coord_xstep = gradients.text_coord_x_ystep + gradients.text_coord_x_xstep * x_step;
+
+        text_coord_y = gradients.text_coords[min_y_vert_index].y +
+            gradients.text_coord_y_xstep * x_prestep + gradients.text_coord_y_ystep * y_prestep;
+        text_coord_ystep = gradients.text_coord_y_ystep + gradients.text_coord_y_xstep * x_step;
     }
 
     void step() {
         x += x_step;
-        color += color_step;
+        text_coord_x += text_coord_xstep;
+        text_coord_y += text_coord_ystep;
     }
 };

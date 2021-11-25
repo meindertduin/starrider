@@ -10,13 +10,27 @@ int main() {
         return 1;
     }
 
+    Bitmap texture;
+
+    texture.bitmap = new uint32_t[32 * 32];
+    texture.width = 32;
+    texture.height = 32;
+
+    for (int i = 0; i < 32 * 32; i++) {
+        float r = (float)((double) rand() / (RAND_MAX));
+        float g = (float)((double) rand() / (RAND_MAX));
+        float b = (float)((double) rand() / (RAND_MAX));
+        auto color = Color(r, g, b);
+        texture.bitmap[i] = color.to_uint32();
+    }
+
     Renderer renderer {&window};
 
     Triangle tri;
 
-    tri.p[0] = Vertex(-1, -1, 0);
-    tri.p[1] = Vertex(0, 1, 0);
-    tri.p[2] = Vertex(1, -1, 0);
+    tri.p[0] = Vertex(V4F(-1, -1, 0), V4F(0, 0, 0));
+    tri.p[1] = Vertex(V4F(0, 1, 0), V4F(1, 0.5, 1));
+    tri.p[2] = Vertex(V4F(1, -1, 0), V4F(1, 0, 0));
 
     Matrix4F identity, projection, translation, rotation_y;
     identity.init_identity();
@@ -62,11 +76,13 @@ int main() {
         proj_tri.p[1].color = Color(0, 1, 0);
         proj_tri.p[2].color = Color(0, 0, 1);
 
-        renderer.draw_triangle(proj_tri);
+        renderer.draw_triangle(proj_tri, texture);
         renderer.render();
 
         time += 1.0f / 300.0f;
     }
+
+    delete texture.bitmap;
 
     return 0;
 }

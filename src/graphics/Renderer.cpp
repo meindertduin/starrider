@@ -138,7 +138,7 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
     }
 }
 
-void Renderer::draw_triangle(const Triangle &triangle) {
+void Renderer::draw_triangle(const Triangle &triangle, const Bitmap &texture) {
     Vertex min_y_vert = triangle.p[0];
 	Vertex mid_y_vert = triangle.p[1];
 	Vertex max_y_vert = triangle.p[2];
@@ -172,7 +172,7 @@ void Renderer::draw_triangle(const Triangle &triangle) {
 
     bool handedness =  (x1 * y2 - x2 * y1) >= 0.0f;
 
-	scan_triangle(min_y_vert, mid_y_vert, max_y_vert, handedness);
+	scan_triangle(min_y_vert, mid_y_vert, max_y_vert, handedness, texture);
 }
 
 void Renderer::clear_screen() {
@@ -181,49 +181,56 @@ void Renderer::clear_screen() {
 	}
 }
 
-void Renderer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness) {
+void Renderer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture) {
   Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
     Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);
     Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert, gradients, 0);
     Edge middle_to_top = Edge(mid_y_vert, max_y_vert, gradients, 1);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness, gradients);
-    scan_edges(bottom_to_top, middle_to_top, handedness, gradients);
+    scan_edges(bottom_to_top, bottom_to_middle, handedness, gradients, texture);
+    scan_edges(bottom_to_top, middle_to_top, handedness, gradients, texture);
 }
 
-void Renderer::scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients) {
+void Renderer::scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients, const Bitmap &texture) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
     if (handedness) {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(b, a, j, gradients);
+            draw_scanline(b, a, j, gradients, texture);
             a.step();
             b.step();
         }
     } else {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(a, b, j, gradients);
+            draw_scanline(a, b, j, gradients, texture);
             a.step();
             b.step();
         }
     }
 }
 
-void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients) {
+void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients, const Bitmap &texture) {
     int x_min = (int)std::ceil(left.x);
     int x_max = (int)std::ceil(right.x);
 
     float x_prestep = (float)x_min - left.x;
 
-    Color color = left.color + gradients.x_step * x_prestep;
+    float text_coord_x = left.text_coord_x + gradients.text_coord_x_xstep * x_prestep;
+    float text_coord_y = left.text_coord_y + gradients.text_coord_y_xstep * x_prestep;
 
     for(int i = x_min; i < x_max; i++)
     {
-        *(m_framebuffer + ((m_width * j) + i)) = color.to_uint32();
-        color += gradients.x_step;
+        int src_x = (int)(text_coord_x * (texture.width - 1) + 0.5f);
+        int src_y = (int)(text_coord_y * (texture.height - 1) + 0.5f);
+
+        uint32_t value = texture.get_value(src_x, src_y);
+
+        *(m_framebuffer + ((m_width * j) + i)) = value;
+        text_coord_x += gradients.text_coord_x_xstep;
+        text_coord_y += gradients.text_coord_y_xstep;
     }
 }

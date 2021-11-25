@@ -10,7 +10,7 @@ public:
     ~Renderer();
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);
-    void draw_triangle(const Triangle &triangle);
+    void draw_triangle(const Triangle &triangle, const Bitmap &texture);
     void clear_screen();
     bool render();
 private:
@@ -26,7 +26,7 @@ private:
 
     bool setup_shared_memory();
 
-    void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness);
-    void scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients);
-    void draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients);
+    void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture);
+    void scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients, const Bitmap &texture);
+    void draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients, const Bitmap &texture);
 };
