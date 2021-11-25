@@ -57,20 +57,14 @@ void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &tex
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
-    if (handedness) {
-        for(int j = y_start; j < y_end; j++)
-        {
+    for(int j = y_start; j < y_end; j++) {
+        if (handedness) {
             draw_scanline(b, a, j, texture);
-            a.step();
-            b.step();
-        }
-    } else {
-        for(int j = y_start; j < y_end; j++)
-        {
+        } else {
             draw_scanline(a, b, j, texture);
-            a.step();
-            b.step();
         }
+        a.step();
+        b.step();
     }
 }
 

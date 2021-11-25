@@ -27,7 +27,6 @@ int main() {
         texture.bitmap[i] = color.to_uint32();
     }
 
-
     Triangle tri;
 
     tri.p[0] = Vertex(V4F(-1, -1, 0), V4F(0, 0, 0));
