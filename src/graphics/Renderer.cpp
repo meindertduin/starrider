@@ -188,39 +188,42 @@ void Renderer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert,
     Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert, gradients, 0);
     Edge middle_to_top = Edge(mid_y_vert, max_y_vert, gradients, 1);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness, gradients, texture);
-    scan_edges(bottom_to_top, middle_to_top, handedness, gradients, texture);
+    scan_edges(bottom_to_top, bottom_to_middle, handedness, texture);
+    scan_edges(bottom_to_top, middle_to_top, handedness, texture);
 }
 
-void Renderer::scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients, const Bitmap &texture) {
+void Renderer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &texture) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
     if (handedness) {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(b, a, j, gradients, texture);
+            draw_scanline(b, a, j, texture);
             a.step();
             b.step();
         }
     } else {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(a, b, j, gradients, texture);
+            draw_scanline(a, b, j, texture);
             a.step();
             b.step();
         }
     }
 }
 
-void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients, const Bitmap &texture) {
+void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const Bitmap &texture) {
     int x_min = (int)std::ceil(left.x);
     int x_max = (int)std::ceil(right.x);
-
     float x_prestep = (float)x_min - left.x;
 
-    float text_coord_x = left.text_coord_x + gradients.text_coord_x_xstep * x_prestep;
-    float text_coord_y = left.text_coord_y + gradients.text_coord_y_xstep * x_prestep;
+    float x_dist = right.x - left.x;
+    float text_coord_x_xstep = (right.text_coord_x - left.text_coord_x) / x_dist;
+    float text_coord_y_xstep = (right.text_coord_y - left.text_coord_y) / x_dist;
+
+    float text_coord_x = left.text_coord_x + text_coord_x_xstep * x_prestep;
+    float text_coord_y = left.text_coord_y + text_coord_x_xstep * x_prestep;
 
     for(int i = x_min; i < x_max; i++)
     {
@@ -230,7 +233,7 @@ void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const G
         uint32_t value = texture.get_value(src_x, src_y);
 
         *(m_framebuffer + ((m_width * j) + i)) = value;
-        text_coord_x += gradients.text_coord_x_xstep;
-        text_coord_y += gradients.text_coord_y_xstep;
+        text_coord_x += text_coord_x_xstep;
+        text_coord_y += text_coord_y_xstep;
     }
 }

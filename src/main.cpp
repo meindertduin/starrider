@@ -29,7 +29,7 @@ int main() {
     Triangle tri;
 
     tri.p[0] = Vertex(V4F(-1, -1, 0), V4F(0, 0, 0));
-    tri.p[1] = Vertex(V4F(0, 1, 0), V4F(1, 0.5, 1));
+    tri.p[1] = Vertex(V4F(0, 1, 0), V4F(0.5, 1, 1));
     tri.p[2] = Vertex(V4F(1, -1, 0), V4F(1, 0, 0));
 
     Matrix4F identity, projection, translation, rotation_y;
