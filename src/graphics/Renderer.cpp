@@ -221,19 +221,23 @@ void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const B
     float x_dist = right.x - left.x;
     float text_coord_x_xstep = (right.text_coord_x - left.text_coord_x) / x_dist;
     float text_coord_y_xstep = (right.text_coord_y - left.text_coord_y) / x_dist;
+    float one_over_zx_step = (right.one_over_z - left.one_over_z) / x_dist;
 
     float text_coord_x = left.text_coord_x + text_coord_x_xstep * x_prestep;
     float text_coord_y = left.text_coord_y + text_coord_x_xstep * x_prestep;
+    float one_over_z = left.one_over_z + one_over_zx_step * x_prestep;
 
     for(int i = x_min; i < x_max; i++)
     {
-        int src_x = (int)(text_coord_x * (texture.width - 1) + 0.5f);
-        int src_y = (int)(text_coord_y * (texture.height - 1) + 0.5f);
+        float z = 1.0f / one_over_z;
+        int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
+        int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 
         uint32_t value = texture.get_value(src_x, src_y);
 
         *(m_framebuffer + ((m_width * j) + i)) = value;
         text_coord_x += text_coord_x_xstep;
         text_coord_y += text_coord_y_xstep;
+        one_over_z += one_over_zx_step;
     }
 }
