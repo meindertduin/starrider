@@ -182,42 +182,48 @@ void Renderer::clear_screen() {
 }
 
 void Renderer::scan_triangle(const V3F &min_y_vert, const V3F &mid_y_vert, const V3F &max_y_vert, bool handedness) {
-    Edge bottom_to_top = Edge(min_y_vert, max_y_vert);
-    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert);
-    Edge middle_to_top = Edge(mid_y_vert, max_y_vert);
+  Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness);
-    scan_edges(bottom_to_top, middle_to_top, handedness);
+    Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);
+    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert, gradients, 0);
+    Edge middle_to_top = Edge(mid_y_vert, max_y_vert, gradients, 1);
+
+    scan_edges(bottom_to_top, bottom_to_middle, handedness, gradients);
+    scan_edges(bottom_to_top, middle_to_top, handedness, gradients);
 }
 
-void Renderer::scan_edges(Edge &a, Edge &b, bool handedness) {
+void Renderer::scan_edges(Edge &a, Edge &b, bool handedness, const Gradients &gradients) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
     if (handedness) {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(b, a, j);
-            a.x += a.x_step;
-            b.x += b.x_step;
+            draw_scanline(b, a, j, gradients);
+            a.step();
+            b.step();
         }
     } else {
         for(int j = y_start; j < y_end; j++)
         {
-            draw_scanline(a, b, j);
-            a.x += a.x_step;
-            b.x += b.x_step;
+            draw_scanline(a, b, j, gradients);
+            a.step();
+            b.step();
         }
     }
 }
 
-void Renderer::draw_scanline(const Edge &left, const Edge &right, int j) {
-    int xMin = (int)std::ceil(left.x);
-    int xMax = (int)std::ceil(right.x);
+void Renderer::draw_scanline(const Edge &left, const Edge &right, int j, const Gradients &gradients) {
+    int x_min = (int)std::ceil(left.x);
+    int x_max = (int)std::ceil(right.x);
 
-    for(int i = xMin; i < xMax; i++)
+    float x_prestep = (float)x_min - left.x;
+
+    Color color = left.color + gradients.x_step * x_prestep;
+
+    for(int i = x_min; i < x_max; i++)
     {
-        Color c = Color(1 , 0, 0);
-        *(m_framebuffer + ((m_width * j) + i)) = c.to_uint32();
+        *(m_framebuffer + ((m_width * j) + i)) = color.to_uint32();
+        color += gradients.x_step;
     }
 }

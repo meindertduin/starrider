@@ -58,6 +58,10 @@ int main() {
         proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();
         proj_tri.p[2] = proj_tri.p[2].transform(screen_space).perspective_divide();
 
+        proj_tri.p[0].color = Color(1, 0, 0);
+        proj_tri.p[1].color = Color(0, 1, 0);
+        proj_tri.p[2].color = Color(0, 0, 1);
+
         renderer.draw_triangle(proj_tri);
         renderer.render();
 

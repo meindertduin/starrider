@@ -15,9 +15,9 @@ struct Color {
     }
 
     u_int32_t to_uint32() const {
-        uint32_t rr = (uint32_t)(r * 255.0f);
-    	uint32_t rg = (uint32_t)(g * 255.0f);
-	    uint32_t rb = (uint32_t)(b * 255.0f);
+        uint32_t rr = (uint32_t)(r * 255.0f + 0.5f);
+    	uint32_t rg = (uint32_t)(g * 255.0f + 0.5f);
+	    uint32_t rb = (uint32_t)(b * 255.0f + 0.5f);
 
         return (rr << 16 ) | (rg << 8) | rb;
     }
@@ -30,8 +30,24 @@ struct Color {
         return Color(r + c.r, g + c.g, b + c.b);
     }
 
+    Color& operator+=(const Color &c) {
+        r += c.r;
+        g += c.g;
+        b += c.b;
+
+        return *this;
+    }
+
+    Color& operator-=(const Color &c) {
+        r -= c.r;
+        g -= c.g;
+        b -= c.b;
+
+        return *this;
+    }
+
     Color operator*(float f) const {
-        return Color(r + f, g + f, b + f);
+        return Color(r * f, g * f, b * f);
     }
 };
 
@@ -196,16 +212,29 @@ struct Edge {
     int y_start;
     int y_end;
 
+    Color color;
+    Color color_step;
+
     Edge() {}
-    Edge(const V3F &min_y_vert, const V3F &max_y_vert) {
+    Edge(const V3F &min_y_vert, const V3F &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
     	y_start = (int)std::ceil(min_y_vert.y);
 		y_end = (int)std::ceil(max_y_vert.y);
 
 		float y_dist = max_y_vert.y - min_y_vert.y;
 		float x_dist = max_y_vert.x- min_y_vert.x;
 
-		float y_pre_step = (float) y_start - min_y_vert.y;
+		float y_prestep = (float) y_start - min_y_vert.y;
 		x_step = (float)x_dist/(float)y_dist;
-		x = min_y_vert.x + y_pre_step * x_step;
+		x = min_y_vert.x + y_prestep * x_step;
+
+        float x_prestep = x - min_y_vert.x;
+
+        color = gradients.color[min_y_vert_index] + (gradients.y_step * y_prestep) + (gradients.x_step * x_prestep);
+        color_step = gradients.y_step + gradients.x_step * x_step;
+    }
+
+    void step() {
+        x += x_step;
+        color += color_step;
     }
 };
