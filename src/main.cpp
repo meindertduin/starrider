@@ -11,21 +11,12 @@ int main() {
         return 1;
     }
 
-    Bitmap texture;
+    Bitmap texture("test_texture.bmp");
     Renderer renderer {&window};
     Rasterizer rasterizer {&renderer};
 
-    texture.bitmap = new uint32_t[32 * 32];
-    texture.width = 32;
-    texture.height = 32;
-
-    for (int i = 0; i < 32 * 32; i++) {
-        float r = (float)((double) rand() / (RAND_MAX));
-        float g = (float)((double) rand() / (RAND_MAX));
-        float b = (float)((double) rand() / (RAND_MAX));
-        auto color = Color(r, g, b);
-        texture.bitmap[i] = color.to_uint32();
-    }
+    texture.width = 16;
+    texture.height = 16;
 
     Triangle tri;
 
@@ -56,7 +47,7 @@ int main() {
         Triangle proj_tri;
         Matrix4F rotation_y;
 
-        rotation_y.init_rotation_y(time);
+        rotation_y.init_rotation(0, time, 0);
         Matrix4F transform = identity * rotation_y * translation * projection;
 
         Triangle transformed_triangle;

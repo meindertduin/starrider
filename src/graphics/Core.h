@@ -2,11 +2,22 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <string>
+
+#include <stdio.h>
+
+#include "../io/BmpReader.h"
 
 struct Bitmap {
     uint32_t *bitmap;
     int width;
     int height;
+
+    Bitmap(std::string path) {
+        BmpReader bmp_reader;
+
+        bmp_reader.read_file(path);
+    }
 
     uint32_t get_value(int x_pos, int y_pos) const {
         return bitmap[width * y_pos + x_pos];
