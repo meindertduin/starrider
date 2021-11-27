@@ -10,7 +10,7 @@ public:
     BmpReader();
     ~BmpReader();
 
-    size_t read_file(string path, uint32_t *bitmap);
+    size_t read_file(string path, uint32_t *&bitmap);
     uint32_t get_width();
     uint32_t get_height();
 private:
