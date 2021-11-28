@@ -131,7 +131,6 @@ struct V4F {
 struct Vertex {
     V4F pos;
     V4F text_coords;
-    Color color;
 
     Vertex() {}
     Vertex(float x, float y, float z) {
