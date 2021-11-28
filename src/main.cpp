@@ -74,8 +74,6 @@ int main() {
         time += 1.0f / 300.0f;
     }
 
-    delete texture.bitmap;
-
     return 0;
 }
 

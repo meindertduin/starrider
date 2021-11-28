@@ -16,9 +16,14 @@ struct Bitmap {
     Bitmap(std::string path) {
         BmpReader bmp_reader;
 
+        // the bmp_reader instantiates the bitmap
         bmp_reader.read_file(path, bitmap);
         width = bmp_reader.get_width();
         height = bmp_reader.get_height();
+    }
+
+    ~Bitmap() {
+        delete[] bitmap;
     }
 
     uint32_t get_value(int x_pos, int y_pos) const {
