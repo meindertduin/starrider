@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <string>
-
+#include <vector>
 #include <stdio.h>
 
 #include "../io/BmpReader.h"
@@ -296,6 +296,12 @@ struct Matrix4F {
 
 struct Triangle {
     Vertex p[3];
+    Triangle() {};
+    Triangle(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+    }
 };
 
 struct Edge {
@@ -346,4 +352,15 @@ struct Edge {
         text_coord_y += text_coord_ystep;
         one_over_z += one_over_zstep;
     }
+};
+
+struct Mesh {
+    Triangle* traingles;
+    size_t triangles_count;
+
+    Mesh(std::string path) {
+
+    }
+
+    ~Mesh();
 };
