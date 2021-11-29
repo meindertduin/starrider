@@ -1,6 +1,6 @@
 #include "ObjReader.h"
 
-#include <strstream>
+#include <sstream>
 
 ObjReader::ObjReader() {  }
 
@@ -24,7 +24,7 @@ vector<Triangle> ObjReader::read_file(string path) {
         char line[128]; // presumption that lines aren't over 128 characters wide
         m_ifs.getline(line, 128);
 
-        std::strstream ss;
+        std::stringstream ss;
         ss << line;
 
         char temp;
