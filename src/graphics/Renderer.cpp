@@ -145,5 +145,7 @@ void Renderer::clear_screen() {
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
-    *(m_framebuffer + ((m_width * y_pos) + x_pos)) = value;
+    if (x_pos < m_width) {
+        *(m_framebuffer + ((m_width * y_pos) + x_pos)) = value;
+    }
 }
