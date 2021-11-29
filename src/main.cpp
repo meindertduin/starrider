@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 
+#include "graphics/Core.h"
 #include "graphics/Renderer.h"
 #include "graphics/Rasterizer.h"
 

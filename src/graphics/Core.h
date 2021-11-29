@@ -132,8 +132,11 @@ struct Vertex {
     V4F pos;
     V4F text_coords;
 
-    Vertex();
-    Vertex(float x, float y, float z);
+    Vertex() {}
+
+    Vertex(float x, float y, float z) {
+        pos = V4F(x, y, z);
+    }
 
     Vertex(float x, float y, float z, float w) {
         pos = V4F(x, y, z, w);
@@ -294,7 +297,11 @@ struct Matrix4F {
 struct Triangle {
     Vertex p[3];
     Triangle() {};
-    Triangle(const Vertex &v1, const Vertex &v2, const Vertex &v3);
+    Triangle(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+        p[0] = v1;
+        p[1] = v2;
+        p[2] = v3;
+    }
 };
 
 struct Edge {
@@ -348,12 +355,10 @@ struct Edge {
 };
 
 struct Mesh {
-    Triangle* traingles;
-    size_t triangles_count;
+    std::vector<Triangle> traingles;
 
-    Mesh(std::string path) {
-
-    }
+    Mesh() {}
+    bool load_from_obj_file(std::string path);
 
     ~Mesh();
 };
