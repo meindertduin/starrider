@@ -15,20 +15,18 @@ int main() {
     Bitmap texture("test_texture.bmp");
     Renderer renderer {&window};
     Rasterizer rasterizer {&renderer};
+    Mesh mesh;
+    mesh.load_from_obj_file("teapot.obj");
 
     texture.width = 16;
     texture.height = 16;
 
-    Triangle tri;
-
-    tri.p[0] = Vertex(V4F(-1, -1, 0), V4F(0, 0, 0));
-    tri.p[1] = Vertex(V4F(0, 1, 0), V4F(0.5, 1, 1));
-    tri.p[2] = Vertex(V4F(1, -1, 0), V4F(1, 0, 0));
-
-    Matrix4F identity, projection, translation, rotation_y;
+    Matrix4F identity, projection, translation, rotation_y, screen_space;
     identity.init_identity();
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
+    screen_space.init_screen_space_transform(400.0f, 400.0f);
+    translation.init_translation(0, 0.0f, 8.0f);
 
     XEvent event;
 
@@ -43,31 +41,28 @@ int main() {
         renderer.clear_screen();
 
         Triangle translated_tri;
-        translation.init_translation(0.0001f, 0.0f, 3.0f);
-
-        Triangle proj_tri;
-        Matrix4F rotation_y;
-
-        rotation_y.init_rotation(0, time, 0);
+        rotation_y.init_rotation(0, time, time);
         Matrix4F transform = identity * rotation_y * translation * projection;
 
-        Triangle transformed_triangle;
+        for (auto triangle : mesh.triangles) {
+            triangle.p[0].text_coords = V4F(0, 0, 0);
+            triangle.p[1].text_coords = V4F(0.5, 1, 1);
+            triangle.p[2].text_coords = V4F(1, 0, 0);
 
-        proj_tri.p[0] = tri.p[0].transform(transform);
-        proj_tri.p[1] = tri.p[1].transform(transform);
-        proj_tri.p[2] = tri.p[2].transform(transform);
+            Triangle proj_tri;
 
-        Matrix4F screen_space;
+            proj_tri.p[0] = triangle.p[0].transform(transform);
+            proj_tri.p[1] = triangle.p[1].transform(transform);
+            proj_tri.p[2] = triangle.p[2].transform(transform);
 
-        screen_space.init_screen_space_transform(400.0f, 400.0f);
+            proj_tri.p[0] = proj_tri.p[0].transform(screen_space).perspective_divide();
+            proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();
+            proj_tri.p[2] = proj_tri.p[2].transform(screen_space).perspective_divide();
 
-        proj_tri.p[0] = proj_tri.p[0].transform(screen_space).perspective_divide();
-        proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();
-        proj_tri.p[2] = proj_tri.p[2].transform(screen_space).perspective_divide();
+            rasterizer.draw_triangle(proj_tri, texture);
+        }
 
-        rasterizer.draw_triangle(proj_tri, texture);
         renderer.render();
-
         time += 1.0f / 300.0f;
     }
 

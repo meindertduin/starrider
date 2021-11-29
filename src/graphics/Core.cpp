@@ -9,8 +9,6 @@ Vertex Vertex::transform(const Matrix4F &m) {
 bool Mesh::load_from_obj_file(std::string path) {
     std::ifstream fs(path);
 
-    std::vector<Triangle> triangles;
-
     if (!fs.is_open())
         return false;
 

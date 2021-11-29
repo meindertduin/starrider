@@ -355,10 +355,8 @@ struct Edge {
 };
 
 struct Mesh {
-    std::vector<Triangle> traingles;
+    std::vector<Triangle> triangles;
 
     Mesh() {}
     bool load_from_obj_file(std::string path);
-
-    ~Mesh();
 };
