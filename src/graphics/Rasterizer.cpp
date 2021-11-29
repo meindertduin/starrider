@@ -1,8 +1,13 @@
 
 #include "Rasterizer.h"
 
-Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
+Rasterizer::Rasterizer(Renderer* renderer, int width, int height)
+    : p_renderer(renderer), m_width(width), m_height(height) {
+    p_z_buffer = new float[width * height];
+}
 
+Rasterizer::~Rasterizer() {
+    delete[] p_z_buffer;
 }
 
 void Rasterizer::draw_triangle(const Triangle &triangle, const Bitmap &texture) {
@@ -42,6 +47,12 @@ void Rasterizer::draw_triangle(const Triangle &triangle, const Bitmap &texture) 
 	scan_triangle(min_y_vert, mid_y_vert, max_y_vert, handedness, texture);
 }
 
+void Rasterizer::clear_depth_buffer() {
+    for (int i = 0; i < m_width * m_height; i++) {
+        p_z_buffer[i] = INFINITY;
+    }
+}
+
 void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture) {
   Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
@@ -77,22 +88,29 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
     float text_coord_x_xstep = (right.text_coord_x - left.text_coord_x) / x_dist;
     float text_coord_y_xstep = (right.text_coord_y - left.text_coord_y) / x_dist;
     float one_over_zx_step = (right.one_over_z - left.one_over_z) / x_dist;
+    float depth_x_step = (right.depth - left.depth) / x_dist;
 
     float text_coord_x = left.text_coord_x + text_coord_x_xstep * x_prestep;
     float text_coord_y = left.text_coord_y + text_coord_x_xstep * x_prestep;
     float one_over_z = left.one_over_z + one_over_zx_step * x_prestep;
+    float depth = left.depth - depth_x_step * x_prestep;
 
     for(int i = x_min; i < x_max; i++)
     {
-        float z = 1.0f / one_over_z;
-        int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
-        int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
+        int index = i + j * m_width;
+        if (p_z_buffer[index] > depth) {
+            float z = 1.0f / one_over_z;
+            int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
+            int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 
-        uint32_t value = texture.get_value(src_x, src_y);
-        p_renderer->set_frame_pixel(i, j, value);
+            uint32_t value = texture.get_value(src_x, src_y);
+            p_renderer->set_frame_pixel(i, j, value);
+            p_z_buffer[index] = depth;
+        }
 
         text_coord_x += text_coord_x_xstep;
         text_coord_y += text_coord_y_xstep;
         one_over_z += one_over_zx_step;
+        depth += depth_x_step;
     }
 }

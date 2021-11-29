@@ -14,7 +14,7 @@ int main() {
 
     Bitmap texture("test_texture.bmp");
     Renderer renderer {&window};
-    Rasterizer rasterizer {&renderer};
+    Rasterizer rasterizer {&renderer, 800, 800};
     Mesh mesh;
     mesh.load_from_obj_file("teapot.obj");
 
@@ -39,6 +39,7 @@ int main() {
         }
 
         renderer.clear_screen();
+        rasterizer.clear_depth_buffer();
 
         Triangle translated_tri;
         rotation_y.init_rotation(0, time, time);

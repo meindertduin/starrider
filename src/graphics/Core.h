@@ -161,6 +161,7 @@ struct Vertex {
 struct Gradients {
     V4F text_coords[3];
     float one_over_z[3];
+    float depth[3];
 
     float text_coord_x_xstep;
     float text_coord_x_ystep;
@@ -171,6 +172,9 @@ struct Gradients {
     float one_over_zx_step;
     float one_over_zy_step;
 
+    float depth_x_step;
+    float depth_y_step;
+
     Gradients(const Vertex& min_y_vert, const Vertex mid_y_vert, const Vertex max_y_vert) {
 		float oneOverdX = 1.0f /
 			(((mid_y_vert.pos.x - max_y_vert.pos.x) *
@@ -180,14 +184,19 @@ struct Gradients {
 
 		float oneOverdY = -oneOverdX;
 
+        depth[0] = min_y_vert.pos.z;
+        depth[1] = mid_y_vert.pos.z;
+        depth[2] = max_y_vert.pos.z;
+
+        // The z value is the occlusion z value.
         one_over_z[0] = 1.0f / min_y_vert.pos.w;
         one_over_z[1] = 1.0f / mid_y_vert.pos.w;
         one_over_z[2] = 1.0f / max_y_vert.pos.w;
 
+        // The w value is the perspective z value.
 		text_coords[0] = min_y_vert.text_coords * one_over_z[0];
 		text_coords[1] = mid_y_vert.text_coords * one_over_z[1];
 		text_coords[2] = max_y_vert.text_coords * one_over_z[2];
-
 
         text_coord_x_xstep = (((text_coords[1].x - text_coords[2].x) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
              ((text_coords[0].x - text_coords[2].x) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
@@ -206,6 +215,12 @@ struct Gradients {
 
         one_over_zy_step = (((one_over_z[1] - one_over_z[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
                 ((one_over_z[0] - one_over_z[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+
+        depth_x_step = (((depth[1] - depth[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+             ((depth[0] - depth[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+
+        depth_y_step = (((depth[1] - depth[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((depth[0] - depth[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
     }
 };
 
@@ -318,6 +333,9 @@ struct Edge {
     float one_over_z;
     float one_over_zstep;
 
+    float depth;
+    float depth_step;
+
     Edge() {}
     Edge(const Vertex &min_y_vert, const Vertex &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
     	y_start = (int)std::ceil(min_y_vert.pos.y);
@@ -344,6 +362,11 @@ struct Edge {
             gradients.one_over_zx_step * x_prestep +
             gradients.one_over_zy_step * y_prestep;
         one_over_zstep = gradients.one_over_zy_step + gradients.one_over_zx_step * x_step;
+
+        depth = gradients.depth[min_y_vert_index] +
+            gradients.depth_x_step * x_prestep +
+            gradients.depth_y_step * y_prestep;
+        depth_step = gradients.depth_y_step + gradients.depth_x_step * x_step;
     }
 
     void step() {
@@ -351,6 +374,7 @@ struct Edge {
         text_coord_x += text_coord_xstep;
         text_coord_y += text_coord_ystep;
         one_over_z += one_over_zstep;
+        depth += depth_step;
     }
 };
 
