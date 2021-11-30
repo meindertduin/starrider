@@ -107,6 +107,39 @@ struct V4F {
         w = in_w;
     }
 
+    float length() const {
+        return sqrtf(x * x + y * y + z * z);
+    }
+
+    void normalise() {
+        float l = length();
+        x /= l; y /= l; z /= l;
+    }
+
+    float prod(const V4F& b) {
+        return (x * b.x + y * b.y + z * b.z);
+    }
+
+    V4F normal() {
+        return *this / length();
+    }
+
+    V4F operator+(const V4F& rhs) const {
+        V4F r;
+        r.x = this->x + rhs.x;
+        r.y = this->y + rhs.y;
+        r.z = this->z + rhs.z;
+        return r;
+    }
+
+    V4F operator-(const V4F& rhs) const {
+        V4F r;
+        r.x = this->x - rhs.x;
+        r.y = this->y - rhs.y;
+        r.z = this->z - rhs.z;
+        return r;
+    }
+
     V4F operator*(float f) const {
         V4F r;
         r.x = x * f;
@@ -125,6 +158,22 @@ struct V4F {
         r.w = w / f;
 
         return r;
+    }
+
+    V4F& operator*=(float f) {
+        x = x * f;
+        y = y * f;
+        z = z * f;
+        w = w * f;
+        return *this;
+    }
+
+    V4F& operator/=(float f) {
+        x = x / f;
+        y = y / f;
+        z = z / f;
+        w = w / f;
+        return *this;
     }
 };
 
@@ -155,6 +204,30 @@ struct Vertex {
         }
 
         return *this;
+    }
+
+    Vertex operator+(const Vertex &v) const {
+        Vertex r;
+        r.pos = pos + v.pos;
+        return r;
+    }
+
+    Vertex operator-(const Vertex &v) const {
+        Vertex r;
+        r.pos = pos + v.pos;
+        return r;
+    }
+
+    Vertex operator*(float f) const {
+        Vertex r;
+        r.pos *= f;
+        return r;
+    }
+
+    Vertex operator/(float f) const {
+        Vertex r;
+        r.pos /= f;
+        return r;
     }
 };
 
@@ -384,3 +457,6 @@ struct Mesh {
     Mesh() {}
     bool load_from_obj_file(std::string path);
 };
+
+Vertex vector_intersect_plane(V4F &plane_p, V4F &plane_n, Vertex &line_start, Vertex &line_end);
+int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2);
