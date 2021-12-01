@@ -458,5 +458,66 @@ struct Mesh {
     bool load_from_obj_file(std::string path);
 };
 
+struct Quaternion {
+    float x, y, z, w;
+
+    Quaternion() {
+        x = y = z = w = 0;
+    }
+
+    Quaternion(float x, float y, float z, float w) {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->w = w;
+    }
+
+    float length() {
+        return std::sqrt(x*x + y*y + z*z + w*w);
+    }
+
+    Quaternion normalized() {
+        float l = length();
+
+        return Quaternion(x / l, y / l, z / l, w / l);
+    }
+
+    Quaternion conjugate() {
+        return Quaternion(-x, -y, -z, w);
+    }
+
+    float dot(Quaternion r) {
+        return x * r.x + y * r.y + z * r.z + w * r.w;
+    }
+};
+
+struct Transform {
+    V4F pos;
+    Quaternion rot;
+    V4F scale;
+
+    Transform() {
+        this->pos = V4F(0, 0, 0, 0);
+        this->rot = Quaternion(0, 0, 0, 1);
+        this->scale = V4F(1, 1, 1, 1);
+    }
+
+    Transform(V4F pos) {
+        this->pos = pos;
+        this->rot = Quaternion(0, 0, 0, 1);
+        this->scale = V4F(1, 1, 1, 1);
+    }
+
+    Transform(V4F pos, Quaternion rot, V4F scale) {
+        this->pos = pos;
+        this->rot = rot;
+        this->scale = scale;
+    }
+
+    Transform set_pos(V4F pos) {
+        return Transform(pos, this->rot, this->scale);
+    }
+};
+
 V4F vector_intersect_plane(V4F &plane_p, V4F &plane_n, V4F &line_start, V4F &line_end);
 int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2);
