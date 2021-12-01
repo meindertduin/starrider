@@ -458,5 +458,5 @@ struct Mesh {
     bool load_from_obj_file(std::string path);
 };
 
-Vertex vector_intersect_plane(V4F &plane_p, V4F &plane_n, Vertex &line_start, Vertex &line_end);
+V4F vector_intersect_plane(V4F &plane_p, V4F &plane_n, V4F &line_start, V4F &line_end);
 int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2);

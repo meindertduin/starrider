@@ -27,7 +27,7 @@ int main() {
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
     screen_space.init_screen_space_transform(400.0f, 400.0f);
-    translation.init_translation(0.0f, 5, 8.0f);
+    translation.init_translation(0.0f, 3, 4.0f);
 
     XEvent event;
 
@@ -75,42 +75,33 @@ int main() {
 
 
                 Triangle new_clipped[2];
-                std::list<Triangle> listTriangles;
-                listTriangles.push_back(proj_tri);
-                int nNewTriangles = 1;
+                std::list<Triangle> list_triangles_front;
+                list_triangles_front.push_back(proj_tri);
+                int n_new_triangles = 1;
 
                 for (int p = 0; p < 4; p++) {
                     int nTrisToAdd = 0;
-                    while (nNewTriangles > 0)
-                    {
+                    while (n_new_triangles > 0) {
                         // Take triangle from front of queue
-                        Triangle test = listTriangles.front();
-                        listTriangles.pop_front();
-                        nNewTriangles--;
+                        Triangle test = list_triangles_front.front();
+                        list_triangles_front.pop_front();
+                        n_new_triangles--;
 
-                        // Clip it against a plane. We only need to test each
-                        // subsequent plane, against subsequent new triangles
-                        // as all triangles after a plane clip are guaranteed
-                        // to lie on the inside of the plane. I like how this
-                        // comment is almost completely and utterly justified
-                        switch (p)
-                        {
-                        case 0:	nTrisToAdd = triangle_clip_against_plane(V4F( 0.0f, 0.0f, 0.0f), V4F( 0.0f, 1.0f, 0.0f ), test, clipped[0], clipped[1]); break;
-                        case 1:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 800.0f - 1, 0.0f), V4F(0.0f, -1.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                        case 2:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F(1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                        case 3:	nTrisToAdd = triangle_clip_against_plane(V4F(800.0f - 1, 0.0f, 0.0f), V4F(-1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                        switch (p) {
+                            case 0:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F( 0.0f, 1.0f, 0.0f ), test, clipped[0], clipped[1]); break;
+                            case 1:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 800.0f - 1, 0.0f), V4F(0.0f, -1.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                            case 2:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F(1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                            case 3:	nTrisToAdd = triangle_clip_against_plane(V4F(800.0f - 1, 0.0f, 0.0f), V4F(-1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
                         }
 
-                        // Clipping may yield a variable number of triangles, so
-                        // add these new ones to the back of the queue for subsequent
-                        // clipping against next planes
                         for (int w = 0; w < nTrisToAdd; w++)
-                            listTriangles.push_back(clipped[w]);
+                            list_triangles_front.push_back(clipped[w]);
                     }
-                    nNewTriangles = listTriangles.size();
+
+                    n_new_triangles = list_triangles_front.size();
                 }
 
-                for (auto &t : listTriangles) {
+                for (auto &t : list_triangles_front) {
                     rasterizer.draw_triangle(t, texture);
                 }
             }
