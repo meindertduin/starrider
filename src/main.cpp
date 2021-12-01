@@ -48,7 +48,7 @@ int main() {
 
         for (auto triangle : mesh.triangles) {
             triangle.p[0].text_coords = V4F(0, 0, 0);
-            triangle.p[1].text_coords = V4F(0.5, 1, 1);
+            triangle.p[1].text_coords = V4F(0.5, 1, 0);
             triangle.p[2].text_coords = V4F(1, 0, 0);
 
             int clipped_triangles = 0;

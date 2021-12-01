@@ -52,6 +52,45 @@ V4F vector_intersect_plane(V4F &plane_p, V4F &plane_n, V4F &line_start, V4F &lin
     return line_start + lineToIntersect;
 }
 
+V4F get_new_text_coords(const Vertex &v1, const Vertex &v2, const V4F &new_v) {
+    float dx, dy, dnx, dny, t_dx, t_dy, t_xmin, t_ymin;
+    if (v1.pos.x > v2.pos.x) {
+        dx = v1.pos.x - v2.pos.x;
+        dy = v1.pos.y - v2.pos.y;
+        dnx = v1.pos.x - new_v.x;
+        dny = v1.pos.y - new_v.y;
+
+        t_dx = v1.text_coords.x - v2.text_coords.x;
+        t_dy = v1.text_coords.y - v2.text_coords.y;
+        t_xmin = v2.text_coords.x;
+        t_ymin = v2.text_coords.y;
+    } else {
+        dx = v2.pos.x - v1.pos.x;
+        dy = v2.pos.y - v1.pos.y;
+        dnx = v2.pos.x - new_v.x;
+        dny = v2.pos.y - new_v.y;
+
+        t_dx = v2.text_coords.x - v1.text_coords.x;
+        t_dy = v2.text_coords.y - v1.text_coords.y;
+        t_xmin = v1.text_coords.x;
+        t_ymin = v1.text_coords.y;
+    }
+
+    float pos_lenght = std::sqrt(dx*dx + dy*dy);
+    float new_length = std::sqrt(dnx*dnx + dny*dny);
+
+    float percentage = 0;
+
+    if (pos_lenght != 0.0f) {
+        percentage = new_length / pos_lenght;
+    }
+
+    float t_x = percentage * t_dx + t_xmin;
+    float t_y = percentage * t_dy + t_ymin;
+
+    return V4F(t_x, t_y, 0);
+}
+
 // returns the amount of triangles that clip against a plane
 int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2) {
     plane_n.normalise();
@@ -104,10 +143,10 @@ int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Tria
         out_tri1.p[0].text_coords = inside_points[0]->text_coords;
 
         out_tri1.p[1].pos = vector_intersect_plane(plane_p, plane_n, inside_points[0]->pos, outside_points[0]->pos);
-        out_tri1.p[1].text_coords = inside_points[0]->text_coords;
+        out_tri1.p[1].text_coords = get_new_text_coords(*inside_points[0], *outside_points[0], out_tri1.p[1].pos);
 
         out_tri1.p[2].pos = vector_intersect_plane(plane_p, plane_n, inside_points[0]->pos, outside_points[1]->pos);
-        out_tri1.p[2].text_coords = inside_points[0]->text_coords;
+        out_tri1.p[2].text_coords = get_new_text_coords(*inside_points[0], *outside_points[1], out_tri1.p[2].pos);
 
         return 1;
     }
@@ -117,12 +156,12 @@ int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Tria
         out_tri1.p[0] = *inside_points[0];
         out_tri1.p[1] = *inside_points[1];
         out_tri1.p[2].pos = vector_intersect_plane(plane_p, plane_n, inside_points[0]->pos, outside_points[0]->pos);
-        out_tri1.p[2].text_coords = inside_points[0]->text_coords;
+        out_tri1.p[2].text_coords = get_new_text_coords(*inside_points[0], *outside_points[0], out_tri1.p[2].pos);
 
         out_tri2.p[0] = *inside_points[1];
         out_tri2.p[1] = out_tri1.p[2];
         out_tri2.p[2].pos = vector_intersect_plane(plane_p, plane_n, inside_points[1]->pos, outside_points[0]->pos);
-        out_tri1.p[2].text_coords = inside_points[0]->text_coords;
+        out_tri1.p[2].text_coords = get_new_text_coords(*inside_points[1], *outside_points[0], out_tri2.p[2].pos);
 
         return 2;
     }
