@@ -400,10 +400,12 @@ struct Matrix4F {
     }
 
     V4F transform(const V4F &r) const {
-        return V4F(m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.w,
+        return V4F(
+            m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.w,
             m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3] * r.w,
             m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3] * r.w,
-            m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w);
+            m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w
+        );
     }
 
     Matrix4F operator*(const Matrix4F &m1) {
@@ -561,6 +563,17 @@ struct Quaternion {
 
     float dot(Quaternion r) {
         return x * r.x + y * r.y + z * r.z + w * r.w;
+    }
+
+    Matrix4F to_rotation_matrix() {
+        auto forward =  V4F(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
+        auto up = V4F(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
+	    auto right = V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
+
+        Matrix4F r;
+        r.init_rotation(forward, up, right);
+
+        return r;
     }
 
     Quaternion operator*(const Quaternion &q) const {
