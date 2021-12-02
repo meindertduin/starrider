@@ -116,8 +116,24 @@ struct V4F {
         x /= l; y /= l; z /= l;
     }
 
+    V4F normalized() const {
+        V4F r = *this;
+        r.normalise();
+        return r;
+    }
+
     float prod(const V4F& b) {
         return (x * b.x + y * b.y + z * b.z);
+    }
+
+    V4F cross(const V4F &v) {
+        V4F r;
+        r.x = y * v.z - z * v.y;
+        r.y = z * v.x - x * v.z;
+        r.z = x * v.y - y * v.x;
+        r.w = 1.0f;
+
+        return r;
     }
 
     V4F normal() {
@@ -356,6 +372,23 @@ struct Matrix4F {
                 m[i][j] = matrix.m[i][j];
     }
 
+    void init_rotation(const V4F &forward, const V4F &up) {
+        V4F f = forward.normalized();
+        V4F r = up.normalized();
+        r = r.cross(f);
+
+        V4F u = f.cross(r);
+        init_rotation(f, u, r);
+    }
+
+    void init_rotation(const V4F &forward, const V4F &up, const V4F &right) {
+        m[0][0] = right.x;      m[0][1] = right.y;      m[0][2] = right.z;      m[0][3] = 0;
+        m[1][0] = up.x;         m[1][1] = up.y;         m[1][2] = up.z;         m[1][3] = 0;
+        m[2][0] = forward.x;    m[2][1] = forward.y;    m[2][2] = forward.z;    m[2][3] = 0;
+        m[3][0] = 0;            m[3][1] = 0;            m[3][2] = 0;            m[3][3] = 1;
+
+    }
+
     void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
         float zrange = znear - zfar;
 
@@ -472,6 +505,46 @@ struct Quaternion {
         this->w = w;
     }
 
+    Quaternion(const Matrix4F &rot) {
+        float trace = rot.m[0][0] + rot.m[1][1] + rot.m[2][2];
+
+        if (trace > 0) {
+            float s = 0.5f / std::sqrt(trace + 1.0f);
+			w = 0.25f / s;
+			x = (rot.m[1][2] - rot.m[2][1]) * s;
+			y = (rot.m[2][0] - rot.m[0][2]) * s;
+			z = (rot.m[0][1] - rot.m[1][0]) * s;
+        } else {
+            if (rot.m[0][0] > rot.m[1][1] && rot.m[0][0] > rot.m[2][2]) {
+                float s = 2.0f * std::sqrt(1.0f + rot.m[0][0] - rot.m[1][1] - rot.m[2][2]);
+				w = (rot.m[1][2] - rot.m[2][1] / s);
+				x = 0.25f * s;
+				y = (rot.m[1][0] + rot.m[0][1]) / s;
+				z = (rot.m[2][0] + rot.m[0][2]) / s;
+            }
+            else if (rot.m[1][1] > rot.m[2][2]) {
+                float s = 2.0f * std::sqrt(1.0f + rot.m[1][1] - rot.m[0][0] - rot.m[2][2]);
+				w = (rot.m[2][0] - rot.m[0][2]) / s;
+				x = (rot.m[1][0] + rot.m[0][1]) / s;
+				y = 0.25f * s;
+				z = (rot.m[2][1] + rot.m[1][2]) / s;
+            }
+            else {
+                float s = 2.0f * std::sqrt(1.0f + rot.m[2][2] - rot.m[0][0] - rot.m[1][1]);
+				w = (rot.m[0][1] - rot.m[1][0]) / s;
+				x = (rot.m[2][0] + rot.m[0][2]) / s;
+				y = (rot.m[1][2] + rot.m[2][1]) / s;
+				z = 0.25f * s;
+            }
+        }
+
+        float length = std::sqrt(x*x + y*y + z*z + w*w);
+        x /= length;
+        y /= length;
+        z /= length;
+        w /= length;
+    }
+
     float length() {
         return std::sqrt(x*x + y*y + z*z + w*w);
     }
@@ -489,6 +562,46 @@ struct Quaternion {
     float dot(Quaternion r) {
         return x * r.x + y * r.y + z * r.z + w * r.w;
     }
+
+    Quaternion operator*(const Quaternion &q) const {
+        Quaternion r;
+        r.x = x * q.x;
+        r.y = y * q.y;
+        r.z = z * q.z;
+        r.w = w * q.w;
+
+        return r;
+    }
+
+    Quaternion operator/(const Quaternion &q) const {
+        Quaternion r;
+        r.x = x / q.x;
+        r.y = y / q.y;
+        r.z = z / q.z;
+        r.w = w / q.w;
+
+        return r;
+    }
+
+    Quaternion operator*(float f) const {
+        Quaternion r;
+        r.x = x * f;
+        r.y = y * f;
+        r.z = z * f;
+        r.w = w * f;
+
+        return r;
+    }
+
+    Quaternion operator/(float f) const {
+        Quaternion r;
+        r.x = x / f;
+        r.y = y / f;
+        r.z = z / f;
+        r.w = w / f;
+
+        return r;
+    }
 };
 
 struct Transform {
@@ -502,20 +615,35 @@ struct Transform {
         this->scale = V4F(1, 1, 1, 1);
     }
 
-    Transform(V4F pos) {
+    Transform(const V4F &pos) {
         this->pos = pos;
         this->rot = Quaternion(0, 0, 0, 1);
         this->scale = V4F(1, 1, 1, 1);
     }
 
-    Transform(V4F pos, Quaternion rot, V4F scale) {
+    Transform(const V4F &pos, const Quaternion &rot, const V4F &scale) {
         this->pos = pos;
         this->rot = rot;
         this->scale = scale;
     }
 
-    Transform set_pos(V4F pos) {
+    Transform set_pos(const V4F &pos) {
         return Transform(pos, this->rot, this->scale);
+    }
+
+    Transform rotate(const Quaternion &rotation) {
+        return Transform(pos, rotation * rot.normalized(), scale);
+    }
+
+    Transform look_at(const V4F &point, const V4F &up) {
+        return rotate(get_look_at_position(point, up));
+    }
+
+    Quaternion get_look_at_position(const V4F &point, const V4F &up) {
+        Matrix4F rot;
+        rot.init_rotation((point - pos).normalized(), up);
+
+        return Quaternion(rot);
     }
 };
 

@@ -8,4 +8,3 @@ Matrix4F get_view_projection() {
 
 }
 
-
