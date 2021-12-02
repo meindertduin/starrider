@@ -28,7 +28,7 @@ int main() {
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
     screen_space.init_screen_space_transform(400.0f, 400.0f);
-    translation.init_translation(9.0, 0, 10.0f);
+    translation.init_translation(0, 0, 2);
 
     Camera camera{projection};
 
@@ -45,7 +45,7 @@ int main() {
         rasterizer.clear_depth_buffer();
 
         Triangle translated_tri;
-        rotation_y.init_rotation(0, time, time);
+        rotation_y.init_rotation(0, time, 0);
         Matrix4F transform = identity * rotation_y * translation;
 
 
@@ -56,6 +56,8 @@ int main() {
 
             int clipped_triangles = 0;
             Triangle clipped[2];
+
+            // TODO: update these values with the current position of the camera
             V4F near_plane =  V4F(0.0f, 0.0f, 0.1f);
             V4F near_normal_plane = V4F(0.0f, 0.0f, 1.0f);
 
@@ -67,7 +69,6 @@ int main() {
             clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
             for (int n = 0; n < clipped_triangles; n++) {
                 Triangle proj_tri;
-
                 Matrix4F vp = camera.get_view_projection();
 
                 proj_tri.p[0] = clipped[n].p[0].transform(vp);

@@ -386,7 +386,6 @@ struct Matrix4F {
         m[1][0] = up.x;         m[1][1] = up.y;         m[1][2] = up.z;         m[1][3] = 0;
         m[2][0] = forward.x;    m[2][1] = forward.y;    m[2][2] = forward.z;    m[2][3] = 0;
         m[3][0] = 0;            m[3][1] = 0;            m[3][2] = 0;            m[3][3] = 1;
-
     }
 
     void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
@@ -507,6 +506,17 @@ struct Quaternion {
         this->w = w;
     }
 
+    Quaternion(V4F axis, float angle) {
+        float sin_half_angle = std::sin(angle / 2.0f);
+        float cos_half_angle = std::cos(angle / 2.0f);
+
+        x = axis.x * sin_half_angle;
+        y = axis.y * sin_half_angle;
+        z = axis.z * sin_half_angle;
+
+        w = cos_half_angle;
+    }
+
     Quaternion(const Matrix4F &rot) {
         float trace = rot.m[0][0] + rot.m[1][1] + rot.m[2][2];
 
@@ -566,9 +576,9 @@ struct Quaternion {
     }
 
     Matrix4F to_rotation_matrix() {
-        auto forward =  V4F(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
-        auto up = V4F(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
-	    auto right = V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
+        V4F forward =  V4F(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
+		V4F up = V4F(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
+		V4F right = V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
 
         Matrix4F r;
         r.init_rotation(forward, up, right);
@@ -578,20 +588,10 @@ struct Quaternion {
 
     Quaternion operator*(const Quaternion &q) const {
         Quaternion r;
-        r.x = x * q.x;
-        r.y = y * q.y;
-        r.z = z * q.z;
-        r.w = w * q.w;
-
-        return r;
-    }
-
-    Quaternion operator/(const Quaternion &q) const {
-        Quaternion r;
-        r.x = x / q.x;
-        r.y = y / q.y;
-        r.z = z / q.z;
-        r.w = w / q.w;
+        r.w = w * q.w - x * q.x - y * q.y - z * q.z;
+		r.x = x * q.w + w * q.x + y * q.z - z * q.y;
+		r.y = y * q.w + w * q.y + z * q.x - x * q.z;
+		r.z = z * q.w + w * q.z + x * q.y - y * q.x;
 
         return r;
     }
@@ -645,7 +645,7 @@ struct Transform {
     }
 
     Transform rotate(const Quaternion &rotation) {
-        return Transform(pos, rotation * rot.normalized(), scale);
+        return Transform(pos, (rotation * rot).normalized(), scale);
     }
 
     Transform look_at(const V4F &point, const V4F &up) {
