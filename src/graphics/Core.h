@@ -655,14 +655,10 @@ struct Transform {
     }
 
     Transform look_at(const V4F &point, const V4F &up) {
-        return rotate(get_look_at_position(point, up));
-    }
+        Matrix4F mat_look_at;
+        mat_look_at.init_rotation(point, up);
 
-    Quaternion get_look_at_position(const V4F &point, const V4F &up) {
-        Matrix4F rot;
-        rot.init_rotation(point, up);
-
-        return Quaternion(rot);
+        return Transform(pos, Quaternion(mat_look_at), scale);
     }
 };
 

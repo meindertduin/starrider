@@ -36,6 +36,8 @@ int main() {
     XEvent event;
 
     for (;;) {
+        Matrix4F vp = camera.get_view_projection();
+
         while(window.poll_event(event)) {
             if (event.type == Expose)  {
             }
@@ -69,7 +71,6 @@ int main() {
             clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
             for (int n = 0; n < clipped_triangles; n++) {
                 Triangle proj_tri;
-                Matrix4F vp = camera.get_view_projection();
 
                 proj_tri.p[0] = clipped[n].p[0].transform(vp);
                 proj_tri.p[1] = clipped[n].p[1].transform(vp);
