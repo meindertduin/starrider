@@ -2,8 +2,19 @@
 #include <sstream>
 #include <fstream>
 
+float saturate(float val) {
+    if (val < 0.0f) {
+        return 0.0f;
+    }
+    if (val > 1.0f) {
+        return 1.0f;
+    }
+
+    return val;
+}
+
 Vertex Vertex::transform(const Matrix4F &m) {
-    return Vertex(m.transform(pos), text_coords);
+    return Vertex(m.transform(pos), text_coords, normal);
 }
 
 bool Mesh::load_from_obj_file(std::string path) {

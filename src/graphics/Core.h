@@ -8,6 +8,8 @@
 
 #include "../io/BmpReader.h"
 
+float saturate(float val);
+
 struct Bitmap {
     uint32_t *bitmap;
     int width;
@@ -122,11 +124,11 @@ struct V4F {
         return r;
     }
 
-    float dot(const V4F &r) {
+    float dot(const V4F &r) const {
         return x * r.x + y * r.y + z * r.z + w * r.w;
     }
 
-    float prod(const V4F& b) {
+    float prod(const V4F& b) const {
         return (x * b.x + y * b.y + z * b.z);
     }
 
@@ -200,6 +202,7 @@ struct V4F {
 struct Vertex {
     V4F pos;
     V4F text_coords;
+    V4F normal;
 
     Vertex() {}
 
@@ -211,9 +214,10 @@ struct Vertex {
         pos = V4F(x, y, z, w);
     }
 
-    Vertex(const V4F &in_pos, const V4F &in_text_coords) {
+    Vertex(const V4F &in_pos, const V4F &in_text_coords, const V4F &in_normal) {
         pos = in_pos;
         text_coords = in_text_coords;
+        normal = in_normal;
     }
 
     Vertex transform(const Matrix4F &m);
@@ -255,6 +259,7 @@ struct Gradients {
     V4F text_coords[3];
     float one_over_z[3];
     float depth[3];
+    float light_amount[3];
 
     float text_coord_x_xstep;
     float text_coord_x_ystep;
@@ -267,6 +272,8 @@ struct Gradients {
 
     float depth_x_step;
     float depth_y_step;
+    float light_amount_xstep;
+    float light_amount_ystep;
 
     Gradients(const Vertex& min_y_vert, const Vertex mid_y_vert, const Vertex max_y_vert) {
 		float oneOverdX = 1.0f /
@@ -280,6 +287,11 @@ struct Gradients {
         depth[0] = min_y_vert.pos.z;
         depth[1] = mid_y_vert.pos.z;
         depth[2] = max_y_vert.pos.z;
+
+        V4F light_dir = V4F(0, 0, 1);
+        light_amount[0] = saturate(min_y_vert.normal.dot(light_dir));
+        light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir));
+        light_amount[2] = saturate(max_y_vert.normal.dot(light_dir));
 
         // The z value is the occlusion z value.
         one_over_z[0] = 1.0f / min_y_vert.pos.w;
@@ -314,6 +326,12 @@ struct Gradients {
 
         depth_y_step = (((depth[1] - depth[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
                 ((depth[0] - depth[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+
+        light_amount_xstep = (((light_amount[1] - light_amount[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+             ((light_amount[0] - light_amount[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+
+        light_amount_ystep = (((light_amount[1] - light_amount[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((light_amount[0] - light_amount[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
     }
 };
 
@@ -447,6 +465,9 @@ struct Edge {
     float depth;
     float depth_step;
 
+    float light_amount;
+    float light_amount_step;
+
     Edge() {}
     Edge(const Vertex &min_y_vert, const Vertex &max_y_vert, const Gradients &gradients, int min_y_vert_index) {
     	y_start = (int)std::ceil(min_y_vert.pos.y);
@@ -478,6 +499,11 @@ struct Edge {
             gradients.depth_x_step * x_prestep +
             gradients.depth_y_step * y_prestep;
         depth_step = gradients.depth_y_step + gradients.depth_x_step * x_step;
+
+        light_amount = gradients.light_amount[min_y_vert_index] +
+            gradients.light_amount_xstep * x_prestep +
+            gradients.light_amount_ystep * y_prestep;
+        light_amount_step = gradients.light_amount_ystep + gradients.light_amount_xstep * x_step;
     }
 
     void step() {
@@ -486,6 +512,7 @@ struct Edge {
         text_coord_y += text_coord_ystep;
         one_over_z += one_over_zstep;
         depth += depth_step;
+        light_amount += light_amount_step;
     }
 };
 

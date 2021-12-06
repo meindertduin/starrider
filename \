@@ -54,25 +54,25 @@ void Rasterizer::clear_depth_buffer() {
 }
 
 void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture) {
-    Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
+  Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
     Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);
     Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert, gradients, 0);
     Edge middle_to_top = Edge(mid_y_vert, max_y_vert, gradients, 1);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness, texture, gradients);
-    scan_edges(bottom_to_top, middle_to_top, handedness, texture, gradients);
+    scan_edges(bottom_to_top, bottom_to_middle, handedness, texture);
+    scan_edges(bottom_to_top, middle_to_top, handedness, texture);
 }
 
-void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &texture, const Gradients &gradients) {
+void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &texture) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
     for(int j = y_start; j < y_end; j++) {
         if (handedness) {
-            draw_scanline(b, a, j, texture, gradients);
+            draw_scanline(b, a, j, texture);
         } else {
-            draw_scanline(a, b, j, texture, gradients);
+            draw_scanline(a, b, j, texture);
         }
         a.step();
         b.step();
@@ -85,10 +85,10 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
     float x_prestep = (float)x_min - left.x;
 
     float x_dist = right.x - left.x;
-    float text_coord_x_xstep = gradients.text_coord_x_xstep;
-    float text_coord_y_xstep = gradients.text_coord_y_xstep;
-    float one_over_zx_step = gradients.one_over_zx_step;
-    float depth_x_step = gradients.depth_x_step;
+    float text_coord_x_xstep = (right.text_coord_x - left.text_coord_x) / x_dist;
+    float text_coord_y_xstep = (right.text_coord_y - left.text_coord_y) / x_dist;
+    float one_over_zx_step = (right.one_over_z - left.one_over_z) / x_dist;
+    float depth_x_step = (right.depth - left.depth) / x_dist;
     float light_amount_xstep = gradients.light_amount_xstep;
 
     float text_coord_x = left.text_coord_x + text_coord_x_xstep * x_prestep;
@@ -106,10 +106,6 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
             int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 
             uint32_t value = texture.get_value(src_x, src_y);
-
-            uint32_t light = light_amount * 255;
-            value = (uint32_t) (0xff << 24) | (light << 16) | (light << 8) | light;
-
             p_renderer->set_frame_pixel(i, j, value);
             p_z_buffer[index] = depth;
         }
@@ -118,6 +114,5 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
         text_coord_y += text_coord_y_xstep;
         one_over_z += one_over_zx_step;
         depth += depth_x_step;
-        light_amount += light_amount_xstep;
     }
 }
