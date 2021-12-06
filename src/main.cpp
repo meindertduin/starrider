@@ -28,7 +28,7 @@ int main() {
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
     screen_space.init_screen_space_transform(400.0f, 400.0f);
-    translation.init_translation(0, 0, 2);
+    translation.init_translation(0, 0, 20);
 
     Camera camera{projection};
 

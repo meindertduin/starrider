@@ -122,6 +122,10 @@ struct V4F {
         return r;
     }
 
+    float dot(const V4F &r) {
+        return x * r.x + y * r.y + z * r.z + w * r.w;
+    }
+
     float prod(const V4F& b) {
         return (x * b.x + y * b.y + z * b.z);
     }
@@ -507,6 +511,8 @@ struct Quaternion {
     }
 
     Quaternion(V4F axis, float angle) {
+        angle = angle /360 * (float)M_PI * 2;
+
         float sin_half_angle = std::sin(angle / 2.0f);
         float cos_half_angle = std::cos(angle / 2.0f);
 
@@ -581,7 +587,7 @@ struct Quaternion {
 		V4F right = V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
 
         Matrix4F r;
-        r.init_rotation(forward, up, right);
+        r.init_rotation(forward.normalized(), up.normalized(), right.normalized());
 
         return r;
     }
@@ -654,7 +660,7 @@ struct Transform {
 
     Quaternion get_look_at_position(const V4F &point, const V4F &up) {
         Matrix4F rot;
-        rot.init_rotation((point - pos).normalized(), up);
+        rot.init_rotation(point, up);
 
         return Quaternion(rot);
     }
