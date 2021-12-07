@@ -2,6 +2,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "../io/ObjReader.h"
+
 float saturate(float val) {
     if (val < 0.0f) {
         return 0.0f;
@@ -18,37 +20,8 @@ Vertex Vertex::transform(const Matrix4F &m) {
 }
 
 bool Mesh::load_from_obj_file(std::string path) {
-    std::ifstream fs(path);
-
-    if (!fs.is_open())
-        return false;
-
-    std::vector<Vertex> vertexes;
-
-    while(!fs.eof()) {
-        char line[128]; // presumption that lines aren't over 128 characters wide
-        fs.getline(line, 128);
-
-        std::stringstream ss;
-        ss << line;
-
-        char temp;
-        if (line[0] == 'v') {
-            float x, y, z;
-            ss >> temp >> x >> y >> z;
-
-            vertexes.push_back(Vertex(x, y, z));
-        }
-
-        if (line[0] == 'f') {
-            int f[3];
-            ss >> temp >> f[0] >> f[1] >> f[2];
-            triangles.push_back(Triangle(vertexes[f[0] -1], vertexes[f[1] - 1], vertexes[f[2] - 1]));
-        }
-    }
-
-    fs.close();
-    return true;
+    ObjReader obj_reader;
+    return obj_reader.read_file(path);
 }
 
 // tests and returns the vector where the line intersects with a plane

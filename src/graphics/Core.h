@@ -110,7 +110,7 @@ struct V4F {
     }
 
     float length() const {
-        return sqrtf(x * x + y * y + z * z);
+        return sqrtf(x * x + y * y + z * z + w * w);
     }
 
     void normalise() {
@@ -288,7 +288,7 @@ struct Gradients {
         depth[1] = mid_y_vert.pos.z;
         depth[2] = max_y_vert.pos.z;
 
-        V4F light_dir = V4F(0, 0, 1);
+        V4F light_dir = V4F(0, 0 , 1);
         light_amount[0] = saturate(min_y_vert.normal.dot(light_dir));
         light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir));
         light_amount[2] = saturate(max_y_vert.normal.dot(light_dir));

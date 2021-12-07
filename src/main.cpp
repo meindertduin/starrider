@@ -68,6 +68,9 @@ int main() {
             translated_tri.p[1] = triangle.p[1].transform(transform);
             translated_tri.p[2] = triangle.p[2].transform(transform);
 
+            Vertex line1 = translated_tri.p[1] - translated_tri.p[0];
+            Vertex line2 = translated_tri.p[2] - translated_tri.p[0];
+
             clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
             for (int n = 0; n < clipped_triangles; n++) {
                 Triangle proj_tri;
