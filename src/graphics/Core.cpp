@@ -21,7 +21,11 @@ Vertex Vertex::transform(const Matrix4F &m) {
 
 bool Mesh::load_from_obj_file(std::string path) {
     ObjReader obj_reader;
-    return obj_reader.read_file(path);
+    if (!obj_reader.read_file(path))
+        return false;
+
+    triangles = obj_reader.create_vertices();
+    return true;
 }
 
 // tests and returns the vector where the line intersects with a plane

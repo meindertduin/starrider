@@ -1,5 +1,6 @@
 #include <sstream>
 #include <fstream>
+#include <map>
 
 #include "ObjReader.h"
 
@@ -36,7 +37,7 @@ bool ObjReader::read_file(string path) {
             float x, y;
             ss >> x >> y;
 
-            m_tex_coords.push_back(std::pair<float, float>(x, y));
+            m_tex_coords.push_back(V4F(x, y, 0));
         }
 
         if (first_token == "vn") {
@@ -52,10 +53,10 @@ bool ObjReader::read_file(string path) {
             while(std::getline(ss, value, ' '))
                 tokens.push_back(value);
 
-            for (int i = 0; i < tokens.size() - 2; i++) {
-                m_indices.push_back(parse_object_index(tokens[0]));
-                m_indices.push_back(parse_object_index(tokens[1 + i]));
+            for (int i = 0; i < tokens.size() - 3; i++) {
+                m_indices.push_back(parse_object_index(tokens[1]));
                 m_indices.push_back(parse_object_index(tokens[2 + i]));
+                m_indices.push_back(parse_object_index(tokens[3 + i]));
             }
         }
     }
@@ -64,8 +65,29 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-vector<Vertex> ObjReader::create_vertices() {
-    vector<Vertex> result;
+vector<Triangle> ObjReader::create_vertices() {
+    std::vector<Triangle> result;
+
+    for (int i = 0; i < m_indices.size(); i += 3) {
+        Vertex vertecis[3];
+
+        for (int j = 0; j < 3; j++) {
+            auto current_index = m_indices[i + j];
+            vertecis[j].pos = m_vertices[current_index.vertex_index];
+
+            if (has_tex_coords) {
+                vertecis[j].text_coords = m_tex_coords[current_index.tex_coord_index];
+            }
+
+            if (has_normal_indices) {
+                vertecis[j].normal = m_normals[current_index.normal_index];
+            }
+        }
+
+        result.push_back(Triangle(vertecis[0], vertecis[1], vertecis[2]));
+    }
+
+    return result;
 }
 
 ObjIndex ObjReader::parse_object_index(string token) {
@@ -77,6 +99,11 @@ ObjIndex ObjReader::parse_object_index(string token) {
     string value;
 
     while(std::getline(ss, value, '/')) {
+        if (value == "") {
+            i++;
+            continue;
+        }
+
         if (i == 0) {
             result.vertex_index = std::stoi(value) - 1;
         } else if (i == 1) {

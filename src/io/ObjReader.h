@@ -18,10 +18,10 @@ class ObjReader {
 public:
     ObjReader();
     bool read_file(string path);
-    vector<Vertex> create_vertices();
+    vector<Triangle> create_vertices();
 private:
     vector<V4F> m_vertices;
-    vector<std::pair<float, float>> m_tex_coords;
+    vector<V4F> m_tex_coords;
     vector<ObjIndex> m_indices;
     vector<V4F> m_normals;
 
