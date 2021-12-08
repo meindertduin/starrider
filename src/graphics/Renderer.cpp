@@ -6,6 +6,14 @@
 
 
 Renderer::Renderer(GWindow* window) : p_window(window) {
+    auto set_dimensions = [&] {
+        m_width = p_window->m_width;
+        m_height = p_window->m_height;
+    };
+
+    set_dimensions();
+    p_window->set_on_resize(set_dimensions);
+
     m_gc = XCreateGC(window->get_display(), window->get_window(), 0, nullptr);
     auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen_num());
 

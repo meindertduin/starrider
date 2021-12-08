@@ -8,7 +8,7 @@
 #include "graphics/RenderPipeline.h"
 
 int main() {
-    GWindow window;
+    GWindow window {800, 800};
     if (!window.initialize()) {
         printf("Graphics Error: Something went wrong while creating the main window\n");
         return 1;
@@ -16,12 +16,15 @@ int main() {
 
     Bitmap texture("test_texture.bmp");
     Renderer renderer {&window};
-    Rasterizer rasterizer {&renderer, 800, 800};
+
+    Rasterizer rasterizer {&renderer, window.m_width, window.m_height};
+
+    RenderPipeline render_pipeline {&renderer};
+
+    // TODO: Values that may belong to a scene?
     Mesh mesh;
     mesh.load_from_obj_file("monkey0.obj");
     mesh.texture = &texture;
-
-    RenderPipeline render_pipeline {&renderer};
 
     Matrix4F projection;
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);

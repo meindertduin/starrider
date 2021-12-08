@@ -13,6 +13,9 @@ public:
     void set_frame_pixel(int x_pos, int y_pos, uint32_t value);
     void clear_screen();
     bool render();
+
+    int m_height = 800;
+    int m_width = 800;
 private:
     GWindow *p_window;
     Visual* p_visual;
@@ -21,8 +24,6 @@ private:
     GC m_gc;
 
     uint32_t* m_framebuffer;
-    int m_height = 800;
-    int m_width = 800;
 
     bool setup_shared_memory();
 };
