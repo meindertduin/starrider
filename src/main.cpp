@@ -18,7 +18,7 @@ int main() {
     Renderer renderer {&window};
     Rasterizer rasterizer {&renderer, 800, 800};
     Mesh mesh;
-    mesh.load_from_obj_file("monkey2.obj");
+    mesh.load_from_obj_file("monkey0.obj");
 
     texture.width = 16;
     texture.height = 16;
@@ -47,7 +47,7 @@ int main() {
         rasterizer.clear_depth_buffer();
 
         Triangle translated_tri;
-        monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 10));
+        monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 0.5));
         Matrix4F transform = monkey_transform.get_matrix_transformation();
 
         for (auto triangle : mesh.triangles) {
