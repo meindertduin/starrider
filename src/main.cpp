@@ -20,9 +20,6 @@ int main() {
     Mesh mesh;
     mesh.load_from_obj_file("monkey0.obj");
 
-    texture.width = 16;
-    texture.height = 16;
-
     Matrix4F projection, screen_space;
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);

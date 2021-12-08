@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <memory>
 
 #include "../io/BmpReader.h"
 
@@ -299,9 +300,9 @@ struct Gradients {
         depth[2] = max_y_vert.pos.z;
 
         V4F light_dir = V4F(0, 0, -1);
-        light_amount[0] = saturate(min_y_vert.normal.dot(light_dir));
-        light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir));
-        light_amount[2] = saturate(max_y_vert.normal.dot(light_dir));
+        light_amount[0] = saturate(min_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
+        light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
+        light_amount[2] = saturate(max_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
 
         // The z value is the occlusion z value.
         one_over_z[0] = 1.0f / min_y_vert.pos.w;
@@ -535,6 +536,7 @@ struct Edge {
 
 struct Mesh {
     std::vector<Triangle> triangles;
+    Bitmap *texture;
 
     Mesh() {}
     bool load_from_obj_file(std::string path);

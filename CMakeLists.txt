@@ -9,7 +9,7 @@ project(${PROJECT_NAME} VERSION ${starrider_version} LANGUAGES CXX C)
 
 #file(GLOB SOURCES "${PORJECT_SOURCE_DIR}/main.cpp" "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-set(SOURCES src/main.cpp src/graphics/Window.cpp src/graphics/Renderer.cpp src/graphics/Core.cpp src/graphics/Rasterizer.cpp src/io/BmpReader.cpp src/graphics/Camera.cpp src/io/ObjReader.cpp)
+set(SOURCES src/main.cpp src/graphics/Window.cpp src/graphics/Renderer.cpp src/graphics/Core.cpp src/graphics/Rasterizer.cpp src/io/BmpReader.cpp src/graphics/Camera.cpp src/io/ObjReader.cpp src/graphics/RenderPipeline.cpp src/entity/Entity.cpp)
 set(HEADERS include)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
