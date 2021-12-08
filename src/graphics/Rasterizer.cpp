@@ -107,7 +107,7 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
 
             uint32_t value = texture.get_value(src_x, src_y);
 
-            uint32_t light = light_amount * 255;
+            uint32_t light = light_amount * 255.0f;
             value = (uint32_t) (0xff << 24) | (light << 16) | (light << 8) | light;
 
             p_renderer->set_frame_pixel(i, j, value);

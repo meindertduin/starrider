@@ -18,17 +18,17 @@ int main() {
     Renderer renderer {&window};
     Rasterizer rasterizer {&renderer, 800, 800};
     Mesh mesh;
-    mesh.load_from_obj_file("teapot.obj");
+    mesh.load_from_obj_file("monkey2.obj");
 
     texture.width = 16;
     texture.height = 16;
 
-    Matrix4F identity, projection, translation, rotation_y, screen_space;
-    identity.init_identity();
+    Matrix4F projection, screen_space;
     float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
     screen_space.init_screen_space_transform(400.0f, 400.0f);
-    translation.init_translation(0, 0, 8);
+
+    Transform monkey_transform = Transform(V4F(0, 0, 5));
 
     Camera camera{projection};
 
@@ -47,15 +47,10 @@ int main() {
         rasterizer.clear_depth_buffer();
 
         Triangle translated_tri;
-        rotation_y.init_rotation(0, time, 0);
-        Matrix4F transform = identity * rotation_y * translation;
-
+        monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 10));
+        Matrix4F transform = monkey_transform.get_matrix_transformation();
 
         for (auto triangle : mesh.triangles) {
-            triangle.p[0].text_coords = V4F(0, 0, 0);
-            triangle.p[1].text_coords = V4F(0.5, 1, 0);
-            triangle.p[2].text_coords = V4F(1, 0, 0);
-
             int clipped_triangles = 0;
             Triangle clipped[2];
 
@@ -68,9 +63,6 @@ int main() {
             translated_tri.p[1] = triangle.p[1].transform(transform);
             translated_tri.p[2] = triangle.p[2].transform(transform);
 
-            Vertex line1 = translated_tri.p[1] - translated_tri.p[0];
-            Vertex line2 = translated_tri.p[2] - translated_tri.p[0];
-
             clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
             for (int n = 0; n < clipped_triangles; n++) {
                 Triangle proj_tri;
@@ -78,6 +70,10 @@ int main() {
                 proj_tri.p[0] = clipped[n].p[0].transform(vp);
                 proj_tri.p[1] = clipped[n].p[1].transform(vp);
                 proj_tri.p[2] = clipped[n].p[2].transform(vp);
+
+                proj_tri.p[0].normal_transform(transform);
+                proj_tri.p[1].normal_transform(transform);
+                proj_tri.p[2].normal_transform(transform);
 
                 proj_tri.p[0] = proj_tri.p[0].transform(screen_space).perspective_divide();
                 proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();

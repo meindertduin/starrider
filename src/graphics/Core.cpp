@@ -19,6 +19,14 @@ Vertex Vertex::transform(const Matrix4F &m) {
     return Vertex(m.transform(pos), text_coords, normal);
 }
 
+void Vertex::normal_transform(const Matrix4F &normal_matrix) {
+    normal = normal_matrix.transform(normal).normalized();
+}
+
+Vertex Vertex::transform(const Matrix4F &transform, const Matrix4F &normal) {
+    return Vertex(transform.transform(pos), text_coords, normal.transform(this->normal).normalized());
+}
+
 bool Mesh::load_from_obj_file(std::string path) {
     ObjReader obj_reader;
     if (!obj_reader.read_file(path))

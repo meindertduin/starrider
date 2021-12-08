@@ -221,6 +221,8 @@ struct Vertex {
     }
 
     Vertex transform(const Matrix4F &m);
+    Vertex transform(const Matrix4F &transform, const Matrix4F &normal);
+    void normal_transform(const Matrix4F &normal_matrix);
 
     Vertex& perspective_divide() {
         if (pos.w != 0.0) {
@@ -288,7 +290,7 @@ struct Gradients {
         depth[1] = mid_y_vert.pos.z;
         depth[2] = max_y_vert.pos.z;
 
-        V4F light_dir = V4F(0, 0 , 1);
+        V4F light_dir = V4F(0, 1 , 0);
         light_amount[0] = saturate(min_y_vert.normal.dot(light_dir));
         light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir));
         light_amount[2] = saturate(max_y_vert.normal.dot(light_dir));
@@ -408,6 +410,13 @@ struct Matrix4F {
         m[1][0] = up.x;         m[1][1] = up.y;         m[1][2] = up.z;         m[1][3] = 0;
         m[2][0] = forward.x;    m[2][1] = forward.y;    m[2][2] = forward.z;    m[2][3] = 0;
         m[3][0] = 0;            m[3][1] = 0;            m[3][2] = 0;            m[3][3] = 1;
+    }
+
+    void init_scale(float x, float y, float z) {
+        m[0][0] = x;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = 0;
+		m[1][0] = 0;	m[1][1] = y;	m[1][2] = 0;	m[1][3] = 0;
+		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = z;	m[2][3] = 0;
+		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
     }
 
     void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
@@ -671,6 +680,16 @@ struct Transform {
         this->pos = pos;
         this->rot = rot;
         this->scale = scale;
+    }
+
+    Matrix4F get_matrix_transformation() {
+        Matrix4F translation, rotation, scale, identity;
+
+        translation.init_translation(pos.x,  pos.y, pos.z);
+        rotation = rot.conjugate().to_rotation_matrix();
+        scale.init_scale(this->scale.x, this->scale.y, this->scale.z);
+
+        return rotation * translation * scale;
     }
 
     Transform set_pos(const V4F &pos) {
