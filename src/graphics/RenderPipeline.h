@@ -5,6 +5,7 @@
 #include "Core.h"
 #include "Camera.h"
 #include "Renderer.h"
+#include "Rasterizer.h"
 
 struct Renderable {
     Transform *transform;
@@ -18,4 +19,6 @@ public:
     void render_frame(const Camera &camera, std::vector<Renderable> renderables);
 private:
     Renderer* p_renderer;
+    Rasterizer m_rasterizer;
+    Matrix4F m_screen_space;
 };

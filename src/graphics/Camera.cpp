@@ -4,7 +4,7 @@ Camera::Camera(const Matrix4F &projection) {
     m_projection = projection;
 }
 
-Matrix4F Camera::get_view_projection() {
+Matrix4F Camera::get_view_projection() const {
     V4F camera_pos = m_transform.pos * -1;
 
     Matrix4F camera_trans;

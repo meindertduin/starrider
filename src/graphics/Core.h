@@ -619,7 +619,7 @@ struct Quaternion {
         return Quaternion(x / l, y / l, z / l, w / l);
     }
 
-    Quaternion conjugate() {
+    Quaternion conjugate() const {
         return Quaternion(-x, -y, -z, w);
     }
 
