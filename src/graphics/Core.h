@@ -28,9 +28,17 @@ struct Bitmap {
         delete[] bitmap;
     }
 
-    uint32_t get_value(int x_pos, int y_pos) const {
-        return bitmap[width * y_pos + x_pos];
+    uint32_t get_value(int x_pos, int y_pos, float light_amount) const {
+        uint32_t value = bitmap[width * y_pos + x_pos];
+
+        uint8_t alpha = 0xFF;
+        uint8_t red = ((value & 0x00FF0000) >> 16) * light_amount;
+        uint8_t blue = ((value & 0x00FF00) >> 8) * light_amount;
+        uint8_t green = (value & 0x000000FF) * light_amount;
+
+        return ((uint32_t)alpha << 24) | ((uint32_t)red << 16) | ((uint32_t)blue << 8) | ((uint32_t)green);
     }
+
 };
 
 struct Color {
@@ -290,7 +298,7 @@ struct Gradients {
         depth[1] = mid_y_vert.pos.z;
         depth[2] = max_y_vert.pos.z;
 
-        V4F light_dir = V4F(0, 1, 0);
+        V4F light_dir = V4F(0, 0, -1);
         light_amount[0] = saturate(min_y_vert.normal.dot(light_dir));
         light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir));
         light_amount[2] = saturate(max_y_vert.normal.dot(light_dir));

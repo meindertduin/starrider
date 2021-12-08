@@ -28,7 +28,7 @@ int main() {
     projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
     screen_space.init_screen_space_transform(400.0f, 400.0f);
 
-    Transform monkey_transform = Transform(V4F(0, 0, 5));
+    Transform monkey_transform = Transform(V4F(0, 0, 2));
 
     Camera camera{projection};
 
