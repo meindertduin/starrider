@@ -6,8 +6,22 @@
 #include "../graphics/Camera.h"
 #include "../graphics/RenderPipeline.h"
 
+Application* Application::sp_instance = nullptr;
+
 Application::Application() {
 
+}
+
+Application::~Application() {
+    delete sp_instance;
+}
+
+Application* Application::get_instance() {
+    if (sp_instance == nullptr) {
+        sp_instance = new Application();
+    }
+
+    return sp_instance;
 }
 
 bool Application::initialize(const AppSettings &settings) {

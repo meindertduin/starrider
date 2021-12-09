@@ -1,14 +1,14 @@
 #include "core/Application.h"
 
 int main() {
-    Application app;
+    auto app = Application::get_instance();
 
-    app.initialize({
+    app->initialize({
         .win_width = 800,
         .win_height = 800,
     });
 
-    app.run();
+    app->run();
 
     return 0;
 }

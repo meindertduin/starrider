@@ -2,6 +2,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <math.h>
+#include <X11/Xutil.h>
 
 #include "../core/Window.h"
 #include "Renderer.h"

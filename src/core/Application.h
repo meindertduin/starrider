@@ -9,12 +9,19 @@ struct AppSettings {
 
 class Application {
 public:
-    Application();
-    bool initialize(const AppSettings &settings);
+    ~Application();
 
-    GWindow get_window();
+    static Application* get_instance();
+
+    bool initialize(const AppSettings &settings);
     void run();
+    GWindow get_window();
+protected:
+    Application();
+
 private:
     GWindow m_window;
     bool m_running;
+
+    static Application *sp_instance;
 };
