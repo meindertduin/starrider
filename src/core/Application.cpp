@@ -78,7 +78,7 @@ void Application::poll_window_events() {
 
     while(m_window.poll_event(event)) {
         if (event.type == Expose)  {
-
+            emit_event({});
         }
     }
 }

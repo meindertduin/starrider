@@ -1,22 +1,23 @@
 #pragma once
 
 #include "Window.h"
+#include "Events.h"
 
 struct AppSettings {
     int win_width;
     int win_height;
 };
 
-class Application {
+class Application : public EventSubject<InputEvent> {
 public:
     static Application* get_instance();
+    ~Application();
 
     bool initialize(const AppSettings &settings);
     void run();
     GWindow get_window();
 protected:
     Application();
-    ~Application();
 
 private:
     GWindow m_window;
