@@ -55,14 +55,9 @@ void Application::run() {
 
     Matrix4F vp = camera.get_view_projection();
 
-    XEvent event;
     float time = 0.0f;
     while (m_running) {
-
-        while(m_window.poll_event(event)) {
-            if (event.type == Expose)  {
-            }
-        }
+        poll_window_events();
 
         monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 0.5));
 
@@ -78,4 +73,12 @@ void Application::run() {
     }
 }
 
+void Application::poll_window_events() {
+    XEvent event;
 
+    while(m_window.poll_event(event)) {
+        if (event.type == Expose)  {
+
+        }
+    }
+}

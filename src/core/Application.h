@@ -9,8 +9,6 @@ struct AppSettings {
 
 class Application {
 public:
-    ~Application();
-
     static Application* get_instance();
 
     bool initialize(const AppSettings &settings);
@@ -18,10 +16,13 @@ public:
     GWindow get_window();
 protected:
     Application();
+    ~Application();
 
 private:
     GWindow m_window;
     bool m_running;
+
+    void poll_window_events();
 
     static Application *sp_instance;
 };
