@@ -1,8 +1,10 @@
-#include "Renderer.h"
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <math.h>
+
+#include "../core/Window.h"
+#include "Renderer.h"
 
 
 Renderer::Renderer(GWindow* window) : p_window(window) {

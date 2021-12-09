@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Window.h"
+#include "../core/Window.h"
 #include "Core.h"
 #include <X11/Xutil.h>
 

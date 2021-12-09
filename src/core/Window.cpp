@@ -2,15 +2,17 @@
 #include <X11/extensions/XShm.h>
 #include <stdio.h>
 
-GWindow::GWindow(int width, int height) : m_width(width), m_height(height) {
-
+GWindow::GWindow() {
 }
 
 GWindow::~GWindow() {
     XCloseDisplay(p_display);
 }
 
-bool GWindow::initialize() {
+bool GWindow::initialize(int width, int height) {
+    m_width = width;
+    m_height = height;
+
     p_display = XOpenDisplay(NULL);
     if (p_display == nullptr) {
         return false;

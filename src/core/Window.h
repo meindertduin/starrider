@@ -10,12 +10,12 @@
 // this implementation only supports X11. Which will be fine for now.
 class GWindow {
 public:
-    GWindow(int width, int height);
+    GWindow();
     ~GWindow();
 
     bool ready_for_render = true;
 
-    bool initialize();
+    bool initialize(int width, int height);
     bool poll_event(XEvent &event);
 
     Display* get_display();
