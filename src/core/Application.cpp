@@ -82,3 +82,7 @@ void Application::poll_window_events() {
         }
     }
 }
+
+GWindow* Application::get_window() {
+    return &m_window;
+}
