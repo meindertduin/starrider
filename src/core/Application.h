@@ -8,7 +8,7 @@ struct AppSettings {
     int win_height;
 };
 
-class Application : public EventSubject<InputEvent> {
+class Application : public MultiEventSubject<InputEvent> {
 public:
     static Application* get_instance();
     ~Application();

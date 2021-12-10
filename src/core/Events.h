@@ -1,9 +1,15 @@
 #pragma once
 
 #include <list>
+#include <map>
 
 struct InputEvent {
 
+};
+
+enum class EventType {
+    Input,
+    Window,
 };
 
 template<typename T>
@@ -42,3 +48,42 @@ protected:
 private:
     std::list<EventObserver<T>*> m_observers;
 };
+
+template<typename T>
+class MultiEventSubject {
+public:
+    virtual ~MultiEventSubject() {}
+
+    virtual void listen(EventObserver<T>* observer, EventType type) {
+
+        if (!m_observers.count(type)) {
+            m_observers[type] = std::list<EventObserver<T>*>();
+            m_observers[type].push_back(observer);
+            return;
+        }
+
+        m_observers[type].push_back(observer);
+    }
+    virtual void unlisten(EventObserver<T>* observer, EventType type) {
+        if (!m_observers.count(type)) {
+            m_observers[type].remove(observer);
+        }
+    }
+
+    virtual void emit_event(const T &event, EventType type) {
+        if (!m_observers.count(type)) {
+            return;
+        }
+
+        for (EventObserver<T>* observer : m_observers[type]) {
+            observer->on_event(event);
+        }
+    }
+protected:
+    MultiEventSubject() {}
+private:
+    std::map<EventType, std::list<EventObserver<T>*>> m_observers;
+};
+
+
+
