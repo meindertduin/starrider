@@ -2,15 +2,34 @@
 
 #include <list>
 #include <map>
-
-struct InputEvent {
-
-};
+#include <stdint.h>
 
 enum class EventType {
-    Input,
+    KeyUp,
+    KeyDown,
+    Mouse,
+    MouseButton,
     Window,
 };
+
+
+struct InputEvent {
+    union {
+        struct  {
+            uint32_t x_pos : 16;
+            uint32_t y_pos : 16;
+        };
+
+        struct {
+            uint32_t width : 16;
+            uint32_t height : 16;
+        };
+
+        uint32_t KeyCode;
+    } body;
+    EventType event_type;
+};
+
 
 template<typename T>
 class EventSubject;
