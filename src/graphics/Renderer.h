@@ -2,8 +2,9 @@
 
 #include "../core/Window.h"
 #include "Core.h"
+#include "../core/Application.h"
 
-class Renderer {
+class Renderer : EventObserver<InputEvent> {
 public:
     Renderer(GWindow* window);
     ~Renderer();
@@ -13,6 +14,13 @@ public:
     void clear_screen();
     bool render();
 
+    void on_event(const InputEvent &event) override {
+        if (event.event_type == EventType::Window) {
+            m_width = event.body.width;
+            m_height = event.body.width;
+        }
+    }
+
     int m_height = 800;
     int m_width = 800;
 private:
@@ -21,6 +29,8 @@ private:
     XShmSegmentInfo m_shm_info;
     XImage* p_screen_image;
     GC m_gc;
+
+    Application *p_app;
 
     uint32_t* m_framebuffer;
 

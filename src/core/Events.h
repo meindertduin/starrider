@@ -12,7 +12,6 @@ enum class EventType {
     Window,
 };
 
-
 struct InputEvent {
     union {
         struct  {
@@ -29,7 +28,6 @@ struct InputEvent {
     } body;
     EventType event_type;
 };
-
 
 template<typename T>
 class EventSubject;

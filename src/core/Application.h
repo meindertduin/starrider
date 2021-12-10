@@ -15,7 +15,7 @@ public:
 
     bool initialize(const AppSettings &settings);
     void run();
-    GWindow get_window();
+    GWindow* get_window();
 protected:
     Application();
 

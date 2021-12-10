@@ -9,20 +9,20 @@
 
 
 Renderer::Renderer(GWindow* window) : p_window(window) {
-    auto set_dimensions = [&] {
-        m_width = p_window->m_width;
-        m_height = p_window->m_height;
-    };
+    p_app = Application::get_instance();
+    p_window = p_app->get_window();
 
-    set_dimensions();
-    p_window->set_on_resize(set_dimensions);
+    m_width = p_window->m_width;
+    m_height = p_window->m_height;
 
-    m_gc = XCreateGC(window->get_display(), window->get_window(), 0, nullptr);
+    p_app->listen(this, EventType::Window);
+
+    m_gc = XCreateGC(p_window->get_display(), p_window->get_window(), 0, nullptr);
     auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen_num());
 
     XSetBackground(p_window->get_display(), m_gc, black_color);
 
-    p_visual = DefaultVisual(window->get_display(), DefaultScreen(window->get_display()));
+    p_visual = DefaultVisual(p_window->get_display(), DefaultScreen(p_window->get_display()));
 
     m_framebuffer = new uint32_t[m_width * m_height];
     for (auto i = 0u; i < m_width * m_height; ++i) {
@@ -31,10 +31,12 @@ Renderer::Renderer(GWindow* window) : p_window(window) {
 
     setup_shared_memory();
 
-    XSync(window->get_display(), false);
+    XSync(p_window->get_display(), false);
 }
 
 Renderer::~Renderer() {
+    p_app->unlisten(this, EventType::Window);
+
     XShmDetach(p_window->get_display(), &m_shm_info);
     shmdt(m_shm_info.shmaddr);
     shmctl(m_shm_info.shmid, IPC_RMID, 0);
