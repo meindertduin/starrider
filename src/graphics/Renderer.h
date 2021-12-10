@@ -6,7 +6,7 @@
 
 class Renderer : EventObserver<InputEvent> {
 public:
-    Renderer(GWindow* window);
+    Renderer();
     ~Renderer();
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);

@@ -59,12 +59,4 @@ void GWindow::resize(int width, int height) {
 
     m_width = width;
     m_height = height;
-
-    for (auto callback : m_resize_callbacks) {
-        callback();
-    }
-}
-
-void GWindow::set_on_resize(std::function<void(void)> on_resize) {
-    m_resize_callbacks.push_back(on_resize);
 }

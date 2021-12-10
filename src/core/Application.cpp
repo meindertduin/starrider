@@ -38,7 +38,7 @@ void Application::run() {
     m_running = true;
 
     Bitmap texture("test_texture.bmp");
-    Renderer renderer {&m_window};
+    Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
 
     // TODO: Values that may belong to a scene?

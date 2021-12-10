@@ -25,11 +25,8 @@ public:
     int m_height;
 
     void resize(int width, int height);
-    void set_on_resize(std::function<void(void)> on_resize);
 private:
     Display* p_display;
     Window m_window;
     int m_screen;
-
-    std::vector<std::function<void(void)>> m_resize_callbacks;
 };

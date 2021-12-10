@@ -8,7 +8,7 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer(GWindow* window) : p_window(window) {
+Renderer::Renderer() {
     p_app = Application::get_instance();
     p_window = p_app->get_window();
 
