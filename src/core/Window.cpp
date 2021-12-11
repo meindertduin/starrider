@@ -50,6 +50,14 @@ int GWindow::get_screen_num() {
 bool GWindow::poll_event(XEvent &event) {
     if (XPending(p_display)) {
         XNextEvent(p_display, &event);
+        if (event.type == Expose) {
+            XWindowAttributes attributes;
+            XGetWindowAttributes(p_display, m_window, &attributes);
+
+            m_width = attributes.width;
+            m_height = attributes.height;
+        }
+
         return true;
     }
 

@@ -30,5 +30,7 @@ private:
     uint32_t* m_framebuffer;
 
     bool setup_shared_memory();
+    void shared_memory_resize();
     void create_framebuffer();
+    void remove_shared_memory();
 };

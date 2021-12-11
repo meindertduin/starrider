@@ -55,6 +55,7 @@ void Renderer::on_event(const InputEvent &event) {
 
         delete[] m_framebuffer;
         create_framebuffer();
+        shared_memory_resize();
     }
 }
 
@@ -113,6 +114,17 @@ bool Renderer::setup_shared_memory() {
     }
 
     return true;
+}
+
+void Renderer::shared_memory_resize() {
+    remove_shared_memory();
+    setup_shared_memory();
+}
+
+void Renderer::remove_shared_memory() {
+    XShmDetach(p_window->get_display(), &m_shm_info);
+    shmdt(m_shm_info.shmaddr);
+    shmctl(m_shm_info.shmid, IPC_RMID, 0);
 }
 
 void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
