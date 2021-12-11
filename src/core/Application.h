@@ -16,6 +16,7 @@ public:
     bool initialize(const AppSettings &settings);
     void run();
     GWindow* get_window();
+    void send_window_event(InputEvent event);
 protected:
     Application();
 

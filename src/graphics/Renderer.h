@@ -14,15 +14,10 @@ public:
     void clear_screen();
     bool render();
 
-    void on_event(const InputEvent &event) override {
-        if (event.event_type == EventType::Window) {
-            m_width = event.body.width;
-            m_height = event.body.width;
-        }
-    }
+    void on_event(const InputEvent &event) override;
 
-    int m_height = 800;
-    int m_width = 800;
+    int m_height;
+    int m_width;
 private:
     GWindow *p_window;
     Visual* p_visual;
@@ -35,4 +30,5 @@ private:
     uint32_t* m_framebuffer;
 
     bool setup_shared_memory();
+    void create_framebuffer();
 };

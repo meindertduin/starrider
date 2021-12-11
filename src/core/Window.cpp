@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <X11/extensions/XShm.h>
 #include <stdio.h>
+#include "Application.h"
 
 GWindow::GWindow() {
 }
@@ -23,7 +24,9 @@ bool GWindow::initialize(int width, int height) {
     m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 500, 100, m_width, m_height, 0, black_color, black_color);
     XSetWindowAttributes set_attr;
     set_attr.override_redirect = true;
-    XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
+
+    // TODO add some sort of setting for the window on startup
+    //XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
     XResizeWindow(p_display, m_window, m_width, m_height);
 
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
@@ -59,4 +62,15 @@ void GWindow::resize(int width, int height) {
 
     m_width = width;
     m_height = height;
+
+    auto app = Application::get_instance();
+
+    InputEvent e {
+        .body = {
+            .value = ((uint32_t)m_width << 16) | (uint32_t)m_height,
+        },
+        .event_type = EventType::Window,
+    };
+
+    app->send_window_event(e);
 }

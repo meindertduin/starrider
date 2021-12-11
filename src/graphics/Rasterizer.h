@@ -5,10 +5,11 @@
 
 class Rasterizer {
 public:
-    Rasterizer(Renderer* renderer, int width, int height);
+    Rasterizer(Renderer* renderer);
     ~Rasterizer();
     void draw_triangle(const Triangle &triangle, const Bitmap &texture);
     void clear_depth_buffer();
+    void set_viewport(int width, int height);
 private:
     Renderer* p_renderer;
     int m_width, m_height;

@@ -24,10 +24,11 @@ struct InputEvent {
             uint32_t height : 16;
         };
 
-        uint32_t KeyCode;
+        uint32_t value;
     } body;
     EventType event_type;
 };
+
 
 template<typename T>
 class EventSubject;
@@ -37,7 +38,6 @@ class EventObserver {
 public:
     virtual ~EventObserver() {}
     virtual void on_event(const T &event) = 0;
-
 protected:
     EventObserver() {}
 };

@@ -20,5 +20,4 @@ public:
 private:
     Renderer* p_renderer;
     Rasterizer m_rasterizer;
-    Matrix4F m_screen_space;
 };

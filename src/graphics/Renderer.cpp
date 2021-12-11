@@ -24,11 +24,7 @@ Renderer::Renderer() {
 
     p_visual = DefaultVisual(p_window->get_display(), DefaultScreen(p_window->get_display()));
 
-    m_framebuffer = new uint32_t[m_width * m_height];
-    for (auto i = 0u; i < m_width * m_height; ++i) {
-		*(m_framebuffer+i) = 0x00000000;
-	}
-
+    create_framebuffer();
     setup_shared_memory();
 
     XSync(p_window->get_display(), false);
@@ -50,6 +46,23 @@ Renderer::~Renderer() {
 
 void Renderer::set_color(const Color &color) {
 
+}
+
+void Renderer::on_event(const InputEvent &event) {
+    if (event.event_type == EventType::Window) {
+        m_width = event.body.width;
+        m_height = event.body.width;
+
+        delete[] m_framebuffer;
+        create_framebuffer();
+    }
+}
+
+void Renderer::create_framebuffer() {
+    m_framebuffer = new uint32_t[m_width * m_height];
+    for (auto i = 0u; i < m_width * m_height; ++i) {
+        *(m_framebuffer+i) = 0x00000000;
+    }
 }
 
 bool Renderer::render() {

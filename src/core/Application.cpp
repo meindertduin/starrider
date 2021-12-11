@@ -53,6 +53,9 @@ void Application::run() {
     Transform monkey_transform = Transform(V4F(0, 0, 2));
     Camera camera{projection};
 
+    camera.width = m_window.m_width;
+    camera.height = m_window.m_height;
+
     Matrix4F vp = camera.get_view_projection();
 
     float time = 0.0f;
@@ -77,12 +80,27 @@ void Application::poll_window_events() {
     XEvent event;
 
     while(m_window.poll_event(event)) {
+        // resize from the server event
         if (event.type == Expose)  {
+            uint32_t width = m_window.m_width;
+            uint32_t height = m_window.m_height;
 
+            InputEvent e {
+                .body = {
+                    .value = (width << 16) | height,
+                },
+                .event_type = EventType::Window,
+            };
+
+            emit_event(e, EventType::Window);
         }
     }
 }
 
 GWindow* Application::get_window() {
     return &m_window;
+}
+
+void Application::send_window_event(InputEvent event) {
+    emit_event(event, EventType::Window);
 }

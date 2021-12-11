@@ -1,9 +1,8 @@
 
 #include "Rasterizer.h"
 
-Rasterizer::Rasterizer(Renderer* renderer, int width, int height)
-    : p_renderer(renderer), m_width(width), m_height(height) {
-    p_z_buffer = new float[width * height];
+Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
+
 }
 
 Rasterizer::~Rasterizer() {
@@ -116,5 +115,15 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
         one_over_z += one_over_zx_step;
         depth += depth_x_step;
         light_amount += light_amount_xstep;
+    }
+}
+
+void Rasterizer::set_viewport(int width, int height) {
+    if (m_width != width || height != m_height) {
+        m_width = width;
+        m_height = height;
+
+        delete[] p_z_buffer;
+        p_z_buffer = new float[width * height];
     }
 }
