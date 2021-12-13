@@ -10,7 +10,7 @@ Application* Application::sp_instance = nullptr;
 
 Application::Application() {
     Matrix4F projection;
-    projection.init_perspective(deg_to_rad(45.0f), 1.0f, 0.1f, 1000.0f);
+    projection.init_perspective(deg_to_half_rad(90.0f), 1.0f, 0.1f, 1000.0f);
 
     p_camera = new Camera(projection);
 
