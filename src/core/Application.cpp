@@ -4,23 +4,15 @@
 #include "../graphics/Core.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
-#include "../math/Radians.h"
 
 Application* Application::sp_instance = nullptr;
 
 Application::Application() {
-    Matrix4F projection;
-    projection.init_perspective(deg_to_half_rad(90.0f), 1.0f, 0.1f, 1000.0f);
-
-    p_camera = new Camera(projection);
-
-    p_camera->width = m_window.m_width;
-    p_camera->height = m_window.m_height;
+    m_camera.set_viewport(m_window.m_width, m_window.m_height);
 }
 
 Application::~Application() {
     delete sp_instance;
-    delete p_camera;
 }
 
 Application* Application::get_instance() {
@@ -55,7 +47,7 @@ void Application::run() {
 
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
-    Matrix4F vp = p_camera->get_view_projection();
+    Matrix4F vp = m_camera.get_view_projection();
 
     float time = 0.0f;
     while (m_running) {
@@ -69,7 +61,7 @@ void Application::run() {
             .mesh = &mesh,
         });
 
-        render_pipeline.render_frame(*p_camera, renderables);
+        render_pipeline.render_frame(m_camera, renderables);
 
         time += 1.0f / 300.0f;
     }
@@ -84,13 +76,7 @@ void Application::poll_window_events() {
             uint32_t width = m_window.m_width;
             uint32_t height = m_window.m_height;
 
-            p_camera->width = width;
-            p_camera->height = height;
-
-            Matrix4F projection;
-            float aspect_ratio = (float)width / (float)height;
-            projection.init_perspective(deg_to_half_rad(90.0f) / aspect_ratio, aspect_ratio, 0.1f, 1000.0f);
-            p_camera->set_projection(projection);
+            m_camera.set_viewport(width, height);
 
             InputEvent e {
                 .body = {

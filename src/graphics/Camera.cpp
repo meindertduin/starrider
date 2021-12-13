@@ -1,11 +1,20 @@
 #include "Camera.h"
+#include "../math/Radians.h"
 
-Camera::Camera(const Matrix4F &projection) {
-    m_projection = projection;
+Camera::Camera() {
+    m_zfar = 1000.0f;
+    m_znear = 0.1f;
+    m_fov = 90.0f;
+
+    m_projection.init_perspective(deg_to_half_rad(m_fov), 1.0f, m_znear, m_zfar);
 }
 
-void Camera::set_projection(const Matrix4F &projection) {
-    m_projection = projection;
+void Camera::set_viewport(int width, int height) {
+    this->width = width;
+    this->height = height;
+
+    float aspect_ratio = (float) width / (float) height;
+    m_projection.init_perspective(deg_to_half_rad(m_fov) / aspect_ratio, aspect_ratio, m_znear, m_zfar);
 }
 
 Matrix4F Camera::get_view_projection() const {
@@ -16,4 +25,3 @@ Matrix4F Camera::get_view_projection() const {
 
     return  camera_trans * m_transform.rot.conjugate().to_rotation_matrix() * m_projection;
 }
-
