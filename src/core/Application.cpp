@@ -4,13 +4,13 @@
 #include "../graphics/Core.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
+#include "../math/Radians.h"
 
 Application* Application::sp_instance = nullptr;
 
 Application::Application() {
     Matrix4F projection;
-    float rad = 1.0 / std::tan(90.0f * 0.5f / 180.0f * 3.14159f);
-    projection.init_perspective(rad, 1.0f, 0.1f, 1000.0f);
+    projection.init_perspective(deg_to_rad(45.0f), 1.0f, 0.1f, 1000.0f);
 
     p_camera = new Camera(projection);
 

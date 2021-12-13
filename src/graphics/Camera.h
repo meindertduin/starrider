@@ -5,6 +5,7 @@
 class Camera {
 public:
     Camera(const Matrix4F &projection);
+    void set_projection(const Matrix4F &projection);
     Matrix4F get_view_projection() const;
     int width, height;
 private:
