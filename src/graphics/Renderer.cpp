@@ -117,6 +117,8 @@ bool Renderer::setup_shared_memory() {
 }
 
 void Renderer::shared_memory_resize() {
+    // TODO there might be a better way to implement resizing the shared memory.
+    // Now I wanted something to work, but to improve checkout: https://stackoverflow.com/questions/30630051/how-do-i-implement-dynamic-shared-memory-resizing
     remove_shared_memory();
     setup_shared_memory();
 }

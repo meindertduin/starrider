@@ -2,6 +2,7 @@
 
 #include "Window.h"
 #include "Events.h"
+#include "../graphics/Camera.h"
 
 struct AppSettings {
     int win_width;
@@ -22,6 +23,7 @@ protected:
 
 private:
     GWindow m_window;
+    Camera *p_camera;
     bool m_running;
 
     void poll_window_events();
