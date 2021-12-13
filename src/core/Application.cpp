@@ -87,6 +87,11 @@ void Application::poll_window_events() {
             p_camera->width = width;
             p_camera->height = height;
 
+            Matrix4F projection;
+            float aspect_ratio = (float)width / (float)height;
+            projection.init_perspective(deg_to_half_rad(90.0f) / aspect_ratio, aspect_ratio, 0.1f, 1000.0f);
+            p_camera->set_projection(projection);
+
             InputEvent e {
                 .body = {
                     .value = (height << 16) | width,
