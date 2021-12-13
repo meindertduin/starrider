@@ -89,7 +89,7 @@ void Application::poll_window_events() {
 
             InputEvent e {
                 .body = {
-                    .value = (width << 16) | height,
+                    .value = (height << 16) | width,
                 },
                 .event_type = EventType::Window,
             };
