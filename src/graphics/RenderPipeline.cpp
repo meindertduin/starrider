@@ -8,7 +8,7 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_ras
 
 void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> renderables) {
     Matrix4F screen_space;
-    screen_space.init_screen_space_transform(camera.width, camera.height);
+    screen_space.init_screen_space_transform((float)camera.width / 2.0f, (float)camera.height / 2.0f);
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
