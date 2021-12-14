@@ -50,12 +50,12 @@ void GWindow::toggle_fullscreen() {
 }
 
 void GWindow::set_fullscreen() {
-    XSizeHints* size_hints;
+    XSizeHints size_hints;
     long hints = 0;
 
-    size_hints = XAllocSizeHints();
+    std::memset(&size_hints, 0, sizeof(XSizeHints));
 
-    if (XGetWMSizeHints(p_display, m_window, size_hints, &hints,
+    if (XGetWMSizeHints(p_display, m_window, &size_hints, &hints,
         XInternAtom(p_display, "WM_SIZE_HINTS", False)) == 0) {
         puts("Failed.");
     }
@@ -65,8 +65,6 @@ void GWindow::set_fullscreen() {
     XSync(p_display, False);
 
     printf("%ld\n", hints);
-
-    XFree(size_hints);
 
     Atom atoms[2] = { XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False), None };
 
