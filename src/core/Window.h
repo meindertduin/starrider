@@ -33,4 +33,5 @@ private:
     bool m_fullscreen;
 
     void set_fullscreen();
+    void unset_fullscreen();
 };

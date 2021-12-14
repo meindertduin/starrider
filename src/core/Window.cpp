@@ -5,7 +5,6 @@
 #include "Application.h"
 
 #include <X11/Xutil.h>
-#include <cstring>
 
 GWindow::GWindow() {
 }
@@ -41,43 +40,23 @@ bool GWindow::initialize(int width, int height) {
 }
 
 void GWindow::toggle_fullscreen() {
-    if (m_fullscreen) {
-
-    } else {
-        set_fullscreen();
-    }
-
-}
-
-void GWindow::set_fullscreen() {
-    XSizeHints size_hints;
-    long hints = 0;
-
-    std::memset(&size_hints, 0, sizeof(XSizeHints));
-
-    if (XGetWMSizeHints(p_display, m_window, &size_hints, &hints,
-        XInternAtom(p_display, "WM_SIZE_HINTS", False)) == 0) {
-        puts("Failed.");
-    }
-
-    XLowerWindow(p_display, m_window);
-    XUnmapWindow(p_display, m_window);
-    XSync(p_display, False);
-
-    printf("%ld\n", hints);
-
-    Atom atoms[2] = { XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False), None };
-
-    XChangeProperty(
-        p_display,
-        m_window,
-        XInternAtom(p_display, "_NET_WM_STATE", False),
-        XA_ATOM, 32, PropModeReplace, (unsigned char*)atoms, 1);
-
-    XMapWindow(p_display, m_window);
-    XRaiseWindow(p_display, m_window);
-
     m_fullscreen = !m_fullscreen;
+
+    Atom wmState = XInternAtom(p_display, "_NET_WM_STATE", False);
+    Atom fullScreen = XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    XEvent xev;
+    xev.xclient.type = ClientMessage;
+    xev.xclient.serial = 0;
+    xev.xclient.send_event = True;
+    xev.xclient.window = m_window;
+    xev.xclient.message_type = wmState;
+    xev.xclient.format= 32;
+    xev.xclient.data.l[0] = (m_fullscreen ? 1 : 0);
+    xev.xclient.data.l[1] = fullScreen;
+    xev.xclient.data.l[2] = 0;
+
+    XSendEvent(p_display, DefaultRootWindow(p_display), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
 Display* GWindow::get_display() {
