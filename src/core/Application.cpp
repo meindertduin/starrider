@@ -48,7 +48,7 @@ void Application::run() {
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
     Matrix4F vp = m_camera.get_view_projection();
-    m_window.toggle_fullscreen();
+    //m_window.toggle_fullscreen();
 
     float time = 0.0f;
     while (m_running) {
