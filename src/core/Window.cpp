@@ -1,7 +1,11 @@
 #include "Window.h"
 #include <X11/extensions/XShm.h>
 #include <stdio.h>
+#include <X11/Xatom.h>
 #include "Application.h"
+
+#include <X11/Xutil.h>
+#include <cstring>
 
 GWindow::GWindow() {
 }
@@ -18,6 +22,7 @@ bool GWindow::initialize(int width, int height) {
     if (p_display == nullptr) {
         return false;
     }
+
     m_screen = DefaultScreen(p_display);
 
     int black_color = BlackPixel(p_display, m_screen);
@@ -33,6 +38,48 @@ bool GWindow::initialize(int width, int height) {
     XMapWindow(p_display , m_window);
 
     return true;
+}
+
+void GWindow::toggle_fullscreen() {
+    if (m_fullscreen) {
+
+    } else {
+        set_fullscreen();
+    }
+
+}
+
+void GWindow::set_fullscreen() {
+    XSizeHints* size_hints;
+    long hints = 0;
+
+    size_hints = XAllocSizeHints();
+
+    if (XGetWMSizeHints(p_display, m_window, size_hints, &hints,
+        XInternAtom(p_display, "WM_SIZE_HINTS", False)) == 0) {
+        puts("Failed.");
+    }
+
+    XLowerWindow(p_display, m_window);
+    XUnmapWindow(p_display, m_window);
+    XSync(p_display, False);
+
+    printf("%ld\n", hints);
+
+    XFree(size_hints);
+
+    Atom atoms[2] = { XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False), None };
+
+    XChangeProperty(
+        p_display,
+        m_window,
+        XInternAtom(p_display, "_NET_WM_STATE", False),
+        XA_ATOM, 32, PropModeReplace, (unsigned char*)atoms, 1);
+
+    XMapWindow(p_display, m_window);
+    XRaiseWindow(p_display, m_window);
+
+    m_fullscreen = !m_fullscreen;
 }
 
 Display* GWindow::get_display() {

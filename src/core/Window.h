@@ -21,6 +21,7 @@ public:
     Display* get_display();
     Window get_window();
     int get_screen_num();
+    void toggle_fullscreen();
     int m_width;
     int m_height;
 
@@ -29,4 +30,7 @@ private:
     Display* p_display;
     Window m_window;
     int m_screen;
+    bool m_fullscreen;
+
+    void set_fullscreen();
 };
