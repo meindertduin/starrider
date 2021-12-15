@@ -4,16 +4,16 @@
 #include <map>
 #include <stdint.h>
 
-enum class EventType {
+enum class WindowEventType {
     KeyUp,
     KeyDown,
     Mouse,
     MouseButton,
-    Window,
+    WinExpose,
 };
 
 
-struct InputEvent {
+struct WindowEvent {
     union {
         struct  {
             uint32_t x_pos : 16;
@@ -25,14 +25,14 @@ struct InputEvent {
             uint32_t width : 16;
             uint32_t height : 16;
             uint32_t value : 32; // TODO filler value needs to be filled in later
-        } window_event;
+        } expose_event;
 
         struct {
             uint32_t keysym;
             uint32_t mask;
         } keyboard_event;
     } body;
-    EventType event_type;
+    WindowEventType event_type;
 };
 
 
@@ -77,7 +77,7 @@ class MultiEventSubject {
 public:
     virtual ~MultiEventSubject() {}
 
-    virtual void listen(EventObserver<T>* observer, EventType type) {
+    virtual void listen(EventObserver<T>* observer, WindowEventType type) {
 
         if (!m_observers.count(type)) {
             m_observers[type] = std::list<EventObserver<T>*>();
@@ -87,13 +87,13 @@ public:
 
         m_observers[type].push_back(observer);
     }
-    virtual void unlisten(EventObserver<T>* observer, EventType type) {
+    virtual void unlisten(EventObserver<T>* observer, WindowEventType type) {
         if (!m_observers.count(type)) {
             m_observers[type].remove(observer);
         }
     }
 
-    virtual void emit_event(const T &event, EventType type) {
+    virtual void emit_event(const T &event, WindowEventType type) {
         if (!m_observers.count(type)) {
             return;
         }
@@ -105,7 +105,7 @@ public:
 protected:
     MultiEventSubject() {}
 private:
-    std::map<EventType, std::list<EventObserver<T>*>> m_observers;
+    std::map<WindowEventType, std::list<EventObserver<T>*>> m_observers;
 };
 
 

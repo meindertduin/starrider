@@ -5,6 +5,8 @@
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
 
+#include "KeyMap.h"
+
 Application* Application::sp_instance = nullptr;
 
 Application::Application() {
@@ -69,12 +71,12 @@ void Application::run() {
 }
 
 void Application::poll_window_events() {
-    InputEvent event;
+    WindowEvent event;
 
     while(m_window.poll_event(event)) {
         // resize from the server event
         switch(event.event_type) {
-            case EventType::Window:
+            case WindowEventType::WinExpose:
             {
                 uint32_t width = m_window.m_width;
                 uint32_t height = m_window.m_height;
@@ -84,8 +86,11 @@ void Application::poll_window_events() {
                 emit_event(event, event.event_type);
             }
             break;
-            case EventType::KeyDown:
-                break;
+            case WindowEventType::KeyDown:
+            {
+
+            }
+            break;
             default:
                 break;
 
@@ -97,6 +102,6 @@ GWindow* Application::get_window() {
     return &m_window;
 }
 
-void Application::send_window_event(InputEvent event) {
-    emit_event(event, EventType::Window);
+void Application::send_window_event(WindowEvent event) {
+    emit_event(event, WindowEventType::WinExpose);
 }

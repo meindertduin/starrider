@@ -72,7 +72,7 @@ int GWindow::get_screen_num() {
     return m_screen;
 }
 
-bool GWindow::poll_event(InputEvent &event) {
+bool GWindow::poll_event(WindowEvent &event) {
     if (XPending(p_display)) {
         XEvent x_event;
         XNextEvent(p_display, &x_event);
@@ -83,16 +83,16 @@ bool GWindow::poll_event(InputEvent &event) {
             m_width = attributes.width;
             m_height = attributes.height;
 
-            event.body.window_event.width = m_width;
-            event.body.window_event.height = m_height;
+            event.body.expose_event.width = m_width;
+            event.body.expose_event.height = m_height;
 
-            event.event_type = EventType::Window;
+            event.event_type = WindowEventType::WinExpose;
         }
         if (x_event.type == KeyPress) {
             event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
             event.body.keyboard_event.mask = x_event.xkey.state;
 
-            event.event_type = EventType::KeyDown;
+            event.event_type = WindowEventType::KeyDown;
         }
 
 
@@ -111,11 +111,11 @@ void GWindow::resize(int width, int height) {
 
     auto app = Application::get_instance();
 
-    InputEvent e;
+    WindowEvent e;
 
-    e.body.window_event.width = m_width;
-    e.body.window_event.height = m_height;
-    e.event_type = EventType::Window;
+    e.body.expose_event.width = m_width;
+    e.body.expose_event.height = m_height;
+    e.event_type = WindowEventType::WinExpose;
 
     app->send_window_event(e);
 }

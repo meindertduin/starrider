@@ -4,7 +4,7 @@
 #include "Core.h"
 #include "../core/Application.h"
 
-class Renderer : EventObserver<InputEvent> {
+class Renderer : EventObserver<WindowEvent> {
 public:
     Renderer();
     ~Renderer();
@@ -14,7 +14,7 @@ public:
     void clear_screen();
     bool render();
 
-    void on_event(const InputEvent &event) override;
+    void on_event(const WindowEvent &event) override;
 
     int m_height;
     int m_width;

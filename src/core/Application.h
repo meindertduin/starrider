@@ -9,7 +9,7 @@ struct AppSettings {
     int win_height;
 };
 
-class Application : public MultiEventSubject<InputEvent> {
+class Application : public MultiEventSubject<WindowEvent> {
 public:
     static Application* get_instance();
     ~Application();
@@ -17,7 +17,7 @@ public:
     bool initialize(const AppSettings &settings);
     void run();
     GWindow* get_window();
-    void send_window_event(InputEvent event);
+    void send_window_event(WindowEvent event);
 protected:
     Application();
 

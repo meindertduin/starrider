@@ -15,7 +15,7 @@ Renderer::Renderer() {
     m_width = p_window->m_width;
     m_height = p_window->m_height;
 
-    p_app->listen(this, EventType::Window);
+    p_app->listen(this, WindowEventType::WinExpose);
 
     m_gc = XCreateGC(p_window->get_display(), p_window->get_window(), 0, nullptr);
     auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen_num());
@@ -31,7 +31,7 @@ Renderer::Renderer() {
 }
 
 Renderer::~Renderer() {
-    p_app->unlisten(this, EventType::Window);
+    p_app->unlisten(this, WindowEventType::WinExpose);
 
     XShmDetach(p_window->get_display(), &m_shm_info);
     shmdt(m_shm_info.shmaddr);
@@ -48,10 +48,10 @@ void Renderer::set_color(const Color &color) {
 
 }
 
-void Renderer::on_event(const InputEvent &event) {
-    if (event.event_type == EventType::Window) {
-        m_width = event.body.window_event.width;
-        m_height = event.body.window_event.height;
+void Renderer::on_event(const WindowEvent &event) {
+    if (event.event_type == WindowEventType::WinExpose) {
+        m_width = event.body.expose_event.width;
+        m_height = event.body.expose_event.height;
 
         delete[] m_framebuffer;
         create_framebuffer();
