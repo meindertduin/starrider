@@ -76,31 +76,34 @@ bool GWindow::poll_event(WindowEvent &event) {
     if (XPending(p_display)) {
         XEvent x_event;
         XNextEvent(p_display, &x_event);
-        if (x_event.type == Expose) {
-            XWindowAttributes attributes;
-            XGetWindowAttributes(p_display, m_window, &attributes);
 
-            m_width = attributes.width;
-            m_height = attributes.height;
+        switch(x_event.type) {
+            case Expose:
+                XWindowAttributes attributes;
+                XGetWindowAttributes(p_display, m_window, &attributes);
 
-            event.body.expose_event.width = m_width;
-            event.body.expose_event.height = m_height;
+                m_width = attributes.width;
+                m_height = attributes.height;
 
-            event.event_type = WindowEventType::WinExpose;
+                event.body.expose_event.width = m_width;
+                event.body.expose_event.height = m_height;
+
+                event.event_type = WindowEventType::WinExpose;
+                break;
+            case KeyPress:
+                event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
+                event.body.keyboard_event.mask = x_event.xkey.state;
+
+                event.event_type = WindowEventType::KeyDown;
+                break;
+            case MotionNotify:
+                event.body.mouse_event.x_pos = x_event.xmotion.x;
+                event.body.mouse_event.y_pos = x_event.xmotion.y;
+                event.event_type = WindowEventType::Mouse;
+                break;
+            default:
+                break;
         }
-        if (x_event.type == KeyPress) {
-            event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
-            event.body.keyboard_event.mask = x_event.xkey.state;
-
-            event.event_type = WindowEventType::KeyDown;
-        }
-
-        if (x_event.type == MotionNotify) {
-            event.body.mouse_event.x_pos = x_event.xmotion.x;
-            event.body.mouse_event.y_pos = x_event.xmotion.y;
-            event.event_type = WindowEventType::Mouse;
-        }
-
 
         return true;
     }
