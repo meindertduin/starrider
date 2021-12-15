@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <functional>
+#include "Events.h"
 
 // TODO absract the window to be able to support other Display Servers. Now
 // this implementation only supports X11. Which will be fine for now.

@@ -5,6 +5,7 @@
 #include "Application.h"
 
 #include <X11/Xutil.h>
+#include "KeyMap.h"
 
 GWindow::GWindow() {
 }
@@ -81,6 +82,17 @@ bool GWindow::poll_event(XEvent &event) {
             m_width = attributes.width;
             m_height = attributes.height;
         }
+        if (event.type == KeyPress) {
+            KeySym keysym = XLookupKeysym(&event.xkey, 0);
+
+
+            switch(event.xkey.state) {
+                case (ShiftMask): // shift mask
+                    printf("Shift\n");
+                    break;
+            }
+        }
+
 
         return true;
     }

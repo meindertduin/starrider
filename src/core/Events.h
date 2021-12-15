@@ -12,6 +12,7 @@ enum class EventType {
     Window,
 };
 
+
 struct InputEvent {
     union {
         struct  {
