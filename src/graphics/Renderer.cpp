@@ -50,8 +50,8 @@ void Renderer::set_color(const Color &color) {
 
 void Renderer::on_event(const InputEvent &event) {
     if (event.event_type == EventType::Window) {
-        m_width = event.body.width;
-        m_height = event.body.height;
+        m_width = event.body.window_event.width;
+        m_height = event.body.window_event.height;
 
         delete[] m_framebuffer;
         create_framebuffer();

@@ -17,7 +17,7 @@ public:
     bool ready_for_render = true;
 
     bool initialize(int width, int height);
-    bool poll_event(XEvent &event);
+    bool poll_event(InputEvent &event);
 
     Display* get_display();
     Window get_window();

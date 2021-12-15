@@ -72,25 +72,27 @@ int GWindow::get_screen_num() {
     return m_screen;
 }
 
-bool GWindow::poll_event(XEvent &event) {
+bool GWindow::poll_event(InputEvent &event) {
     if (XPending(p_display)) {
-        XNextEvent(p_display, &event);
-        if (event.type == Expose) {
+        XEvent x_event;
+        XNextEvent(p_display, &x_event);
+        if (x_event.type == Expose) {
             XWindowAttributes attributes;
             XGetWindowAttributes(p_display, m_window, &attributes);
 
             m_width = attributes.width;
             m_height = attributes.height;
+
+            event.body.window_event.width = m_width;
+            event.body.window_event.height = m_height;
+
+            event.event_type = EventType::Window;
         }
-        if (event.type == KeyPress) {
-            KeySym keysym = XLookupKeysym(&event.xkey, 0);
+        if (x_event.type == KeyPress) {
+            event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
+            event.body.keyboard_event.mask = x_event.xkey.state;
 
-
-            switch(event.xkey.state) {
-                case (ShiftMask): // shift mask
-                    printf("Shift\n");
-                    break;
-            }
+            event.event_type = EventType::KeyDown;
         }
 
 
@@ -109,12 +111,11 @@ void GWindow::resize(int width, int height) {
 
     auto app = Application::get_instance();
 
-    InputEvent e {
-        .body = {
-            .value = ((uint32_t)m_width << 16) | (uint32_t)m_height,
-        },
-        .event_type = EventType::Window,
-    };
+    InputEvent e;
+
+    e.body.window_event.width = m_width;
+    e.body.window_event.height = m_height;
+    e.event_type = EventType::Window;
 
     app->send_window_event(e);
 }

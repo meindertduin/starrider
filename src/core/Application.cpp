@@ -69,34 +69,26 @@ void Application::run() {
 }
 
 void Application::poll_window_events() {
-    XEvent event;
+    InputEvent event;
 
     while(m_window.poll_event(event)) {
         // resize from the server event
-        switch(event.type) {
-            case Expose:
+        switch(event.event_type) {
+            case EventType::Window:
             {
                 uint32_t width = m_window.m_width;
                 uint32_t height = m_window.m_height;
 
                 m_camera.set_viewport(width, height);
 
-                InputEvent e {
-                    .body = {
-                        .value = (height << 16) | width,
-                    },
-                    .event_type = EventType::Window,
-                };
-
-                emit_event(e, EventType::Window);
+                emit_event(event, event.event_type);
             }
             break;
-            case ButtonPress:
-            printf("button press\n");
-            break;
+            case EventType::KeyDown:
+                break;
+            default:
+                break;
 
-        }
-        if (event.type == Expose)  {
         }
     }
 }

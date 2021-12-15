@@ -18,14 +18,19 @@ struct InputEvent {
         struct  {
             uint32_t x_pos : 16;
             uint32_t y_pos : 16;
-        };
+            uint32_t value : 32; // TODO filler value needs to be filled in later
+        } mouse_event;
 
         struct {
             uint32_t width : 16;
             uint32_t height : 16;
-        };
+            uint32_t value : 32; // TODO filler value needs to be filled in later
+        } window_event;
 
-        uint32_t value;
+        struct {
+            uint32_t keysym;
+            uint32_t mask;
+        } keyboard_event;
     } body;
     EventType event_type;
 };
