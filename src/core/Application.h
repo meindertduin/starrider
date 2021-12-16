@@ -25,6 +25,7 @@ private:
     GWindow m_window;
     Camera m_camera;
     bool m_running;
+    int m_fps;
 
     void poll_window_events();
 

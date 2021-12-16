@@ -6,11 +6,13 @@
 #include "../graphics/RenderPipeline.h"
 
 #include "KeyMap.h"
+#include "Time.h"
 
 Application* Application::sp_instance = nullptr;
 
 Application::Application() {
     m_camera.set_viewport(m_window.m_width, m_window.m_height);
+    m_fps = 60;
 }
 
 Application::~Application() {
@@ -54,6 +56,8 @@ void Application::run() {
 
     float time = 0.0f;
     while (m_running) {
+        auto cycle_start = get_program_ticks_ms();
+
         poll_window_events();
 
         monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 0.5));
@@ -65,6 +69,12 @@ void Application::run() {
         });
 
         render_pipeline.render_frame(m_camera, renderables);
+
+        auto dt = cycle_start - get_program_ticks_ms();
+        int cycle_delay = (1000.0f / (float)m_fps) - dt;
+        if (cycle_delay > 0) {
+            delay(cycle_delay);
+        }
 
         time += 1.0f / 300.0f;
     }
