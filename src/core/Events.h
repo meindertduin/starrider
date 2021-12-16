@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 enum class WindowEventType {
+    WinNone,
     KeyUp,
     KeyDown,
     Mouse,

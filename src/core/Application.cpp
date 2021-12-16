@@ -92,6 +92,8 @@ void Application::poll_window_events() {
                 break;
 
         }
+
+        event.event_type = WindowEventType::WinNone;
     }
 }
 
