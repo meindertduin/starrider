@@ -78,10 +78,7 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
-                uint32_t width = m_window.m_width;
-                uint32_t height = m_window.m_height;
-
-                m_camera.set_viewport(width, height);
+                m_camera.set_viewport(event.body.expose_event.width, event.body.expose_event.height);
 
                 emit_event(event, event.event_type);
             }

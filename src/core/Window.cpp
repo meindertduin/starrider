@@ -82,6 +82,10 @@ bool GWindow::poll_event(WindowEvent &event) {
                 XWindowAttributes attributes;
                 XGetWindowAttributes(p_display, m_window, &attributes);
 
+                if (attributes.width == m_width && attributes.height == m_height) {
+                    return false;
+                }
+
                 m_width = attributes.width;
                 m_height = attributes.height;
 
@@ -89,6 +93,7 @@ bool GWindow::poll_event(WindowEvent &event) {
                 event.body.expose_event.height = m_height;
 
                 event.event_type = WindowEventType::WinExpose;
+
                 break;
             case KeyPress:
                 event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
