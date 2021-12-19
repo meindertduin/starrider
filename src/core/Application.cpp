@@ -54,7 +54,6 @@ void Application::run() {
     Matrix4F vp = m_camera.get_view_projection();
     //m_window.toggle_fullscreen();
 
-    float time = 0.0f;
     while (m_running) {
         auto cycle_start = get_program_ticks_ms();
 
@@ -75,8 +74,6 @@ void Application::run() {
         if (cycle_delay > 0) {
             delay(cycle_delay);
         }
-
-        time += 1.0f / 300.0f;
     }
 }
 
