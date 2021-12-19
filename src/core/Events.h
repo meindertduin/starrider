@@ -15,6 +15,10 @@ enum class WindowEventType {
 
 
 struct WindowEvent {
+    WindowEvent() {
+        event_type = WindowEventType::WinNone;
+    }
+
     union {
         struct  {
             uint32_t x_pos : 16;

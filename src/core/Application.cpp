@@ -78,7 +78,6 @@ void Application::run() {
 
 void Application::poll_window_events() {
     WindowEvent event;
-    event.event_type = WindowEventType::WinNone;
 
     while(m_window.poll_event(event)) {
         // resize from the server event
