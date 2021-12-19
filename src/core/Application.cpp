@@ -59,7 +59,7 @@ void Application::run() {
 
         poll_window_events();
 
-        monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 0.5));
+        monkey_transform = monkey_transform.rotate(Quaternion(V4F(0, 1, 0), 0.5f));
 
         std::vector<Renderable> renderables;
         renderables.push_back({
@@ -69,7 +69,7 @@ void Application::run() {
 
         render_pipeline.render_frame(m_camera, renderables);
 
-        auto dt = cycle_start - get_program_ticks_ms();
+        auto dt = get_program_ticks_ms() - cycle_start;
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
         if (cycle_delay > 0) {
             delay(cycle_delay);
