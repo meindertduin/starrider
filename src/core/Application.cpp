@@ -66,8 +66,7 @@ void Application::run() {
             .transform = &monkey_transform,
             .mesh = &mesh,
         });
-
-        render_pipeline.render_frame(m_camera, renderables);
+       render_pipeline.render_frame(m_camera, renderables);
 
         auto dt = get_program_ticks_ms() - cycle_start;
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
@@ -79,6 +78,7 @@ void Application::run() {
 
 void Application::poll_window_events() {
     WindowEvent event;
+    event.event_type = WindowEventType::WinNone;
 
     while(m_window.poll_event(event)) {
         // resize from the server event
