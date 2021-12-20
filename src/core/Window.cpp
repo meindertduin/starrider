@@ -37,6 +37,7 @@ bool GWindow::initialize(int width, int height) {
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask | PointerMotionMask);
     XMapWindow(p_display , m_window);
 
+
     return true;
 }
 
@@ -58,6 +59,10 @@ void GWindow::toggle_fullscreen() {
     xev.xclient.data.l[2] = 0;
 
     XSendEvent(p_display, DefaultRootWindow(p_display), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
+
+void GWindow::reset_cursor() {
+    XWarpPointer(p_display, None, m_window, 0, 0, 0, 0, (float)m_width / 2.0f, (float)m_height / 2.0f);
 }
 
 Display* GWindow::get_display() {

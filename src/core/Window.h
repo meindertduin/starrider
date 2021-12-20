@@ -23,6 +23,7 @@ public:
     Window get_window();
     int get_screen_num();
     void toggle_fullscreen();
+    void reset_cursor();
     int m_width;
     int m_height;
 

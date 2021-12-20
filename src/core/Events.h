@@ -102,7 +102,6 @@ public:
         }
     }
 
-
     virtual void unlisten(EventObserver<T>* observer, WindowEventType type) {
         if (!m_observers.count(type)) {
             m_observers[type].remove(observer);

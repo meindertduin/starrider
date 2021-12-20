@@ -55,9 +55,10 @@ void Application::run() {
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
     Matrix4F vp = p_camera->get_view_projection();
-    //m_window.toggle_fullscreen();
+    // m_window.toggle_fullscreen();
 
     while (m_running) {
+        m_window.reset_cursor();
         auto cycle_start = get_program_ticks_ms();
 
         poll_window_events();
