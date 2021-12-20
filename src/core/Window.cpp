@@ -62,6 +62,7 @@ void GWindow::toggle_fullscreen() {
 }
 
 void GWindow::reset_cursor() {
+
     XWarpPointer(p_display, None, m_window, 0, 0, 0, 0, (float)m_width / 2.0f, (float)m_height / 2.0f);
 }
 

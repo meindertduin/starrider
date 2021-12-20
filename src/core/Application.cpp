@@ -40,6 +40,9 @@ bool Application::initialize(const AppSettings &settings) {
 void Application::run() {
     m_running = true;
 
+    auto cursor = XCreateFontCursor(m_window.get_display(), 0);
+    XDefineCursor(m_window.get_display(), m_window.get_window(), cursor);
+
     p_camera = new Camera();
     p_camera->set_viewport(m_window.m_width, m_window.m_height);
 
@@ -78,6 +81,8 @@ void Application::run() {
             delay(cycle_delay);
         }
     }
+
+    XFreeCursor(m_window.get_display(), cursor);
 }
 
 void Application::poll_window_events() {
