@@ -4,13 +4,15 @@
 #include <map>
 #include <stdint.h>
 
-enum class WindowEventType {
-    WinNone,
-    KeyUp,
-    KeyDown,
-    Mouse,
-    MouseButton,
-    WinExpose,
+enum WindowEventType {
+    WinNone = 1,
+    KeyUp = 1 << 1,
+    KeyDown = 1 << 2,
+    Mouse = 1 << 3,
+    MouseButton = 1 << 4,
+    WinExpose = 1 << 5,
+
+    num_values = 6,
 };
 
 
@@ -83,7 +85,6 @@ public:
     virtual ~MultiEventSubject() {}
 
     virtual void listen(EventObserver<T>* observer, WindowEventType type) {
-
         if (!m_observers.count(type)) {
             m_observers[type] = std::list<EventObserver<T>*>();
             m_observers[type].push_back(observer);
@@ -92,6 +93,16 @@ public:
 
         m_observers[type].push_back(observer);
     }
+
+    virtual void listen_multiple(EventObserver<T>* observer, uint32_t types_mask) {
+        for (int i = 0; i < WindowEventType::num_values; i++) {
+            if (types_mask & (1 << i)) {
+                listen(observer, static_cast<WindowEventType>(1 << i));
+            }
+        }
+    }
+
+
     virtual void unlisten(EventObserver<T>* observer, WindowEventType type) {
         if (!m_observers.count(type)) {
             m_observers[type].remove(observer);

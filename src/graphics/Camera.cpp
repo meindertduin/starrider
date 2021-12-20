@@ -19,8 +19,6 @@ Camera::~Camera() {
     app->unlisten(this, WindowEventType::KeyDown);
 }
 
-
-
 void Camera::on_event(const WindowEvent &event) {
     switch(event.event_type) {
         case WindowEventType::KeyDown:
