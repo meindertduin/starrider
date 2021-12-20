@@ -14,4 +14,6 @@ enum SKeySym {
     K_PAGE_DOWN = XK_Page_Down,
     K_END = XK_End,
     K_BEGIN = XK_Begin,
+    K_q = XK_q,
+    K_e = XK_e,
 };

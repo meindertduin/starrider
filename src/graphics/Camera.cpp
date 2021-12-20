@@ -24,9 +24,28 @@ Camera::~Camera() {
 void Camera::on_event(const WindowEvent &event) {
     switch(event.event_type) {
         case WindowEventType::KeyDown:
-            if (event.body.keyboard_event.keysym == K_UP) {
-                m_transform.pos.x += 0.5f;
+            switch(event.body.keyboard_event.keysym) {
+                case K_UP:
+                    m_transform.pos.z += 0.3f;
+                    break;
+                case K_DOWN:
+                    m_transform.pos.z -= 0.3f;
+                    break;
+                case K_LEFT:
+                    m_transform.pos.x -= 0.3f;
+                    break;
+                case K_RIGHT:
+                    m_transform.pos.x += 0.3f;
+                    break;
+                case K_q:
+                    m_transform = m_transform.rotate(Quaternion(V4F(0, 1, 0), -1.0f));
+                    break;
+                case K_e:
+                    m_transform = m_transform.rotate(Quaternion(V4F(0, 1, 0), 1.0f));
+                default:
+                    break;
             }
+
             break;
         default:
             break;
