@@ -11,12 +11,12 @@
 Application* Application::sp_instance = nullptr;
 
 Application::Application() {
-    m_camera.set_viewport(m_window.m_width, m_window.m_height);
     m_fps = 60;
 }
 
 Application::~Application() {
     delete sp_instance;
+    delete p_camera;
 }
 
 Application* Application::get_instance() {
@@ -40,6 +40,9 @@ bool Application::initialize(const AppSettings &settings) {
 void Application::run() {
     m_running = true;
 
+    p_camera = new Camera();
+    p_camera->set_viewport(m_window.m_width, m_window.m_height);
+
     Bitmap texture("test_texture.bmp");
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
@@ -51,7 +54,7 @@ void Application::run() {
 
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
-    Matrix4F vp = m_camera.get_view_projection();
+    Matrix4F vp = p_camera->get_view_projection();
     //m_window.toggle_fullscreen();
 
     while (m_running) {
@@ -66,7 +69,7 @@ void Application::run() {
             .transform = &monkey_transform,
             .mesh = &mesh,
         });
-       render_pipeline.render_frame(m_camera, renderables);
+       render_pipeline.render_frame(*p_camera, renderables);
 
         auto dt = get_program_ticks_ms() - cycle_start;
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
@@ -84,14 +87,14 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
-                m_camera.set_viewport(event.body.expose_event.width, event.body.expose_event.height);
+                p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
 
                 emit_event(event, event.event_type);
             }
             break;
             case WindowEventType::KeyDown:
             {
-
+                emit_event(event, event.event_type);
             }
             break;
             default:

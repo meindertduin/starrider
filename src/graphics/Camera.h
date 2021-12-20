@@ -1,13 +1,17 @@
 #pragma once
 
 #include "Core.h"
+#include "../core/Events.h"
 
-class Camera {
+class Camera : public EventObserver<WindowEvent> {
 public:
     Camera();
+    ~Camera();
     void set_viewport(int width, int height);
     Matrix4F get_view_projection() const;
     int width, height;
+
+    void on_event(const WindowEvent &event) override;
 private:
     float m_zfar;
     float m_znear;
