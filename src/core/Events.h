@@ -15,7 +15,6 @@ enum WindowEventType {
     num_values = 6,
 };
 
-
 struct WindowEvent {
     WindowEvent() {
         event_type = WindowEventType::WinNone;
