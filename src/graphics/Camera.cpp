@@ -11,7 +11,7 @@ Camera::Camera() {
     m_projection.init_perspective(deg_to_half_rad(m_fov), 1.0f, m_znear, m_zfar);
 
     auto app = Application::get_instance();
-    app->listen_multiple(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
+    app->listen(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
 }
 
 Camera::~Camera() {

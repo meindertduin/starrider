@@ -85,20 +85,10 @@ class MultiEventSubject {
 public:
     virtual ~MultiEventSubject() {}
 
-    virtual void listen(EventObserver<T>* observer, WindowEventType type) {
-        if (!m_observers.count(type)) {
-            m_observers[type] = std::list<EventObserver<T>*>();
-            m_observers[type].push_back(observer);
-            return;
-        }
-
-        m_observers[type].push_back(observer);
-    }
-
-    virtual void listen_multiple(EventObserver<T>* observer, uint32_t types_mask) {
+    virtual void listen(EventObserver<T>* observer, uint32_t types_mask) {
         for (int i = 0; i < WindowEventType::num_values; i++) {
             if (types_mask & (1 << i)) {
-                listen(observer, static_cast<WindowEventType>(1 << i));
+                set_listentype(observer, static_cast<WindowEventType>(1 << i));
             }
         }
     }
@@ -119,6 +109,16 @@ public:
         }
     }
 protected:
+    virtual void set_listentype(EventObserver<T>* observer, WindowEventType type) {
+        if (!m_observers.count(type)) {
+            m_observers[type] = std::list<EventObserver<T>*>();
+            m_observers[type].push_back(observer);
+            return;
+        }
+
+        m_observers[type].push_back(observer);
+    }
+
     MultiEventSubject() {}
 private:
     std::map<WindowEventType, std::list<EventObserver<T>*>> m_observers;
