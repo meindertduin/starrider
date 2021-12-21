@@ -703,19 +703,22 @@ struct Transform {
         return rotation * translation * scale;
     }
 
-    Transform set_pos(const V4F &pos) {
-        return Transform(pos, this->rot, this->scale);
+    void set_pos(const V4F &pos) {
+        this->pos = pos;
     }
 
-    Transform rotate(const Quaternion &rotation) {
-        return Transform(pos, (rotation * rot).normalized(), scale);
+    Transform& rotate(const Quaternion &rotation) {
+        this->rot = (rotation * rot).normalized();
+
+        return *this;
     }
 
-    Transform look_at(const V4F &point, const V4F &up) {
+    Transform& look_at(const V4F &point, const V4F &up) {
         Matrix4F mat_look_at;
         mat_look_at.init_rotation(point, up);
+        this->rot = Quaternion(mat_look_at);
 
-        return Transform(pos, Quaternion(mat_look_at), scale);
+        return *this;
     }
 };
 

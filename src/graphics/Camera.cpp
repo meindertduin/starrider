@@ -49,8 +49,8 @@ void Camera::on_event(const WindowEvent &event) {
                 float d_xmovment = (float)event.body.mouse_event.d_xpos;
                 float d_ymovment = (float)event.body.mouse_event.d_ypos;
 
-                m_transform = m_transform.rotate(Quaternion(V4F(0, 1, 0), 1.0f * (d_xmovment / 100.f)));
-                m_transform = m_transform.rotate(Quaternion(V4F(1, 0, 0), 1.0f * (d_ymovment / 100.f)));
+                m_transform.rotate(Quaternion(V4F(0, 1, 0), 1.0f * (d_xmovment / 100.f)));
+                m_transform.rotate(Quaternion(V4F(1, 0, 0), 1.0f * (d_ymovment / 100.f)));
             }
             break;
         default:
