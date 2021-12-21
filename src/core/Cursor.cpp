@@ -18,7 +18,7 @@ void Cursor::reset_pos_middle() {
 
 void Cursor::initialize(GWindow *root_window) {
     p_window = root_window;
-    m_cursor = XCreateFontCursor(root_window->get_display(), 2);
+    m_cursor = XCreateFontCursor(root_window->get_display(), 1);
 }
 
 }

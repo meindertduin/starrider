@@ -38,8 +38,6 @@ bool GWindow::initialize(int width, int height) {
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask | PointerMotionMask);
     XMapWindow(p_display , m_window);
 
-    m_cursor.initialize(this);
-
     return true;
 }
 

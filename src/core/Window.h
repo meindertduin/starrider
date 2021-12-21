@@ -6,7 +6,6 @@
 #include <vector>
 #include <functional>
 #include "Events.h"
-#include "Cursor.h"
 
 // TODO absract the window to be able to support other Display Servers. Now
 // this implementation only supports X11. Which will be fine for now.
@@ -18,7 +17,6 @@ public:
     bool ready_for_render = true;
     int m_width;
     int m_height;
-    Core::Cursor m_cursor;
 
     bool initialize(int width, int height);
     bool poll_event(WindowEvent &event);

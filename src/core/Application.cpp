@@ -45,6 +45,8 @@ void Application::run() {
     p_camera = new Camera();
     p_camera->set_viewport(m_window.m_width, m_window.m_height);
 
+    m_cursor.initialize(&m_window);
+
     Bitmap texture("test_texture.bmp");
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
@@ -60,6 +62,8 @@ void Application::run() {
     // m_window.toggle_fullscreen();
 
     while (m_running) {
+        m_cursor.reset_pos_middle();
+
         auto cycle_start = get_program_ticks_ms();
 
         poll_window_events();
@@ -110,6 +114,10 @@ void Application::poll_window_events() {
 
 GWindow* Application::get_window() {
     return &m_window;
+}
+
+Core::Cursor* Application::get_cursor() {
+    return &m_cursor;
 }
 
 void Application::send_window_event(WindowEvent event) {
