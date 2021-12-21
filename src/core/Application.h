@@ -13,14 +13,14 @@ struct AppSettings {
 
 class Application : public MultiEventSubject<WindowEvent> {
 public:
-    static Application* get_instance();
     ~Application();
 
-    bool initialize(const AppSettings &settings);
-    void run();
+    static Application* get_instance();
     GWindow* get_window();
     Core::Cursor* get_cursor();
 
+    bool initialize(const AppSettings &settings);
+    void run();
     void send_window_event(WindowEvent event);
 protected:
     Application();

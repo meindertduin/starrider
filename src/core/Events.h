@@ -11,8 +11,9 @@ enum WindowEventType {
     Mouse = 1 << 3,
     MouseButton = 1 << 4,
     WinExpose = 1 << 5,
+    MouseMotion = 1 << 6,
 
-    num_values = 6,
+    num_values = 7,
 };
 
 struct WindowEvent {
@@ -24,7 +25,8 @@ struct WindowEvent {
         struct  {
             uint32_t x_pos : 16;
             uint32_t y_pos : 16;
-            uint32_t value : 32; // TODO filler value needs to be filled in later
+            int d_xpos : 16;
+            int d_ypos : 16;
         } mouse_event;
 
         struct {

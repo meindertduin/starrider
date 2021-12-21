@@ -103,9 +103,10 @@ bool GWindow::poll_event(WindowEvent &event) {
                 event.event_type = WindowEventType::KeyDown;
                 break;
             case MotionNotify:
-                event.body.mouse_event.x_pos = x_event.xmotion.x;
-                event.body.mouse_event.y_pos = x_event.xmotion.y;
-                event.event_type = WindowEventType::Mouse;
+                // TODO think about how to integrate this with the cursor!
+                // event.body.mouse_event.x_pos = x_event.xmotion.x;
+                // event.body.mouse_event.y_pos = x_event.xmotion.y;
+                // event.event_type = WindowEventType::Mouse;
                 break;
             default:
                 break;

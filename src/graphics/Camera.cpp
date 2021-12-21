@@ -11,7 +11,7 @@ Camera::Camera() {
     m_projection.init_perspective(deg_to_half_rad(m_fov), 1.0f, m_znear, m_zfar);
 
     auto app = Application::get_instance();
-    app->listen(this, WindowEventType::KeyDown);
+    app->listen_multiple(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
 }
 
 Camera::~Camera() {
@@ -43,7 +43,9 @@ void Camera::on_event(const WindowEvent &event) {
                 default:
                     break;
             }
-
+            break;
+        case WindowEventType::MouseMotion:
+            printf("%d, %d\n", event.body.mouse_event.d_xpos, event.body.mouse_event.d_ypos);
             break;
         default:
             break;
