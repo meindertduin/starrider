@@ -643,7 +643,7 @@ struct Quaternion {
     }
 
     V4F get_right() {
-        return V4F(1, 0, 0, 1);
+        return V4F(1, 0, 0, 1).rotate(*this);
     }
 
     Quaternion operator*(const Quaternion &q) const {
