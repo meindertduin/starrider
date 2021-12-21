@@ -2,7 +2,7 @@
 #include "Rasterizer.h"
 
 Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
-
+    p_z_buffer = nullptr;
 }
 
 Rasterizer::~Rasterizer() {
@@ -123,7 +123,9 @@ void Rasterizer::set_viewport(int width, int height) {
         m_width = width;
         m_height = height;
 
-        delete[] p_z_buffer;
+        if (p_z_buffer != nullptr) {
+            delete[] p_z_buffer;
+        }
         p_z_buffer = new float[width * height];
     }
 }
