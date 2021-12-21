@@ -318,35 +318,30 @@ struct Gradients {
 		text_coords[1] = mid_y_vert.text_coords * one_over_z[1];
 		text_coords[2] = max_y_vert.text_coords * one_over_z[2];
 
-        text_coord_x_xstep = (((text_coords[1].x - text_coords[2].x) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((text_coords[0].x - text_coords[2].x) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+        auto calc_x_step = [&](float f0, float f1, float f2) {
+            return (((f1 - f2) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
+                ((f0 - f2) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+        };
 
-        text_coord_x_ystep = (((text_coords[1].x - text_coords[2].x) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((text_coords[0].x - text_coords[2].x) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        auto calc_y_step = [&](float f0, float f1, float f2) {
+            return (((f1 - f2) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
+                ((f0 - f2) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        };
 
-        text_coord_y_xstep = (((text_coords[1].y - text_coords[2].y) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((text_coords[0].y - text_coords[2].y) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+        text_coord_x_xstep = calc_x_step(text_coords[0].x, text_coords[1].x, text_coords[2].x);
+        text_coord_x_ystep = calc_y_step(text_coords[0].x, text_coords[1].x, text_coords[2].x);
 
-        text_coord_y_ystep = (((text_coords[1].y - text_coords[2].y) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((text_coords[0].y - text_coords[2].y) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        text_coord_y_xstep = calc_x_step(text_coords[0].y, text_coords[1].y, text_coords[2].y);
+        text_coord_y_ystep = calc_y_step(text_coords[0].y, text_coords[1].y, text_coords[2].y);
 
-        one_over_zx_step = (((one_over_z[1] - one_over_z[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((one_over_z[0] - one_over_z[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
+        one_over_zx_step = calc_x_step(one_over_z[0], one_over_z[1], one_over_z[2]);
+        one_over_zy_step = calc_y_step(one_over_z[0], one_over_z[1], one_over_z[2]);
 
-        one_over_zy_step = (((one_over_z[1] - one_over_z[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((one_over_z[0] - one_over_z[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        depth_x_step = calc_x_step(depth[0], depth[1], depth[2]);
+        depth_y_step = calc_y_step(depth[0], depth[1], depth[2]);
 
-        depth_x_step = (((depth[1] - depth[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((depth[0] - depth[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
-
-        depth_y_step = (((depth[1] - depth[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((depth[0] - depth[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
-
-        light_amount_xstep = (((light_amount[1] - light_amount[2]) * (min_y_vert.pos.y - max_y_vert.pos.y)) -
-             ((light_amount[0] - light_amount[2]) * (mid_y_vert.pos.y - max_y_vert.pos.y))) * oneOverdX;
-
-        light_amount_ystep = (((light_amount[1] - light_amount[2]) * (min_y_vert.pos.x - max_y_vert.pos.x)) -
-                ((light_amount[0] - light_amount[2]) * (mid_y_vert.pos.x - max_y_vert.pos.x))) * oneOverdY;
+        light_amount_xstep = calc_x_step(light_amount[0], light_amount[1], light_amount[2]);
+        light_amount_ystep = calc_y_step(light_amount[0], light_amount[1], light_amount[2]);
     }
 };
 
@@ -641,7 +636,6 @@ struct Quaternion {
 
         return r;
     }
-
 
     V4F get_forward() {
         return V4F(0, 0, 1, 1).rotate(*this);

@@ -105,7 +105,6 @@ void Application::poll_window_events() {
     WindowEvent event;
 
     while(m_window.poll_event(event)) {
-        // resize from the server event
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
