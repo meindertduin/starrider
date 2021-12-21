@@ -83,18 +83,22 @@ void Application::run() {
             delay(cycle_delay);
         }
 
-        auto delta_mouse = m_cursor.get_delta_movement();
-        WindowEvent mouse_motion;
-        mouse_motion.event_type = WindowEventType::MouseMotion;
-        mouse_motion.body.mouse_event = {
-            .x_pos = delta_mouse.x_pos,
-            .y_pos = delta_mouse.y_pos,
-            .d_xpos = delta_mouse.delta_x,
-            .d_ypos = delta_mouse.delta_y,
-        };
-
-        emit_event(mouse_motion, mouse_motion.event_type);
+        emit_mouse_motion_event();
     }
+}
+
+void Application::emit_mouse_motion_event() {
+    auto delta_mouse = m_cursor.get_delta_movement();
+    WindowEvent mouse_motion;
+    mouse_motion.event_type = WindowEventType::MouseMotion;
+    mouse_motion.body.mouse_event = {
+        .x_pos = delta_mouse.x_pos,
+        .y_pos = delta_mouse.y_pos,
+        .d_xpos = delta_mouse.delta_x,
+        .d_ypos = delta_mouse.delta_y,
+    };
+
+    emit_event(mouse_motion, mouse_motion.event_type);
 }
 
 void Application::poll_window_events() {

@@ -97,6 +97,7 @@ struct Point {
 };
 
 struct Matrix4F;
+struct Quaternion;
 
 struct V4F {
     float x, y, z, w;
@@ -155,6 +156,8 @@ struct V4F {
     V4F normal() {
         return *this / length();
     }
+
+    V4F& rotate(const Quaternion &rot);
 
     V4F operator+(const V4F& rhs) const {
         V4F r;
@@ -639,12 +642,26 @@ struct Quaternion {
         return r;
     }
 
+    V4F get_right() {
+        return V4F(1, 0, 0, 1);
+    }
+
     Quaternion operator*(const Quaternion &q) const {
         Quaternion r;
         r.w = w * q.w - x * q.x - y * q.y - z * q.z;
 		r.x = x * q.w + w * q.x + y * q.z - z * q.y;
 		r.y = y * q.w + w * q.y + z * q.x - x * q.z;
 		r.z = z * q.w + w * q.z + x * q.y - y * q.x;
+
+        return r;
+    }
+
+    Quaternion operator*(const V4F &v) const {
+        Quaternion r;
+        r.w = -x * v.x - y * v.y - z * v.z;
+        r.x =  w * v.x + y * v.z - z * v.y;
+        r.y =  w * v.y + z * v.x - x * v.z;
+        r.z =  w * v.z + x * v.y - y * v.x;
 
         return r;
     }

@@ -33,6 +33,7 @@ private:
     int m_fps;
 
     void poll_window_events();
+    void emit_mouse_motion_event();
 
     static Application *sp_instance;
 };

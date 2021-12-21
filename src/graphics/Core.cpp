@@ -125,3 +125,15 @@ int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Tria
 
     return 0;
 }
+
+V4F& V4F::rotate(const Quaternion &rot) {
+    Quaternion conj = rot.conjugate();
+    Quaternion new_rot = rot * *this * conj;
+
+    x = new_rot.x;
+    y = new_rot.y;
+    z = new_rot.z;
+    w = 1.0f;
+
+    return *this;
+}
