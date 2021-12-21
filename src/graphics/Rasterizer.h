@@ -11,9 +11,9 @@ public:
     void clear_depth_buffer();
     void set_viewport(int width, int height);
 private:
-    Renderer* p_renderer;
     int m_width, m_height;
-    float *p_z_buffer;
+    Renderer* p_renderer = nullptr;
+    float *p_z_buffer = nullptr;
 
     void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture);
     void scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &texture, const Gradients &gradients);

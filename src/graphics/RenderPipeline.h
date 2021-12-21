@@ -18,6 +18,7 @@ public:
 
     void render_frame(const Camera &camera, std::vector<Renderable> renderables);
 private:
-    Renderer* p_renderer;
     Rasterizer m_rasterizer;
+
+    Renderer* p_renderer = nullptr;
 };

@@ -16,7 +16,9 @@ Application::Application() {
 
 Application::~Application() {
     delete sp_instance;
-    delete p_camera;
+
+    if (p_camera != nullptr)
+        delete p_camera;
 }
 
 Application* Application::get_instance() {

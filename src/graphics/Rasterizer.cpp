@@ -2,11 +2,11 @@
 #include "Rasterizer.h"
 
 Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
-    p_z_buffer = nullptr;
 }
 
 Rasterizer::~Rasterizer() {
-    delete[] p_z_buffer;
+    if (p_z_buffer != nullptr)
+        delete[] p_z_buffer;
 }
 
 void Rasterizer::draw_triangle(const Triangle &triangle, const Bitmap &texture) {
@@ -123,9 +123,9 @@ void Rasterizer::set_viewport(int width, int height) {
         m_width = width;
         m_height = height;
 
-        if (p_z_buffer != nullptr) {
+        if (p_z_buffer != nullptr)
             delete[] p_z_buffer;
-        }
+
         p_z_buffer = new float[width * height];
     }
 }

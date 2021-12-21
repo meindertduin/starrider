@@ -23,7 +23,7 @@ protected:
 
 private:
     GWindow m_window;
-    Camera *p_camera;
+    Camera *p_camera = nullptr;
     bool m_running;
     int m_fps;
 

@@ -29,7 +29,7 @@ public:
     void toggle_fullscreen();
     void resize(int width, int height);
 private:
-    Display* p_display;
+    Display* p_display = nullptr;
     Window m_window;
 
     int m_screen;

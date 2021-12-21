@@ -12,7 +12,7 @@
 float saturate(float val);
 
 struct Bitmap {
-    uint32_t *bitmap;
+    uint32_t *bitmap = nullptr;
     int width;
     int height;
 
@@ -26,7 +26,8 @@ struct Bitmap {
     }
 
     ~Bitmap() {
-        delete[] bitmap;
+        if (bitmap != nullptr)
+            delete[] bitmap;
     }
 
     uint32_t get_value(int x_pos, int y_pos, float light_amount) const {

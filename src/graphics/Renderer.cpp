@@ -39,7 +39,9 @@ Renderer::~Renderer() {
 
     XDestroyImage(p_screen_image);
 
-    delete[] m_framebuffer;
+    if (p_framebuffer != nullptr)
+       delete[] p_framebuffer;
+
     p_visual = nullptr;
     p_window = nullptr;
 }
@@ -53,16 +55,18 @@ void Renderer::on_event(const WindowEvent &event) {
         m_width = event.body.expose_event.width;
         m_height = event.body.expose_event.height;
 
-        delete[] m_framebuffer;
+        if (p_framebuffer != nullptr)
+            delete[] p_framebuffer;
+
         create_framebuffer();
         shared_memory_resize();
     }
 }
 
 void Renderer::create_framebuffer() {
-    m_framebuffer = new uint32_t[m_width * m_height];
+    p_framebuffer = new uint32_t[m_width * m_height];
     for (auto i = 0u; i < m_width * m_height; ++i) {
-        *(m_framebuffer+i) = 0x00000000;
+        *(p_framebuffer+i) = 0x00000000;
     }
 }
 
@@ -73,7 +77,7 @@ bool Renderer::render() {
 
     // copy all the data from the frame_buffer to the shm buffer
     for (auto i = 0u; i < m_width *m_height; i++) {
-		*((int*) m_shm_info.shmaddr+i) = *(m_framebuffer + i);
+		*((int*) m_shm_info.shmaddr+i) = *(p_framebuffer + i);
 	}
 
     Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
@@ -140,7 +144,7 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
     u_int32_t p_code = color.to_uint32();
 
     if (dx == 0 && dy == 0) {
-        m_framebuffer[m_width * p1.y + p1.x] = p_code;
+        p_framebuffer[m_width * p1.y + p1.x] = p_code;
     }
 
     if (dx > dy) {
@@ -157,7 +161,7 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
         float slope = (float) dy / (float) dx;
         for (auto x = xmin; x <= xmax; x++) {
             int y = std::floor(p1.y + ((x - p1.x) * slope));
-            *(m_framebuffer + ((m_width * y) + x)) = p_code;
+            *(p_framebuffer + ((m_width * y) + x)) = p_code;
         }
     } else {
         int ymin, ymax;
@@ -173,19 +177,19 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
         float slope = (float) dx / (float) dy;
         for (auto y = ymin; y <= ymax; y++) {
             int x = std::floor(p1.x + ((y - p1.y) * slope));
-            *(m_framebuffer + ((m_width * y) + x)) = p_code;
+            *(p_framebuffer + ((m_width * y) + x)) = p_code;
         }
     }
 }
 
 void Renderer::clear_screen() {
     for (auto i = 0u; i < m_width * m_height; ++i) {
-		*(m_framebuffer+i) = 0x00000000;
+		*(p_framebuffer+i) = 0x00000000;
 	}
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
     if (x_pos < m_width) {
-        *(m_framebuffer + ((m_width * y_pos) + x_pos)) = value;
+        *(p_framebuffer + ((m_width * y_pos) + x_pos)) = value;
     }
 }

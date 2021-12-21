@@ -19,15 +19,15 @@ public:
     int m_height;
     int m_width;
 private:
-    GWindow *p_window;
-    Visual* p_visual;
+    GWindow *p_window = nullptr;
+    Visual* p_visual = nullptr;
+    XImage* p_screen_image = nullptr;
+
     XShmSegmentInfo m_shm_info;
-    XImage* p_screen_image;
     GC m_gc;
 
-    Application *p_app;
-
-    uint32_t* m_framebuffer;
+    Application *p_app = nullptr;
+    uint32_t* p_framebuffer = nullptr;
 
     bool setup_shared_memory();
     void shared_memory_resize();
