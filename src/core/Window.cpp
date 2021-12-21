@@ -35,7 +35,7 @@ bool GWindow::initialize(int width, int height) {
     //XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
     XResizeWindow(p_display, m_window, m_width, m_height);
 
-    XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask | PointerMotionMask);
+    XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(p_display , m_window);
 
     return true;
@@ -105,12 +105,6 @@ bool GWindow::poll_event(WindowEvent &event) {
                 event.body.keyboard_event.mask = x_event.xkey.state;
 
                 event.event_type = WindowEventType::KeyDown;
-                break;
-            case MotionNotify:
-                // TODO think about how to integrate this with the cursor!
-                // event.body.mouse_event.x_pos = x_event.xmotion.x;
-                // event.body.mouse_event.y_pos = x_event.xmotion.y;
-                // event.event_type = WindowEventType::Mouse;
                 break;
             default:
                 break;
