@@ -69,6 +69,10 @@ Window GWindow::get_window() {
     return m_window;
 }
 
+int GWindow::get_screen() {
+    return m_screen;
+}
+
 int GWindow::get_screen_num() {
     return m_screen;
 }

@@ -24,10 +24,12 @@ public:
     void reset_pos_middle();
     MouseMovement get_delta_movement();
 private:
-    XCursor m_cursor;
+    XCursor m_cursor = 0;
     GWindow *p_window;
 
     uint32_t m_xpos, m_ypos;
+
+    void set_empty_cursor();
 };
 
 }

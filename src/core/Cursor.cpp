@@ -10,7 +10,8 @@ Cursor::Cursor() {
 }
 
 Cursor::~Cursor() {
-    XFreeCursor(p_window->get_display(), m_cursor);
+    if (m_cursor)
+        XFreeCursor(p_window->get_display(), m_cursor);
 }
 
 void Cursor::reset_pos_middle() {
@@ -23,7 +24,7 @@ void Cursor::reset_pos_middle() {
 
 void Cursor::initialize(GWindow *root_window) {
     p_window = root_window;
-    m_cursor = XCreateFontCursor(root_window->get_display(), 1);
+    set_empty_cursor();
 }
 
 Cursor::MouseMovement Cursor::get_delta_movement() {
@@ -41,6 +42,23 @@ Cursor::MouseMovement Cursor::get_delta_movement() {
         .delta_x = win_x - static_cast<int>(m_xpos),
         .delta_y = win_y - static_cast<int>(m_ypos),
     };
+}
+
+void Cursor::set_empty_cursor() {
+    XColor color  = { 0 };
+    const char data[] = { 0 };
+
+    Pixmap pixmap = XCreateBitmapFromData(p_window->get_display(), p_window->get_window(), data, 1, 1);
+
+    if (m_cursor) {
+        XFreeCursor(p_window->get_display(), m_cursor);
+        m_cursor = 0;
+    }
+
+    m_cursor = XCreatePixmapCursor(p_window->get_display(), pixmap, pixmap, &color, &color, 0, 0);
+
+    XFreePixmap(p_window->get_display(), pixmap);
+    XDefineCursor(p_window->get_display(), p_window->get_window(), m_cursor);
 }
 
 }
