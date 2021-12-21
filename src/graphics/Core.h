@@ -642,8 +642,29 @@ struct Quaternion {
         return r;
     }
 
+
+    V4F get_forward() {
+        return V4F(0, 0, 1, 1).rotate(*this);
+    }
+
+    V4F get_back() {
+        return V4F(0, 0, -1, 1).rotate(*this);
+    }
+
     V4F get_right() {
         return V4F(1, 0, 0, 1).rotate(*this);
+    }
+
+    V4F get_left() {
+        return V4F(-1, 0, 0, 1).rotate(*this);
+    }
+
+    V4F get_up() {
+        return V4F(0, 1, 0, 1).rotate(*this);
+    }
+
+    V4F get_down() {
+        return V4F(0, -1, 0, 1).rotate(*this);
     }
 
     Quaternion operator*(const Quaternion &q) const {
@@ -708,6 +729,10 @@ struct Transform {
         this->pos = pos;
         this->rot = rot;
         this->scale = scale;
+    }
+
+    void move(const V4F &dir, float amt) {
+        set_pos(pos + (dir * amt));
     }
 
     Matrix4F get_matrix_transformation() {
