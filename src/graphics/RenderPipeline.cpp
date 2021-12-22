@@ -36,42 +36,6 @@ void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> 
             proj_tri.p[2] = translated_tri.p[2].transform(vp, transform);
 
             m_rasterizer.draw_triangle(proj_tri, *renderable.mesh->texture);
-
-            // clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
-
-            //for (int n = 0; n < clipped_triangles; n++) {
-
-                //Triangle new_clipped[2];
-                //std::list<Triangle> list_triangles_front;
-                //list_triangles_front.push_back(proj_tri);
-                //int n_new_triangles = 1;
-
-                //for (int p = 0; p < 4; p++) {
-                //    int nTrisToAdd = 0;
-                //    while (n_new_triangles > 0) {
-                //        // Take triangle from front of queue
-                //        Triangle test = list_triangles_front.front();
-                //        list_triangles_front.pop_front();
-                //        n_new_triangles--;
-
-                //        switch (p) {
-                //            case 0:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F( 0.0f, 1.0f, 0.0f ), test, clipped[0], clipped[1]); break;
-                //            case 1:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, camera.height - 1, 0.0f), V4F(0.0f, -1.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                //            case 2:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F(1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                //            case 3:	nTrisToAdd = triangle_clip_against_plane(V4F(camera.width - 1, 0.0f, 0.0f), V4F(-1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                //        }
-
-                //        for (int w = 0; w < nTrisToAdd; w++)
-                //            list_triangles_front.push_back(clipped[w]);
-                //    }
-
-                //    n_new_triangles = list_triangles_front.size();
-                //}
-
-                //for (auto &t : list_triangles_front) {
-                //    m_rasterizer.draw_triangle(t, *renderable.mesh->texture);
-                //}
-            //}
         }
     }
 
