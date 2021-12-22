@@ -8,10 +8,47 @@ Rasterizer::~Rasterizer() {
         delete[] p_z_buffer;
 }
 
-void Rasterizer::fill_triangle(const Triangle &triangle, const Bitmap &texture) {
-    Vertex min_y_vert = triangle.p[0];
-	Vertex mid_y_vert = triangle.p[1];
-	Vertex max_y_vert = triangle.p[2];
+void Rasterizer::draw_triangle(Triangle &triangle, const Bitmap &texture) {
+    bool v1_inside = triangle.p[0].inside_view_frustrum();
+    bool v2_inside = triangle.p[1].inside_view_frustrum();
+    bool v3_inside = triangle.p[2].inside_view_frustrum();
+
+    if (v1_inside && v2_inside && v3_inside) {
+        fill_triangle(triangle, texture);
+    }
+
+     std::vector<Vertex> vertices;
+     std::vector<Vertex> auxilary_list;
+
+     vertices.push_back(triangle.p[0]);
+     vertices.push_back(triangle.p[1]);
+     vertices.push_back(triangle.p[2]);
+
+     if (clip_polygon_axis(vertices, auxilary_list, 0) &&
+             clip_polygon_axis(vertices, auxilary_list, 1) &&
+             clip_polygon_axis(vertices, auxilary_list, 2))
+     {
+         Vertex initial_vertex = vertices[0];
+
+         for (int i = 1; i < vertices.size() - 1; i++) {
+             Triangle draw_triangle;
+             draw_triangle.p[0] = initial_vertex;
+             draw_triangle.p[1] = vertices[i];
+             draw_triangle.p[2] = vertices[i + 1];
+
+             fill_triangle(draw_triangle, texture);
+         }
+     }
+}
+
+void Rasterizer::fill_triangle(Triangle &triangle, const Bitmap &texture) {
+    Matrix4F screen_space, identity;
+    screen_space.init_screen_space_transform((float)m_width / 2.0f, (float)m_height / 2.0f);
+    identity.init_identity();
+
+    Vertex min_y_vert = triangle.p[0].transform(screen_space, identity).perspective_divide();
+	Vertex mid_y_vert = triangle.p[1].transform(screen_space, identity).perspective_divide();
+	Vertex max_y_vert = triangle.p[2].transform(screen_space, identity).perspective_divide();
 
 	if(max_y_vert.pos.y < mid_y_vert.pos.y)
 	{
@@ -129,7 +166,7 @@ void Rasterizer::set_viewport(int width, int height) {
     }
 }
 
-bool Rasterizer::clip_polygon_axis(std::vector<Vertex> vertices, std::vector<Vertex> auxilary_list, int component_index) {
+bool Rasterizer::clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Vertex> &auxilary_list, int component_index) {
     clip_polygon_component(vertices, component_index, 1.0f, auxilary_list);
     vertices.clear();
 
@@ -144,8 +181,8 @@ bool Rasterizer::clip_polygon_axis(std::vector<Vertex> vertices, std::vector<Ver
     return !vertices.empty();
 }
 
-void Rasterizer::clip_polygon_component(std::vector<Vertex> vertices, int component_index,
-    float component_factor, std::vector<Vertex> result)
+void Rasterizer::clip_polygon_component(std::vector<Vertex> &vertices, int component_index,
+    float component_factor, std::vector<Vertex> &result)
 {
     Vertex prev_vertex = vertices[vertices.size() -1];
     float previous_component = prev_vertex.get(component_index) * component_factor;
@@ -155,7 +192,7 @@ void Rasterizer::clip_polygon_component(std::vector<Vertex> vertices, int compon
         float current_component = current_vertex.get(component_index) * component_factor;
         bool current_inside = current_component <= current_vertex.pos.w;
 
-        if(current_inside ^ previous_inside)
+        if((current_inside || previous_inside) && current_inside != previous_inside)
         {
             float lerpAmt = (prev_vertex.pos.w - previous_component) /
                 ((prev_vertex.pos.w - previous_component) -

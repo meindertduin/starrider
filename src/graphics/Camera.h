@@ -12,12 +12,12 @@ public:
     int width, height;
 
     void on_event(const WindowEvent &event) override;
+    Transform m_transform;
 private:
     float m_zfar;
     float m_znear;
     float m_fov;
 
     Matrix4F m_projection;
-    Transform m_transform;
     V4F y_axis = V4F(0, 1, 0);
 };

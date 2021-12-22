@@ -121,7 +121,7 @@ struct V4F {
     }
 
     V4F lerp(V4F dest, float amt) {
-        return ((dest - *this) * amt) + *this;
+        return (dest - *this) * amt + *this;
     }
 
     float length() const {
@@ -168,6 +168,7 @@ struct V4F {
         r.x = this->x + rhs.x;
         r.y = this->y + rhs.y;
         r.z = this->z + rhs.z;
+        r.w = this->w + rhs.w;
         return r;
     }
 
@@ -176,6 +177,7 @@ struct V4F {
         r.x = this->x - rhs.x;
         r.y = this->y - rhs.y;
         r.z = this->z - rhs.z;
+        r.w = this->w - rhs.w;
         return r;
     }
 
@@ -251,6 +253,12 @@ struct Vertex {
 
     Vertex lerp(const Vertex &v, float amt) {
         return Vertex(pos.lerp(v.pos, amt), text_coords.lerp(v.text_coords, amt), normal.lerp(v.normal, amt));
+    }
+
+    bool inside_view_frustrum() const {
+        return std::abs(pos.x) <= std::abs(pos.w) &&
+            std::abs(pos.y) <= std::abs(pos.w) &&
+            std::abs(pos.z) <= std::abs(pos.w);
     }
 
     float get(int index) {
@@ -380,8 +388,8 @@ struct Matrix4F {
     }
 
     void init_screen_space_transform(float half_width, float half_height) {
-        m[0][0] = half_width;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = half_width;
-		m[1][0] = 0;	m[1][1] = -half_height;	m[1][2] = 0;	m[1][3] = half_height;
+        m[0][0] = half_width;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = half_width - 0.5f;
+		m[1][0] = 0;	m[1][1] = -half_height;	m[1][2] = 0;	m[1][3] = half_height - 0.5f;
 		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
 		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
     }
@@ -661,27 +669,27 @@ struct Quaternion {
         return r;
     }
 
-    V4F get_forward() {
+    V4F get_forward() const {
         return V4F(0, 0, 1, 1).rotate(*this);
     }
 
-    V4F get_back() {
+    V4F get_back() const {
         return V4F(0, 0, -1, 1).rotate(*this);
     }
 
-    V4F get_right() {
+    V4F get_right() const {
         return V4F(1, 0, 0, 1).rotate(*this);
     }
 
-    V4F get_left() {
+    V4F get_left() const {
         return V4F(-1, 0, 0, 1).rotate(*this);
     }
 
-    V4F get_up() {
+    V4F get_up() const {
         return V4F(0, 1, 0, 1).rotate(*this);
     }
 
-    V4F get_down() {
+    V4F get_down() const {
         return V4F(0, -1, 0, 1).rotate(*this);
     }
 

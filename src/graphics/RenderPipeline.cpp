@@ -7,8 +7,6 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_ras
 }
 
 void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> renderables) {
-    Matrix4F screen_space;
-    screen_space.init_screen_space_transform((float)camera.width / 2.0f, (float)camera.height / 2.0f);
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
@@ -31,54 +29,49 @@ void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> 
             translated_tri.p[1] = triangle.p[1].transform(transform);
             translated_tri.p[2] = triangle.p[2].transform(transform);
 
-            clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
+            Triangle proj_tri;
 
-            for (int n = 0; n < clipped_triangles; n++) {
-                Triangle proj_tri;
+            proj_tri.p[0] = translated_tri.p[0].transform(vp, transform);
+            proj_tri.p[1] = translated_tri.p[1].transform(vp, transform);
+            proj_tri.p[2] = translated_tri.p[2].transform(vp, transform);
 
-                proj_tri.p[0] = clipped[n].p[0].transform(vp);
-                proj_tri.p[1] = clipped[n].p[1].transform(vp);
-                proj_tri.p[2] = clipped[n].p[2].transform(vp);
+            m_rasterizer.draw_triangle(proj_tri, *renderable.mesh->texture);
 
-                proj_tri.p[0].normal_transform(transform);
-                proj_tri.p[1].normal_transform(transform);
-                proj_tri.p[2].normal_transform(transform);
+            // clipped_triangles = triangle_clip_against_plane(near_plane, near_normal_plane, translated_tri, clipped[0], clipped[1]);
 
-                proj_tri.p[0] = proj_tri.p[0].transform(screen_space).perspective_divide();
-                proj_tri.p[1] = proj_tri.p[1].transform(screen_space).perspective_divide();
-                proj_tri.p[2] = proj_tri.p[2].transform(screen_space).perspective_divide();
+            //for (int n = 0; n < clipped_triangles; n++) {
 
-                Triangle new_clipped[2];
-                std::list<Triangle> list_triangles_front;
-                list_triangles_front.push_back(proj_tri);
-                int n_new_triangles = 1;
+                //Triangle new_clipped[2];
+                //std::list<Triangle> list_triangles_front;
+                //list_triangles_front.push_back(proj_tri);
+                //int n_new_triangles = 1;
 
-                for (int p = 0; p < 4; p++) {
-                    int nTrisToAdd = 0;
-                    while (n_new_triangles > 0) {
-                        // Take triangle from front of queue
-                        Triangle test = list_triangles_front.front();
-                        list_triangles_front.pop_front();
-                        n_new_triangles--;
+                //for (int p = 0; p < 4; p++) {
+                //    int nTrisToAdd = 0;
+                //    while (n_new_triangles > 0) {
+                //        // Take triangle from front of queue
+                //        Triangle test = list_triangles_front.front();
+                //        list_triangles_front.pop_front();
+                //        n_new_triangles--;
 
-                        switch (p) {
-                            case 0:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F( 0.0f, 1.0f, 0.0f ), test, clipped[0], clipped[1]); break;
-                            case 1:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, camera.height - 1, 0.0f), V4F(0.0f, -1.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                            case 2:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F(1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                            case 3:	nTrisToAdd = triangle_clip_against_plane(V4F(camera.width - 1, 0.0f, 0.0f), V4F(-1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
-                        }
+                //        switch (p) {
+                //            case 0:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F( 0.0f, 1.0f, 0.0f ), test, clipped[0], clipped[1]); break;
+                //            case 1:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, camera.height - 1, 0.0f), V4F(0.0f, -1.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                //            case 2:	nTrisToAdd = triangle_clip_against_plane(V4F(0.0f, 0.0f, 0.0f), V4F(1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                //            case 3:	nTrisToAdd = triangle_clip_against_plane(V4F(camera.width - 1, 0.0f, 0.0f), V4F(-1.0f, 0.0f, 0.0f), test, clipped[0], clipped[1]); break;
+                //        }
 
-                        for (int w = 0; w < nTrisToAdd; w++)
-                            list_triangles_front.push_back(clipped[w]);
-                    }
+                //        for (int w = 0; w < nTrisToAdd; w++)
+                //            list_triangles_front.push_back(clipped[w]);
+                //    }
 
-                    n_new_triangles = list_triangles_front.size();
-                }
+                //    n_new_triangles = list_triangles_front.size();
+                //}
 
-                for (auto &t : list_triangles_front) {
-                    m_rasterizer.fill_triangle(t, *renderable.mesh->texture);
-                }
-            }
+                //for (auto &t : list_triangles_front) {
+                //    m_rasterizer.draw_triangle(t, *renderable.mesh->texture);
+                //}
+            //}
         }
     }
 

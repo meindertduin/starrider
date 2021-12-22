@@ -50,8 +50,6 @@ V4F vector_intersect_plane(V4F &plane_p, V4F &plane_n, V4F &line_start, V4F &lin
 
 // returns the amount of triangles that clip against a plane
 int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2) {
-    plane_n.normalise();
-
     auto dist = [&](V4F &p)
     {
         V4F n = p;
