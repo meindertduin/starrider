@@ -76,7 +76,7 @@ void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> 
                 }
 
                 for (auto &t : list_triangles_front) {
-                    m_rasterizer.draw_triangle(t, *renderable.mesh->texture);
+                    m_rasterizer.fill_triangle(t, *renderable.mesh->texture);
                 }
             }
         }

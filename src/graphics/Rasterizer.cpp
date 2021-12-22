@@ -1,4 +1,3 @@
-
 #include "Rasterizer.h"
 
 Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
@@ -9,7 +8,7 @@ Rasterizer::~Rasterizer() {
         delete[] p_z_buffer;
 }
 
-void Rasterizer::draw_triangle(const Triangle &triangle, const Bitmap &texture) {
+void Rasterizer::fill_triangle(const Triangle &triangle, const Bitmap &texture) {
     Vertex min_y_vert = triangle.p[0];
 	Vertex mid_y_vert = triangle.p[1];
 	Vertex max_y_vert = triangle.p[2];
@@ -127,5 +126,51 @@ void Rasterizer::set_viewport(int width, int height) {
             delete[] p_z_buffer;
 
         p_z_buffer = new float[width * height];
+    }
+}
+
+bool Rasterizer::clip_polygon_axis(std::vector<Vertex> vertices, std::vector<Vertex> auxilary_list, int component_index) {
+    clip_polygon_component(vertices, component_index, 1.0f, auxilary_list);
+    vertices.clear();
+
+    if(auxilary_list.empty())
+    {
+        return false;
+    }
+
+    clip_polygon_component(auxilary_list, component_index, -1.0f, vertices);
+    auxilary_list.clear();
+
+    return !vertices.empty();
+}
+
+void Rasterizer::clip_polygon_component(std::vector<Vertex> vertices, int component_index,
+    float component_factor, std::vector<Vertex> result)
+{
+    Vertex prev_vertex = vertices[vertices.size() -1];
+    float previous_component = prev_vertex.get(component_index) * component_factor;
+    bool previous_inside = previous_component <= prev_vertex.pos.w;
+
+    for (auto current_vertex : vertices) {
+        float current_component = current_vertex.get(component_index) * component_factor;
+        bool current_inside = current_component <= current_vertex.pos.w;
+
+        if(current_inside ^ previous_inside)
+        {
+            float lerpAmt = (prev_vertex.pos.w - previous_component) /
+                ((prev_vertex.pos.w - previous_component) -
+                 (current_vertex.pos.w - current_component));
+
+            result.push_back(prev_vertex.lerp(current_vertex, lerpAmt));
+        }
+
+        if(current_inside)
+        {
+            result.push_back(current_vertex);
+        }
+
+        prev_vertex = current_vertex;
+        previous_component = current_component;
+        previous_inside = current_inside;
     }
 }
