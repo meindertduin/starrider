@@ -120,6 +120,10 @@ struct V4F {
         w = in_w;
     }
 
+    V4F lerp(V4F dest, float amt) {
+        return ((dest - *this) * amt) + *this;
+    }
+
     float length() const {
         return sqrtf(x * x + y * y + z * z + w * w);
     }
@@ -243,6 +247,26 @@ struct Vertex {
         }
 
         return *this;
+    }
+
+    Vertex lerp(const Vertex &v, float amt) {
+        return Vertex(pos.lerp(v.pos, amt), text_coords.lerp(v.text_coords, amt), normal.lerp(v.normal, amt));
+    }
+
+    float get(int index) {
+        switch(index) {
+            case 0:
+                return pos.x;
+            case 1:
+                return pos.y;
+            case 2:
+                return pos.z;
+            case 3:
+                return pos.w;
+            default:
+                // TODO maybe throw error?
+                return pos.w;
+        }
     }
 
     Vertex operator+(const Vertex &v) const {
