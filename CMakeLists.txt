@@ -1,21 +1,42 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.18)
 project(starrider)
 
 set(CMAKE_CXX_STANDARD 20)
 set(starrider_version 0.1)
 
+
 set(PROJECT_VERSION ${starrider_version})
 project(${PROJECT_NAME} VERSION ${starrider_version} LANGUAGES CXX C)
 
-#file(GLOB SOURCES "${PORJECT_SOURCE_DIR}/main.cpp" "${PROJECT_SOURCE_DIR}/src/*.cpp")
+set(SOURCES
+    src/main.cpp
+    src/core/Window.cpp
+    src/graphics/Renderer.cpp
+    src/graphics/Core.cpp
+    src/graphics/Rasterizer.cpp
+    src/io/BmpReader.cpp
+    src/graphics/Camera.cpp
+    src/io/ObjReader.cpp
+    src/graphics/RenderPipeline.cpp
+    src/entity/Entity.cpp
+    src/core/Application.cpp
+    src/core/Events.cpp
+    src/core/Time.cpp
+    src/core/Cursor.cpp
+    src/graphics/TTF.cpp
+)
 
-set(SOURCES src/main.cpp src/core/Window.cpp src/graphics/Renderer.cpp src/graphics/Core.cpp src/graphics/Rasterizer.cpp src/io/BmpReader.cpp src/graphics/Camera.cpp src/io/ObjReader.cpp src/graphics/RenderPipeline.cpp src/entity/Entity.cpp src/core/Application.cpp src/core/Events.cpp src/core/Time.cpp src/core/Cursor.cpp)
 set(HEADERS include)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
 
-include_directories(src)
+include_directories(
+    src
+    /usr/include/freetype2
+)
+
 set(PROJECT_TEST_NAME ${PROJECT_NAME}_test)
 
+
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADER})
-target_link_libraries(${PROJECT_NAME} X11 Xext)
+target_link_libraries(${PROJECT_NAME} X11 Xext freetype)
