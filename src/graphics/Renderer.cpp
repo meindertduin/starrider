@@ -18,7 +18,7 @@ Renderer::Renderer() {
     p_app->listen(this, WindowEventType::WinExpose);
 
     m_gc = XCreateGC(p_window->get_display(), p_window->get_window(), 0, nullptr);
-    auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen_num());
+    auto black_color = XBlackPixel(p_window->get_display(), p_window->get_screen());
 
     XSetBackground(p_window->get_display(), m_gc, black_color);
 

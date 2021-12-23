@@ -73,10 +73,6 @@ int GWindow::get_screen() {
     return m_screen;
 }
 
-int GWindow::get_screen_num() {
-    return m_screen;
-}
-
 bool GWindow::poll_event(WindowEvent &event) {
     if (XPending(p_display)) {
         XEvent x_event;

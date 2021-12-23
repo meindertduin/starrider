@@ -25,7 +25,6 @@ public:
     Window get_window();
     int get_screen();
 
-    int get_screen_num();
     void toggle_fullscreen();
     void resize(int width, int height);
 private:
