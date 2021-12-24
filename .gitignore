@@ -5,7 +5,4 @@ compile_commands.json
 debug/
 run.sh
 debug.sh
-teapot.obj
-test.obj
-monkey2.obj
 external
