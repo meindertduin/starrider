@@ -1,6 +1,7 @@
 build
 compile_commands.json
 .vimspector.json
+.ccls
 debug/
 run.sh
 debug.sh
