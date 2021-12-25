@@ -3,6 +3,7 @@
 #include "../core/Window.h"
 #include "Core.h"
 #include "../core/Application.h"
+#include "Texture.h"
 
 class Renderer : EventObserver<WindowEvent> {
 public:
@@ -14,6 +15,7 @@ public:
     void clear_screen();
     bool render();
 
+    void render_texture();
     void on_event(const WindowEvent &event) override;
 
     int m_height;

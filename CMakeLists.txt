@@ -24,6 +24,7 @@ set(SOURCES
     src/core/Time.cpp
     src/core/Cursor.cpp
     src/graphics/TTF.cpp
+    src/graphics/Texture.cpp
 )
 
 set(HEADERS include)

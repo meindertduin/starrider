@@ -8,7 +8,7 @@ Rasterizer::~Rasterizer() {
         delete[] p_z_buffer;
 }
 
-void Rasterizer::draw_triangle(Triangle &triangle, const Bitmap &texture) {
+void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
     bool v1_inside = triangle.p[0].inside_view_frustrum();
     bool v2_inside = triangle.p[1].inside_view_frustrum();
     bool v3_inside = triangle.p[2].inside_view_frustrum();
@@ -41,7 +41,7 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Bitmap &texture) {
      }
 }
 
-void Rasterizer::fill_triangle(Triangle &triangle, const Bitmap &texture) {
+void Rasterizer::fill_triangle(Triangle &triangle, const Texture &texture) {
     Matrix4F screen_space, identity;
     screen_space.init_screen_space_transform((float)m_width / 2.0f, (float)m_height / 2.0f);
     identity.init_identity();
@@ -88,7 +88,7 @@ void Rasterizer::clear_depth_buffer() {
     }
 }
 
-void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Bitmap &texture) {
+void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture) {
     Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
     Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);
@@ -99,7 +99,7 @@ void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_ver
     scan_edges(bottom_to_top, middle_to_top, handedness, texture, gradients);
 }
 
-void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &texture, const Gradients &gradients) {
+void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
@@ -114,7 +114,7 @@ void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Bitmap &tex
     }
 }
 
-void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const Bitmap &texture, const Gradients &gradients) {
+void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients) {
     int x_min = (int)std::ceil(left.x);
     int x_max = (int)std::ceil(right.x);
     float x_prestep = (float)x_min - left.x;
@@ -140,7 +140,7 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
             int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
             int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 
-            uint32_t value = texture.get_value(src_x, src_y, light_amount);
+            uint32_t value = texture.get_pixel(src_x, src_y, light_amount);
 
             p_renderer->set_frame_pixel(i, j, value);
             p_z_buffer[index] = depth;

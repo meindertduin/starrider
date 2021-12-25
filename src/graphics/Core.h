@@ -8,11 +8,14 @@
 #include <memory>
 
 #include "../io/BmpReader.h"
+#include "Texture.h"
+
+class Texture;
 
 float saturate(float val);
 
 struct Bitmap {
-    uint32_t *bitmap = nullptr;
+    uint32_t *pixels = nullptr;
     int width;
     int height;
 
@@ -22,18 +25,18 @@ struct Bitmap {
         BmpReader bmp_reader;
 
         // the bmp_reader instantiates the bitmap
-        bmp_reader.read_file(path, bitmap);
+        bmp_reader.read_file(path, pixels);
         width = bmp_reader.get_width();
         height = bmp_reader.get_height();
     }
 
     ~Bitmap() {
-        if (bitmap != nullptr)
-            delete[] bitmap;
+        if (pixels != nullptr)
+            delete[] pixels;
     }
 
     uint32_t get_value(int x_pos, int y_pos, float light_amount) const {
-        uint32_t value = bitmap[width * y_pos + x_pos];
+        uint32_t value = pixels[width * y_pos + x_pos];
 
         uint8_t alpha = 0xFF;
         uint8_t red = ((value & 0x00FF0000) >> 16) * light_amount;
@@ -567,9 +570,11 @@ struct Edge {
     }
 };
 
+
+
 struct Mesh {
     std::vector<Triangle> triangles;
-    Bitmap *texture;
+    Texture *texture;
 
     Mesh() {}
     bool load_from_obj_file(std::string path);

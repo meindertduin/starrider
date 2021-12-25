@@ -4,6 +4,7 @@
 #include "../graphics/Core.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
+#include "../graphics/Texture.h"
 
 #include "KeyMap.h"
 #include "Time.h"
@@ -47,14 +48,16 @@ void Application::run() {
 
     m_cursor.initialize(&m_window);
 
-    Bitmap texture("test_texture.bmp");
+    Texture brick_texture;
+    brick_texture.load_from_bmp("test_texture.bmp");
+
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
 
     // TODO: Values that may belong to a scene?
     Mesh mesh;
     mesh.load_from_obj_file("monkey0.obj");
-    mesh.texture = &texture;
+    mesh.texture = &brick_texture;
 
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
