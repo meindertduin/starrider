@@ -11,7 +11,6 @@ bool init_ttf() {
         return false;
     }
 
-
     return true;
 }
 

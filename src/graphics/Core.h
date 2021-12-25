@@ -16,6 +16,8 @@ struct Bitmap {
     int width;
     int height;
 
+    Bitmap();
+
     Bitmap(std::string path) {
         BmpReader bmp_reader;
 
