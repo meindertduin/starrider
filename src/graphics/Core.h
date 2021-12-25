@@ -14,6 +14,13 @@ class Texture;
 
 float saturate(float val);
 
+struct Rect {
+    int width;
+    int height;
+    int x_pos;
+    int y_pos;
+};
+
 struct Bitmap {
     uint32_t *pixels = nullptr;
     int width;
@@ -427,6 +434,7 @@ struct Matrix4F {
 		m[3][0] = 0;			m[3][1] = 0;				m[3][2] = 0;	m[3][3] = 1;
     }
 
+
     void init_rotation(float x, float y, float z) {
         Matrix4F rot_x, rot_y, rot_z;
 
@@ -471,7 +479,17 @@ struct Matrix4F {
 		m[1][0] = 0.0f;                             m[1][1] = 1.0f / fov;	m[1][2] = 0;	m[1][3] = 0.0f;
 		m[2][0] = 0.0f;	                            m[2][1] = 0.0f;				m[2][2] = (-znear - zfar)/zrange;	m[2][3] = zfar * znear / zrange;
 		m[3][0] = 0.0f;	                            m[3][1] = 0.0f;				m[3][2] = 1.0f;	m[3][3] = 0.0f;
+    }
 
+    void init_orthographic(float left, float right, float bottom, float top, float near, float far) {
+        float width = right - left;
+		float height = top - bottom;
+		float depth = far - near;
+
+		m[0][0] = 2.0f/width; m[0][1] = 0;	m[0][2] = 0;	m[0][3] = -(right + left)/width;
+		m[1][0] = 0;	m[1][1] = 2.0f/height;m[1][2] = 0;	m[1][3] = -(top + bottom)/height;
+		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 2.0f/depth;m[2][3] = -(far + near)/depth;
+		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
     }
 
     V4F transform(const V4F &r) const {

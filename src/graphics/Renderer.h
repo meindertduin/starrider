@@ -15,7 +15,7 @@ public:
     void clear_screen();
     bool render();
 
-    void render_texture();
+    void render_texture(const Texture &texture, const Rect &src, const Rect &dest);
     void on_event(const WindowEvent &event) override;
 
     int m_height;

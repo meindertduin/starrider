@@ -193,3 +193,7 @@ void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
         *(p_framebuffer + ((m_width * y_pos) + x_pos)) = value;
     }
 }
+
+void Renderer::render_texture(const Texture &texture, const Rect &src, const Rect &dest) {
+
+}
