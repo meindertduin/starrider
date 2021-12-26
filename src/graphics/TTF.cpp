@@ -14,8 +14,12 @@ bool init_ttf() {
     return true;
 }
 
-FontSetTTF::FontSetTTF() {
+void free_ttf() {
+    FT_Done_FreeType(library);
+}
 
+FontSetTTF::FontSetTTF() {
+    FT_Done_Face(m_face);
 }
 
 bool FontSetTTF::load_font(std::string path) {
@@ -33,6 +37,11 @@ bool FontSetTTF::load_font(std::string path) {
 
             return false;
         }
+
+        m_face->glyph->bitmap.buffer;
+
+        Glyph glyph;
+        m_glyphs.insert(std::pair<char, Glyph>(c, glyph));
     }
 
     return true;

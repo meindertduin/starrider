@@ -22,17 +22,26 @@ struct Rect {
 };
 
 struct Bitmap {
+    enum class Format {
+        RED,
+        RG,
+        RGB,
+        RGBA,
+    };
+
     uint32_t *pixels = nullptr;
     int width;
     int height;
+    Format format;
 
     Bitmap();
 
     Bitmap(std::string path) {
         BmpReader bmp_reader;
 
-        // the bmp_reader instantiates the bitmap
         bmp_reader.read_file(path, pixels);
+        format = Format::RGBA;
+
         width = bmp_reader.get_width();
         height = bmp_reader.get_height();
     }
@@ -40,17 +49,6 @@ struct Bitmap {
     ~Bitmap() {
         if (pixels != nullptr)
             delete[] pixels;
-    }
-
-    uint32_t get_value(int x_pos, int y_pos, float light_amount) const {
-        uint32_t value = pixels[width * y_pos + x_pos];
-
-        uint8_t alpha = 0xFF;
-        uint8_t red = ((value & 0x00FF0000) >> 16) * light_amount;
-        uint8_t blue = ((value & 0x00FF00) >> 8) * light_amount;
-        uint8_t green = (value & 0x000000FF) * light_amount;
-
-        return ((uint32_t)alpha << 24) | ((uint32_t)red << 16) | ((uint32_t)blue << 8) | ((uint32_t)green);
     }
 
     uint32_t get_value(int x_pos, int y_pos) {

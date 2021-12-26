@@ -27,6 +27,7 @@ union Pixel {
 
 class Texture {
 public:
+
     Texture();
     ~Texture();
     void test_load();

@@ -5,10 +5,14 @@
 
 #include <string>
 #include <map>
+#include "Texture.h"
 
 bool init_ttf();
+void free_ttf();
 
 struct Glyph {
+    Texture texture;
+
 };
 
 class FontSetTTF {
