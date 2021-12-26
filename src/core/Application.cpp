@@ -50,6 +50,8 @@ void Application::run() {
 
     Texture brick_texture;
     brick_texture.load_from_bmp("test_texture.bmp");
+    Texture grass_texture;
+    grass_texture.load_from_bmp("grass.bmp");
 
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
@@ -82,12 +84,12 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.height = brick_texture.height;
-       rect.width = brick_texture.width;
+       rect.height = grass_texture.height;
+       rect.width = grass_texture.width;
        rect.x_pos = 10;
        rect.y_pos = 10;
 
-       renderer.render_texture(brick_texture, rect, rect);
+       renderer.render_texture(grass_texture, rect, rect);
        renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;

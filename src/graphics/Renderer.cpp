@@ -203,7 +203,13 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
 
         for (int i = 0; i < src.height; i++) {
             for (int j = 0; j < src.width; j++) {
-                *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = texture.get_pixel(i, j);
+                uint8_t alpha = texture.get_pixel(i, j) >> 24;
+
+                if (alpha == 0xFF) {
+                    *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = texture.get_pixel(i, j);
+                } else if (alpha > 0) {
+
+                }
             }
         }
     }
