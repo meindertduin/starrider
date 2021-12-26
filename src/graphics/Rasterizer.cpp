@@ -140,7 +140,7 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
             int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
             int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 
-            uint32_t value = texture.get_pixel(src_x, src_y, light_amount);
+            uint32_t value = texture.get_pixel(src_x, src_y, light_amount).value;
 
             p_renderer->set_frame_pixel(i, j, value);
             p_z_buffer[index] = depth;

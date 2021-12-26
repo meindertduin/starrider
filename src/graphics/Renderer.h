@@ -29,7 +29,7 @@ private:
     GC m_gc;
 
     Application *p_app = nullptr;
-    uint32_t* p_framebuffer = nullptr;
+    Pixel* p_framebuffer = nullptr;
 
     bool setup_shared_memory();
     void shared_memory_resize();
