@@ -23,6 +23,10 @@ FontSetTTF::FontSetTTF() {
 
 FontSetTTF::~FontSetTTF() {
     FT_Done_Face(m_face);
+
+    for (auto glyph : m_glyphs) {
+        delete glyph.second;
+    }
 }
 
 bool FontSetTTF::load_font(std::string path) {
