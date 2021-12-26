@@ -21,9 +21,9 @@ Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
         .value = p_bitmap->get_value(x_pos, y_pos)
     };
 
-    r.rgba.blue = r.rgba.blue * light_amount;
-    r.rgba.red = r.rgba.red * light_amount;
-    r.rgba.green = r.rgba.green * light_amount;
+    r.rgba.blue *= light_amount;
+    r.rgba.red *= light_amount;
+    r.rgba.green *= light_amount;
 
     return r;
 }

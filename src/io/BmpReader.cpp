@@ -8,7 +8,7 @@ BmpReader::~BmpReader() {
     }
 }
 
-size_t BmpReader::read_file(string path, uint32_t *&bitmap) {
+size_t BmpReader::read_file(string path, void *&bitmap) {
     m_ifs = std::ifstream(path, std::ios::in | std::ios::binary);
 
     if (!m_ifs.is_open()) {
