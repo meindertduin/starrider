@@ -4,13 +4,24 @@
 
 struct Bitmap;
 
+struct RGBA {
+    uint32_t blue : 8;
+    uint32_t green : 8;
+    uint32_t red : 8;
+    uint32_t alpha : 8;
+
+    void blend(const RGBA &r) {
+        float u_alpha = (float) alpha / (float) 0xFF;
+
+        blue = blue * u_alpha + r.blue * (1.0f - u_alpha);
+        red =  red * u_alpha + r.red * (1.0f - u_alpha);
+        green = green * u_alpha + r.green * (1.0f - u_alpha);
+        alpha = alpha * u_alpha + r.alpha * (1.0f - u_alpha);
+    }
+};
+
 union Pixel {
-    struct {
-        uint32_t blue : 8;
-        uint32_t green : 8;
-        uint32_t red : 8;
-        uint32_t alpha : 8;
-    } rgba;
+    RGBA rgba;
     uint32_t value;
 };
 

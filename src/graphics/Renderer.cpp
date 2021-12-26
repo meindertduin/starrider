@@ -205,10 +205,13 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
             for (int j = 0; j < src.width; j++) {
                 auto pixel = texture.get_pixel(i, j);
 
-                if (pixel.rgba.alpha == 0xFF) {
-                    *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = pixel;
-                } else if (pixel.rgba.alpha > 0) {
+                if (pixel.rgba.alpha > 0) {
+                    if (pixel.rgba.alpha != 0xFF) {
+                        Pixel current = *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j));
+                        pixel.rgba.blend(current.rgba);
+                    }
 
+                    *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = pixel;
                 }
             }
         }
