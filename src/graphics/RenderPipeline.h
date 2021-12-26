@@ -16,7 +16,7 @@ class RenderPipeline {
 public:
     RenderPipeline(Renderer *renderer);
 
-    void render_frame(const Camera &camera, std::vector<Renderable> renderables);
+    void render_viewport(const Camera &camera, std::vector<Renderable> renderables);
 private:
     Rasterizer m_rasterizer;
 

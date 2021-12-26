@@ -75,7 +75,6 @@ Matrix4F Camera::get_view_projection() const {
 
     Matrix4F ortho;
     ortho.init_orthographic(-1, 1, -1, 1, m_znear, m_zfar);
-    // ortho.init_orthographic(0, width, 0, height, m_znear, m_zfar);
 
     return  camera_trans * m_transform.rot.conjugate().to_rotation_matrix() * ortho;
 }

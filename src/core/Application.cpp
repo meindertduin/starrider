@@ -78,7 +78,9 @@ void Application::run() {
             .transform = &monkey_transform,
             .mesh = &mesh,
         });
-       render_pipeline.render_frame(*p_camera, renderables);
+
+       render_pipeline.render_viewport(*p_camera, renderables);
+       renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;
         int cycle_delay = (1000.0f / (float)m_fps) - dt;

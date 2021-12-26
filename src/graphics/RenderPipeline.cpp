@@ -6,7 +6,7 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_ras
 
 }
 
-void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> renderables) {
+void RenderPipeline::render_viewport(const Camera &camera, std::vector<Renderable> renderables) {
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
@@ -31,6 +31,4 @@ void RenderPipeline::render_frame(const Camera &camera, std::vector<Renderable> 
             m_rasterizer.draw_triangle(proj_tri, *renderable.mesh->texture);
         }
     }
-
-    p_renderer->render();
 }
