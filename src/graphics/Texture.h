@@ -3,6 +3,7 @@
 #include <string>
 
 struct Bitmap;
+enum class Format;
 
 struct RGBA {
     uint32_t blue : 8;
@@ -32,6 +33,7 @@ public:
     ~Texture();
     void test_load();
     void load_from_bmp(std::string path);
+    void load_from_bitmap(Format format, int width, int height, void* data);
 
     Pixel get_pixel(int x_pos, int y_pos, float light_amount) const;
     Pixel get_pixel(int x_pos, int y_pos) const;

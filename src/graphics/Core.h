@@ -21,13 +21,14 @@ struct Rect {
     int y_pos;
 };
 
+enum class Format {
+    RED,
+    RG,
+    RGB,
+    RGBA,
+};
+
 struct Bitmap {
-    enum class Format {
-        RED,
-        RG,
-        RGB,
-        RGBA,
-    };
 
     void *pixels = nullptr;
     int width;

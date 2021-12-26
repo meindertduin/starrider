@@ -9,6 +9,11 @@ Texture::~Texture() {
         delete p_bitmap;
 }
 
+void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
+    p_bitmap = new Bitmap(format, width, height, data);
+    width = p_bitmap->width;
+    height = p_bitmap->height;
+}
 
 void Texture::load_from_bmp(std::string path) {
     p_bitmap = new Bitmap(path);
