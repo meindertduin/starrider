@@ -89,7 +89,10 @@ void Application::run() {
        rect.x_pos = 10;
        rect.y_pos = 10;
 
-       renderer.render_texture(grass_texture, rect, rect);
+       Rect src = rect;
+       src.width *= 1.4f;
+       src.height *= 1.4f;
+       renderer.render_texture(grass_texture, rect, src);
        renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;

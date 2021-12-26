@@ -198,22 +198,27 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
     if (dest.x_pos > 0 && dest.width + dest.x_pos <= m_width
             && dest.y_pos > 0 && dest.height + dest.y_pos <= m_height)
     {
-        float x_scale = (float)dest.width / (float)src.width;
-        float y_scale = (float)dest.height / (float)src.height;
+        float x_step = (float)src.width / (float)dest.width;
+        float y_step = (float)src.height / (float)dest.height;
 
-        for (int i = 0; i < src.height; i++) {
-            for (int j = 0; j < src.width; j++) {
-                auto pixel = texture.get_pixel(i, j);
+        float y = 0;
+        for (int y_out = 0; y_out < dest.height; y_out++) {
+            float x = 0;
+            for (int x_out = 0; x_out < dest.width; x_out++) {
+                auto pixel = texture.get_pixel(std::round(x), std::round(y));
 
                 if (pixel.rgba.alpha > 0) {
                     if (pixel.rgba.alpha != 0xFF) {
-                        Pixel current = *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j));
+                        Pixel current = *(p_framebuffer + ((m_width * (dest.y_pos + x_out)) + dest.x_pos + y_out));
                         pixel.rgba.blend(current.rgba);
                     }
 
-                    *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = pixel;
+                    *(p_framebuffer + ((m_width * (dest.y_pos + x_out)) + dest.x_pos + y_out)) = pixel;
                 }
+
+                x += x_step;
             }
+            y += y_step;
         }
     }
 }
