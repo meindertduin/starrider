@@ -80,6 +80,14 @@ void Application::run() {
         });
 
        render_pipeline.render_viewport(*p_camera, renderables);
+
+       Rect rect;
+       rect.height = brick_texture.height;
+       rect.width = brick_texture.width;
+       rect.x_pos = 10;
+       rect.y_pos = 10;
+
+       renderer.render_texture(brick_texture, rect, rect);
        renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;

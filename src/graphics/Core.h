@@ -53,6 +53,9 @@ struct Bitmap {
         return ((uint32_t)alpha << 24) | ((uint32_t)red << 16) | ((uint32_t)blue << 8) | ((uint32_t)green);
     }
 
+    uint32_t get_value(int x_pos, int y_pos) {
+        return pixels[width * y_pos + x_pos];
+    }
 };
 
 struct Color {

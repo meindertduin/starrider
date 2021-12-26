@@ -18,3 +18,7 @@ void Texture::load_from_bmp(std::string path) {
 uint32_t Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
     return p_bitmap->get_value(x_pos, y_pos, light_amount);
 }
+
+uint32_t Texture::get_pixel(int x_pos, int y_pos) const {
+    return p_bitmap->get_value(x_pos, y_pos);
+}

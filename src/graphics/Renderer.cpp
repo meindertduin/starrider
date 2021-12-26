@@ -195,5 +195,16 @@ void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
 }
 
 void Renderer::render_texture(const Texture &texture, const Rect &src, const Rect &dest) {
+    if (dest.x_pos > 0 && dest.width + dest.x_pos <= m_width
+            && dest.y_pos > 0 && dest.height + dest.y_pos <= m_height)
+    {
+        float x_scale = (float)dest.width / (float)src.width;
+        float y_scale = (float)dest.height / (float)src.height;
 
+        for (int i = 0; i < src.height; i++) {
+            for (int j = 0; j < src.width; j++) {
+                *(p_framebuffer + ((m_width * (dest.y_pos + i)) + dest.x_pos + j)) = texture.get_pixel(i, j);
+            }
+        }
+    }
 }
