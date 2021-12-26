@@ -31,6 +31,7 @@ enum class Format {
 struct Bitmap {
 
     void *pixels = nullptr;
+    bool free_pixels = false;
     int width;
     int height;
     Format format;
@@ -46,7 +47,9 @@ struct Bitmap {
     Bitmap(std::string path) {
         BmpReader bmp_reader;
 
+        // fucntion call allocates memory for pixels
         bmp_reader.read_file(path, pixels);
+        free_pixels = true;
         format = Format::RGBA;
 
         width = bmp_reader.get_width();
@@ -54,7 +57,7 @@ struct Bitmap {
     }
 
     ~Bitmap() {
-        if (pixels != nullptr)
+        if (pixels != nullptr && free_pixels)
             delete[] static_cast<char*>(pixels);
     }
 
