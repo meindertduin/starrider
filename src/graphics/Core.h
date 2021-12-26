@@ -126,6 +126,20 @@ struct Point {
 struct Matrix4F;
 struct Quaternion;
 
+
+struct V2I {
+    int x, y;
+
+    V2I() {
+        x = y = 0;
+    }
+
+    V2I(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+};
+
 struct V4F {
     float x, y, z, w;
     V4F() {

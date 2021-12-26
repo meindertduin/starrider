@@ -6,18 +6,22 @@
 #include <string>
 #include <map>
 #include "Texture.h"
+#include "Core.h"
 
 bool init_ttf();
 void free_ttf();
 
 struct Glyph {
     Texture texture;
-
+    V2I size;
+    V2I bearing;
+    long advance;
 };
 
 class FontSetTTF {
 public:
     FontSetTTF();
+    ~FontSetTTF();
 
     bool load_font(std::string path);
     Glyph get_glyph(char c);

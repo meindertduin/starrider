@@ -11,6 +11,7 @@ int main() {
     });
 
     app->run();
+    free_ttf();
 
     return 0;
 }

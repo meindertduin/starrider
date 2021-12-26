@@ -19,11 +19,14 @@ void free_ttf() {
 }
 
 FontSetTTF::FontSetTTF() {
+}
+
+FontSetTTF::~FontSetTTF() {
     FT_Done_Face(m_face);
 }
 
 bool FontSetTTF::load_font(std::string path) {
-    auto font_error = FT_New_Face(library, "/usr/share/fonts/TTF/Symbola.ttf", 0, &m_face);
+    auto font_error = FT_New_Face(library, path.c_str(), 0, &m_face);
     if (font_error == FT_Err_Unknown_File_Format) {
         return false;
     }
@@ -38,9 +41,17 @@ bool FontSetTTF::load_font(std::string path) {
             return false;
         }
 
-        m_face->glyph->bitmap.buffer;
+        Texture texture;
+        texture.load_from_bitmap(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows,
+                m_face->glyph->bitmap.buffer);
 
-        Glyph glyph;
+        Glyph glyph = {
+            .texture = texture,
+            .size = V2I(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
+            .bearing = V2I(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top),
+            .advance = m_face->glyph->advance.x,
+        };
+
         m_glyphs.insert(std::pair<char, Glyph>(c, glyph));
     }
 

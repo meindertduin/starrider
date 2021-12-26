@@ -5,6 +5,7 @@
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
 #include "../graphics/Texture.h"
+#include "../graphics/TTF.h"
 
 #include "KeyMap.h"
 #include "Time.h"
@@ -42,6 +43,10 @@ bool Application::initialize(const AppSettings &settings) {
 
 void Application::run() {
     m_running = true;
+
+    FontSetTTF fontset;
+    fontset.load_font("/usr/share/fonts/TTF/Symbola.ttf");
+    auto a_glyph = fontset.get_glyph('a');
 
     p_camera = new Camera();
     p_camera->set_viewport(m_window.m_width, m_window.m_height);
@@ -84,15 +89,15 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.height = grass_texture.height;
-       rect.width = grass_texture.width;
+       rect.height = a_glyph.texture.height;
+       rect.width = a_glyph.texture.width;
        rect.x_pos = 10;
        rect.y_pos = 10;
 
        Rect src = rect;
        src.width *= 1.4f;
        src.height *= 1.4f;
-       renderer.render_texture(grass_texture, rect, src);
+       renderer.render_texture(a_glyph.texture, rect, src);
        renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;
