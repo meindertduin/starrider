@@ -27,5 +27,5 @@ public:
     Glyph get_glyph(char c);
 private:
     FT_Face m_face;
-    std::map<char, Glyph> m_glyphs;
+    std::map<char, Glyph*> m_glyphs;
 };

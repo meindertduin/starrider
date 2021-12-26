@@ -45,19 +45,20 @@ bool FontSetTTF::load_font(std::string path) {
         texture.load_from_bitmap(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows,
                 m_face->glyph->bitmap.buffer);
 
-        Glyph glyph = {
+        Glyph *glyph = new Glyph();
+        *glyph = {
             .texture = texture,
             .size = V2I(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows),
             .bearing = V2I(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top),
             .advance = m_face->glyph->advance.x,
         };
 
-        m_glyphs.insert(std::pair<char, Glyph>(c, glyph));
+        m_glyphs.insert(std::pair<char, Glyph*>(c, glyph));
     }
 
     return true;
 }
 
 Glyph FontSetTTF::get_glyph(char c) {
-    return m_glyphs[c];
+    return *m_glyphs[c];
 }

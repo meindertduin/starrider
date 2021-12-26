@@ -29,9 +29,8 @@ enum class Format {
 };
 
 struct Bitmap {
-
     void *pixels = nullptr;
-    bool free_pixels = false;
+    bool free_pixels;
     int width;
     int height;
     Format format;
@@ -41,6 +40,7 @@ struct Bitmap {
         this->format = format;
         this->width = width;
         this->height = height;
+        free_pixels = false;
         pixels = data;
     }
 
