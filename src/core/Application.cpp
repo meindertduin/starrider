@@ -5,6 +5,7 @@
 #include "../graphics/Renderer.h"
 #include "../graphics/RenderPipeline.h"
 #include "../graphics/Texture.h"
+#include "../graphics//Font.h"
 
 #include "KeyMap.h"
 #include "Time.h"
@@ -64,7 +65,9 @@ void Application::run() {
     Transform monkey_transform = Transform(V4F(0, 0, 3));
 
     Matrix4F vp = p_camera->get_view_projection();
-    // m_window.toggle_fullscreen();
+
+    BitmapFont bitmap_font("bitmapfont.bmp");
+    auto a_glyph = bitmap_font.get_glyph('c');
 
     while (m_running) {
         m_cursor.reset_pos_middle();
@@ -84,8 +87,8 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.width = grass_texture.width;
-       rect.height = grass_texture.height;
+       rect.width = a_glyph.width;
+       rect.height = a_glyph.height;
        rect.x_pos = 0;
        rect.y_pos = 0;
 
@@ -94,7 +97,7 @@ void Application::run() {
        src.height *= 2;
        src.x_pos = 10;
        src.y_pos = 10;
-       renderer.render_texture(grass_texture, rect, rect);
+       renderer.render_texture(*a_glyph.texture, rect, src);
 
        renderer.render();
 

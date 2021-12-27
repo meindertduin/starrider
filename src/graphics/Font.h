@@ -8,12 +8,14 @@
 struct Glyph {
     int width;
     int height;
-    Texture texture;
+    Texture *texture;
 };
 
 class BitmapFont {
 public:
     BitmapFont(std::string bitmap_path);
+    ~BitmapFont();
+    Glyph get_glyph(char c);
 private:
-    std::map<char, Glyph> m_glyphs;
+    std::map<char, Glyph*> m_glyphs;
 };

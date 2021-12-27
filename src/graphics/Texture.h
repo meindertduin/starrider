@@ -66,7 +66,7 @@ struct Bitmap {
         }
     }
 
-    Bitmap copy_section(const Rect &src) {
+    Bitmap* copy_section(const Rect &src) {
         if (src.x_pos + src.width <= width && src.y_pos + src.height <= height) {
             void *data;
             switch(format) {
@@ -80,9 +80,9 @@ struct Bitmap {
                     break;
             }
 
-            return Bitmap(format, src.width, src.height, data);
+            return new Bitmap(format, src.width, src.height, data);
         } else {
-            return Bitmap();
+            return new Bitmap();
         }
     }
 };
@@ -116,13 +116,14 @@ public:
     void test_load();
     void load_from_bmp(std::string path);
     void load_from_bitmap(Format format, int width, int height, void* data);
+    void load_from_bitmap(Bitmap *bitmap);
 
     Pixel get_pixel(int x_pos, int y_pos, float light_amount) const;
     Pixel get_pixel(int x_pos, int y_pos) const;
     int width;
     int height;
 private:
-    Bitmap *m_bitmap;
+    Bitmap *m_bitmap = nullptr;
 };
 
 

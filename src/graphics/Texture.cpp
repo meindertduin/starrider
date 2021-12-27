@@ -5,6 +5,8 @@ Texture::Texture() {
 }
 
 Texture::~Texture() {
+    if (m_bitmap != nullptr)
+        delete m_bitmap;
 }
 
 void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
@@ -18,6 +20,12 @@ void Texture::load_from_bmp(std::string path) {
     m_bitmap = new Bitmap(path);
     width = m_bitmap->width;
     height = m_bitmap->height;
+}
+
+void Texture::load_from_bitmap(Bitmap *bitmap) {
+    m_bitmap = bitmap;
+    width = m_bitmap->width;
+    width = m_bitmap->height;
 }
 
 Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
