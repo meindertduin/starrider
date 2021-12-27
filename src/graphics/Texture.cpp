@@ -33,12 +33,6 @@ Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
 }
 
 Pixel Texture::get_pixel(int x_pos, int y_pos) const {
-    if (m_orientation == Orientation::RIGHTROT) {
-        int temp = x_pos;
-        x_pos = y_pos;
-        y_pos = width - temp;
-    }
-
     return {
         .value = m_bitmap->get_value(y_pos, width - x_pos)
     };

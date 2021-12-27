@@ -195,8 +195,8 @@ void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
 }
 
 void Renderer::render_texture(const Texture &texture, const Rect &src, const Rect &dest) {
-    if (dest.x_pos > 0 && dest.width + dest.x_pos <= m_width
-            && dest.y_pos > 0 && dest.height + dest.y_pos <= m_height)
+    if (dest.x_pos >= 0 && dest.width + dest.x_pos <= m_width
+            && dest.y_pos >= 0 && dest.height + dest.y_pos <= m_height)
     {
         float x_step = (float)src.width / (float)dest.width;
         float y_step = (float)src.height / (float)dest.height;
