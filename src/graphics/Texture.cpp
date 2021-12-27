@@ -34,6 +34,6 @@ Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
 
 Pixel Texture::get_pixel(int x_pos, int y_pos) const {
     return {
-        .value = m_bitmap->get_value(x_pos, y_pos)
+        .value = m_bitmap->get_value(y_pos, width - x_pos)
     };
 }

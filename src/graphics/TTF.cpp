@@ -49,6 +49,9 @@ bool FontSetTTF::load_font(std::string path) {
         texture.load_from_bitmap(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows,
                 m_face->glyph->bitmap.buffer);
 
+        texture.width = m_face->glyph->bitmap.width;
+        texture.height = m_face->glyph->bitmap.rows;
+
         Glyph *glyph = new Glyph();
         *glyph = {
             .texture = texture,
