@@ -65,6 +65,26 @@ struct Bitmap {
                 return 0;
         }
     }
+
+    Bitmap copy_section(const Rect &src) {
+        if (src.x_pos + src.width <= width && src.y_pos + src.height <= height) {
+            void *data;
+            switch(format) {
+                case Format::RGBA:
+                    data = new uint32_t[src.width * src.height];
+                    for (int y = 0; y < src.height; y++)
+                        for (int x = 0; x < src.width; x++)
+                            static_cast<uint32_t*>(data)[src.width * y + x] = static_cast<uint32_t*>(pixels)[src.width + (src.y_pos + y) + (src.x_pos + x)];
+                    break;
+                default:
+                    break;
+            }
+
+            return Bitmap(format, src.width, src.height, data);
+        } else {
+            return Bitmap();
+        }
+    }
 };
 
 struct RGBA {
