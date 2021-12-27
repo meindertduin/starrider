@@ -46,7 +46,7 @@ void Application::run() {
 
     FontSetTTF fontset;
     fontset.load_font("/usr/share/fonts/TTF/Symbola.ttf");
-    auto a_glyph = fontset.get_glyph('a');
+    auto a_glyph = fontset.get_glyph(98);
 
     p_camera = new Camera();
     p_camera->set_viewport(m_window.m_width, m_window.m_height);
@@ -89,14 +89,14 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.height = a_glyph.texture.height;
-       rect.width = a_glyph.texture.width;
+       rect.height = a_glyph.size.x;
+       rect.width = a_glyph.size.y;
        rect.x_pos = 10;
        rect.y_pos = 10;
 
        Rect src = rect;
-       src.width *= 1.4f;
-       src.height *= 1.4f;
+       src.width *= 2;
+       src.height *= 2;
        renderer.render_texture(a_glyph.texture, rect, src);
        renderer.render();
 

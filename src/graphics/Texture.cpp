@@ -5,25 +5,24 @@ Texture::Texture() {
 }
 
 Texture::~Texture() {
-    if (p_bitmap != nullptr)
-        delete p_bitmap;
 }
 
 void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
-    p_bitmap = new Bitmap(format, width, height, data);
-    width = p_bitmap->width;
-    height = p_bitmap->height;
+    m_bitmap = new Bitmap(format, width, height, data);
+
+    width = m_bitmap->width;
+    height = m_bitmap->height;
 }
 
 void Texture::load_from_bmp(std::string path) {
-    p_bitmap = new Bitmap(path);
-    width = p_bitmap->width;
-    height = p_bitmap->height;
+    m_bitmap = new Bitmap(path);
+    width = m_bitmap->width;
+    height = m_bitmap->height;
 }
 
 Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
     Pixel r = {
-        .value = p_bitmap->get_value(x_pos, y_pos)
+        .value = m_bitmap->get_value(x_pos, y_pos)
     };
 
     r.rgba.blue *= light_amount;
@@ -35,6 +34,6 @@ Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
 
 Pixel Texture::get_pixel(int x_pos, int y_pos) const {
     return {
-        .value = p_bitmap->get_value(x_pos, y_pos)
+        .value = m_bitmap->get_value(x_pos, y_pos)
     };
 }

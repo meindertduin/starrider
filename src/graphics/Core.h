@@ -14,64 +14,6 @@ class Texture;
 
 float saturate(float val);
 
-struct Rect {
-    int width;
-    int height;
-    int x_pos;
-    int y_pos;
-};
-
-enum class Format {
-    RED,
-    RG,
-    RGB,
-    RGBA,
-};
-
-struct Bitmap {
-    void *pixels = nullptr;
-    bool free_pixels;
-    int width;
-    int height;
-    Format format;
-
-    Bitmap();
-    Bitmap(Format format, int width, int height, void* data) {
-        this->format = format;
-        this->width = width;
-        this->height = height;
-        free_pixels = false;
-        pixels = data;
-    }
-
-    Bitmap(std::string path) {
-        BmpReader bmp_reader;
-
-        // fucntion call allocates memory for pixels
-        bmp_reader.read_file(path, pixels);
-        free_pixels = true;
-        format = Format::RGBA;
-
-        width = bmp_reader.get_width();
-        height = bmp_reader.get_height();
-    }
-
-    ~Bitmap() {
-        if (pixels != nullptr && free_pixels)
-            delete[] static_cast<char*>(pixels);
-    }
-
-    uint32_t get_value(int x_pos, int y_pos) {
-        switch(format) {
-            case Format::RED:
-                return static_cast<uint8_t*>(pixels)[width * y_pos + x_pos] << 16;
-            case Format::RGBA:
-                return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
-            default:
-                return 0;
-        }
-    }
-};
 
 struct Color {
     float r, g, b;
