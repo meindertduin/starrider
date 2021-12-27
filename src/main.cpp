@@ -1,8 +1,6 @@
 #include "core/Application.h"
-#include "graphics/TTF.h"
 
 int main() {
-    init_ttf();
     auto app = Application::get_instance();
 
     app->initialize({
@@ -11,7 +9,6 @@ int main() {
     });
 
     app->run();
-    free_ttf();
 
     return 0;
 }

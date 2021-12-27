@@ -205,7 +205,7 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
         for (int y_out = 0; y_out < dest.height; y_out++) {
             float x = 0;
             for (int x_out = 0; x_out < dest.width; x_out++) {
-                auto pixel = texture.get_pixel(std::round(x), std::round(y));
+                auto pixel = texture.get_pixel(std::round(x + src.x_pos), std::round(y + src.y_pos));
 
                 if (pixel.rgba.alpha > 0) {
                     if (pixel.rgba.alpha != 0xFF) {

@@ -23,7 +23,6 @@ set(SOURCES
     src/core/Events.cpp
     src/core/Time.cpp
     src/core/Cursor.cpp
-    src/graphics/TTF.cpp
     src/graphics/Texture.cpp
 )
 

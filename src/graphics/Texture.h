@@ -83,6 +83,7 @@ struct RGBA {
     }
 };
 
+
 union Pixel {
     RGBA rgba;
     uint32_t value;
@@ -102,6 +103,9 @@ public:
     int height;
 private:
     Bitmap *m_bitmap;
+    enum class Orientation {
+        RIGHTROT,
+    } m_orientation;
 };
 
 
