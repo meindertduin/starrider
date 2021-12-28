@@ -3,11 +3,12 @@
 #include "Font.h"
 
 BitmapFont::BitmapFont(std::string bitmap_path) {
-    Bitmap bitmap(bitmap_path);
+    Texture font_texture;
 
+    font_texture.load_from_bmp(bitmap_path);
     int characters_amount = 126 - '!';
-    int font_width = bitmap.width / characters_amount;
-    int font_height = bitmap.height;
+    int font_width = font_texture.width / characters_amount;
+    int font_height = font_texture.height;
 
     Rect src = {
         .width = font_width,
@@ -17,16 +18,12 @@ BitmapFont::BitmapFont(std::string bitmap_path) {
     };
 
     for (int i = 0; i < characters_amount; i++) {
-        Texture *texture = new Texture();
-
         src.x_pos = i * font_width;
-        Bitmap* glyph_bitmap = bitmap.copy_section(src);
-        texture->load_from_bitmap(glyph_bitmap);
 
         Glyph *glyph = new Glyph();
         glyph->width = font_width;
         glyph->height = font_height;
-        glyph->texture = texture;
+        glyph->texture = font_texture.from_section(src);
 
         m_glyphs.insert(std::pair<char, Glyph*>(i + '!', glyph));
     }

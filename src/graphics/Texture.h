@@ -58,7 +58,7 @@ struct Bitmap {
         }
     }
 
-    Bitmap* copy_section(const Rect &src) {
+    Bitmap copy_section(const Rect &src) {
         if (src.x_pos + src.width <= width && src.y_pos + src.height <= height) {
             void *data;
             switch(format) {
@@ -66,15 +66,15 @@ struct Bitmap {
                     data = new uint32_t[src.width * src.height];
                     for (int y = 0; y < src.height; y++)
                         for (int x = 0; x < src.width; x++)
-                            static_cast<uint32_t*>(data)[src.width * y + x] = static_cast<uint32_t*>(pixels)[src.width + (src.y_pos + y) + (src.x_pos + x)];
+                            static_cast<uint32_t*>(data)[src.width * y + x] = static_cast<uint32_t*>(pixels)[src.width * y + x];
                     break;
                 default:
                     break;
             }
 
-            return new Bitmap(format, src.width, src.height, data);
+            return Bitmap(format, src.width, src.height, data);
         } else {
-            return new Bitmap();
+            return Bitmap();
         }
     }
 };
@@ -108,7 +108,8 @@ public:
     void test_load();
     void load_from_bmp(std::string path);
     void load_from_bitmap(Format format, int width, int height, void* data);
-    void load_from_bitmap(Bitmap *bitmap);
+    void load_from_bitmap(Bitmap &&bitmap);
+    Texture* from_section(Rect src);
 
     Pixel get_pixel(int x_pos, int y_pos, float light_amount) const;
     Pixel get_pixel(int x_pos, int y_pos) const;

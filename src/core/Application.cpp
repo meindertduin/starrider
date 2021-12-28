@@ -67,7 +67,7 @@ void Application::run() {
     Matrix4F vp = p_camera->get_view_projection();
 
     BitmapFont bitmap_font("bitmapfont.bmp");
-    auto a_glyph = bitmap_font.get_glyph('c');
+    auto a_glyph = bitmap_font.get_glyph('!');
 
     while (m_running) {
         m_cursor.reset_pos_middle();
@@ -93,8 +93,6 @@ void Application::run() {
        rect.y_pos = 0;
 
        Rect src = rect;
-       src.width *= 2;
-       src.height *= 2;
        src.x_pos = 10;
        src.y_pos = 10;
        renderer.render_texture(*a_glyph.texture, rect, src);
