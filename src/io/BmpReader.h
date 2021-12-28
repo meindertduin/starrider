@@ -26,4 +26,5 @@ private:
     std::ifstream m_ifs;
 
     void read_header();
+    uint32_t* row(int row, uint32_t* bitmap);
 };

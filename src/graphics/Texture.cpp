@@ -51,6 +51,7 @@ Texture* Texture::from_section(Rect src) {
     Texture *r = new Texture();
     uint32_t *data = new uint32_t[src.width * src.height];
     auto pixels = static_cast<uint32_t*>(m_bitmap.pixels);
+
     for (int y = 0; y < src.height; y++)
         for (int x = 0; x < src.width; x++)
             data[src.width * y + x] = m_bitmap.get_value(x + src.x_pos, y + src.y_pos);

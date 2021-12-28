@@ -19,7 +19,10 @@ size_t BmpReader::read_file(string path, void *&bitmap) {
     bitmap = new uint32_t[m_header.bitmap_size / (m_header.bit_per_pixel / 8)];
 
     m_ifs.seekg(m_header.pix_array_offset, std::ios_base::beg);
-    m_ifs.read(reinterpret_cast<char*>(bitmap), m_header.bitmap_size);
+    for (int i = 0; i < m_header.height; i++) {
+        uint32_t* row_ptr = row(m_header.height - i - 1, reinterpret_cast<uint32_t*>(bitmap));
+        m_ifs.read(reinterpret_cast<char*>(row_ptr), 4 * m_header.width);
+    }
 
     return m_header.bitmap_size;
 }
@@ -50,4 +53,8 @@ uint32_t BmpReader::get_width() {
 
 uint32_t BmpReader::get_height() {
     return m_header.height;
+}
+
+uint32_t* BmpReader::row(int row, uint32_t* bitmap) {
+    return &bitmap[m_header.width * row];
 }
