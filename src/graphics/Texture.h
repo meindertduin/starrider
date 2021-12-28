@@ -21,7 +21,6 @@ enum class Format {
 
 struct Bitmap {
     void *pixels = nullptr;
-    bool free_pixels;
     int width;
     int height;
     Format format;
@@ -31,7 +30,6 @@ struct Bitmap {
         this->format = format;
         this->width = width;
         this->height = height;
-        free_pixels = false;
         pixels = data;
     }
 
@@ -40,16 +38,10 @@ struct Bitmap {
 
         // fucntion call allocates memory for pixels
         bmp_reader.read_file(path, pixels);
-        free_pixels = true;
         format = Format::RGBA;
 
         width = bmp_reader.get_width();
         height = bmp_reader.get_height();
-    }
-
-    ~Bitmap() {
-        if (pixels != nullptr && free_pixels)
-            delete[] static_cast<char*>(pixels);
     }
 
     uint32_t get_value(int x_pos, int y_pos) const {
@@ -123,7 +115,7 @@ public:
     int width;
     int height;
 private:
-    Bitmap *m_bitmap = nullptr;
+    Bitmap m_bitmap;
 };
 
 
