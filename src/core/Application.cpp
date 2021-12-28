@@ -67,7 +67,7 @@ void Application::run() {
     Matrix4F vp = p_camera->get_view_projection();
 
     BitmapFont bitmap_font("bitmapfont.bmp");
-    auto a_glyph = bitmap_font.get_glyph('!');
+    auto a_glyph = bitmap_font.get_glyph('a');
 
     while (m_running) {
         m_cursor.reset_pos_middle();
@@ -87,15 +87,17 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.width = a_glyph.width;
-       rect.height = a_glyph.height;
+       rect.width = grass_texture.width;
+       rect.height = grass_texture.height;
        rect.x_pos = 0;
        rect.y_pos = 0;
 
        Rect src = rect;
+       src.width *= 2;
+       src.height *= 2;
        src.x_pos = 10;
        src.y_pos = 10;
-       renderer.render_texture(*a_glyph.texture, rect, src);
+       renderer.render_texture(grass_texture, rect, rect);
 
        renderer.render();
 
