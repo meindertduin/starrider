@@ -1,4 +1,5 @@
 #include "BmpReader.h"
+#include <iostream>
 
 BmpReader::BmpReader() {}
 
@@ -12,14 +13,18 @@ size_t BmpReader::read_file(string path, void *&bitmap) {
     m_ifs = std::ifstream(path, std::ios::in | std::ios::binary);
 
     if (!m_ifs.is_open()) {
-        // TODO: throw an error
+        std::cerr << "BitReader::read_file() Error: file "
+            << path << " not found!" << std::endl;
+        return 0;
     }
 
     read_header();
     bitmap = new uint32_t[m_header.bitmap_size / (m_header.bit_per_pixel / 8)];
 
     m_ifs.seekg(m_header.pix_array_offset, std::ios_base::beg);
+
     for (int i = 0; i < m_header.height; i++) {
+        // reading the rows in inverse order, so that the bitmap of the image isn't inverted.
         uint32_t* row_ptr = row(m_header.height - i - 1, reinterpret_cast<uint32_t*>(bitmap));
         m_ifs.read(reinterpret_cast<char*>(row_ptr), 4 * m_header.width);
     }
