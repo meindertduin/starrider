@@ -2,6 +2,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 #include "Texture.h"
 
@@ -31,7 +32,8 @@ public:
     TTFFont(std::string path);
     ~TTFFont();
     Glyph get_glyph(char c);
+    Texture* from_char(char c);
 private:
     FT_Face m_face;
-    std::map<char, Glyph*> m_glyphs;
+    Glyph m_glyphs[128];
 };

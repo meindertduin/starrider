@@ -56,9 +56,8 @@ Glyph BitmapFont::get_glyph(char c) {
 }
 
 TTFFont::TTFFont(std::string path) {
-
     FT_New_Face(library, path.c_str(), 0, &m_face);
-    FT_Set_Pixel_Sizes(m_face, 0, 20);
+    FT_Set_Pixel_Sizes(m_face, 0, 32);
 
     for (unsigned char c = 0; c < 128; c++) {
         if (FT_Load_Char(m_face, c, FT_LOAD_RENDER)) {
@@ -67,15 +66,23 @@ TTFFont::TTFFont(std::string path) {
 
         Texture *texture = new Texture();
 
-        Glyph *glyph = new Glyph();
-        glyph->width = m_face->glyph->bitmap.width;
-        glyph->height = m_face->glyph->bitmap.rows;
-        texture->load_from_bitmap(Format::RED, glyph->width, glyph->height, m_face->glyph->bitmap.buffer);
-        glyph->texture = texture;
+        Glyph glyph;
+        texture->load_from_bitmap(Format::RED, glyph.width, glyph.height, m_face->glyph->bitmap.buffer);
+        glyph.width = m_face->glyph->bitmap.width;
+        glyph.height = m_face->glyph->bitmap.rows;
+        glyph.texture = texture;
 
-        m_glyphs.insert(std::pair<char, Glyph*>(c, glyph));
+        m_glyphs[c] = glyph;
     }
+}
 
+Texture* TTFFont::from_char(char c) {
+    FT_Set_Pixel_Sizes(m_face, 0, 32);
+
+    FT_Load_Char(m_face, c, FT_LOAD_RENDER);
+    Texture *texture = new Texture();
+    texture->load_from_bitmap(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
+    return texture;
 }
 
 TTFFont::~TTFFont() {
@@ -83,5 +90,5 @@ TTFFont::~TTFFont() {
 }
 
 Glyph TTFFont::get_glyph(char c) {
-    return *m_glyphs[c];
+    return m_glyphs[c];
 }

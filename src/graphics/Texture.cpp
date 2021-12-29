@@ -11,10 +11,10 @@ Texture::~Texture() {
 }
 
 void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
-    m_bitmap = Bitmap(format, width, height, data);
+    this->width = width;
+    this->height = height;
 
-    width = m_bitmap.width;
-    height = m_bitmap.height;
+    m_bitmap = Bitmap(format, width, height, data);
 }
 
 void Texture::load_from_bmp(std::string path) {

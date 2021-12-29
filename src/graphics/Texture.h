@@ -48,8 +48,8 @@ struct Bitmap {
         switch(format) {
             case Format::RED:
                 {
-                    uint32_t val = static_cast<uint8_t*>(pixels)[width * y_pos + x_pos];
-                    return (0x0000FF00 + val) << 16;
+                    uint32_t val = reinterpret_cast<unsigned char*>(pixels)[width * y_pos + x_pos];
+                    return (val << 24) | (val << 16) | (val << 8) | val;
                 }
             case Format::RGBA:
                 return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
