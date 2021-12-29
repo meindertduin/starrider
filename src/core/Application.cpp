@@ -67,8 +67,7 @@ void Application::run() {
     Matrix4F vp = p_camera->get_view_projection();
 
     TTFFont ttf_font("arial.ttf");
-    auto a_glyph = ttf_font.get_glyph('b');
-    auto ttf = ttf_font.from_char('d');
+    auto a_glyph = ttf_font.get_glyph('Z');
 
     while (m_running) {
         m_cursor.reset_pos_middle();
@@ -88,15 +87,16 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        Rect rect;
-       rect.width = ttf->width;
-       rect.height = ttf->height;
+       rect.width = a_glyph.width;
+       rect.height = a_glyph.height;
        rect.x_pos = 0;
        rect.y_pos = 0;
 
        Rect src = rect;
        src.x_pos = 20;
        src.y_pos = 20;
-       renderer.render_texture(*ttf, rect, src);
+       renderer.render_texture(*a_glyph.texture, rect, src);
+
 
        renderer.render();
 

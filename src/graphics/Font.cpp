@@ -59,18 +59,12 @@ TTFFont::TTFFont(std::string path) {
     FT_New_Face(library, path.c_str(), 0, &m_face);
     FT_Set_Pixel_Sizes(m_face, 0, 32);
 
-    for (unsigned char c = 0; c < 128; c++) {
-        if (FT_Load_Char(m_face, c, FT_LOAD_RENDER)) {
-            return;
-        }
-
-        Texture *texture = new Texture();
-
+    for (char c = 0; c < 127; c++) {
         Glyph glyph;
-        texture->load_from_bitmap(Format::RED, glyph.width, glyph.height, m_face->glyph->bitmap.buffer);
+
+        glyph.texture = from_char(c);
         glyph.width = m_face->glyph->bitmap.width;
         glyph.height = m_face->glyph->bitmap.rows;
-        glyph.texture = texture;
 
         m_glyphs[c] = glyph;
     }
@@ -90,5 +84,8 @@ TTFFont::~TTFFont() {
 }
 
 Glyph TTFFont::get_glyph(char c) {
+    // TODO: as i understand the buffer for the face->glyph needs to be re-rendered everytime it's used.
+    // This may or may not be optimizable
+    FT_Load_Char(m_face, c, FT_LOAD_RENDER);
     return m_glyphs[c];
 }
