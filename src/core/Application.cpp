@@ -67,7 +67,8 @@ void Application::run() {
     Matrix4F vp = p_camera->get_view_projection();
 
     BitmapFont bitmap_font("bitmapfont.bmp");
-    auto a_glyph = bitmap_font.get_glyph('#');
+    TTFFont ttf_font("/usr/share/fonts/TTF/Symbola.ttf");
+    auto a_glyph = ttf_font.get_glyph('!');
 
     while (m_running) {
         m_cursor.reset_pos_middle();

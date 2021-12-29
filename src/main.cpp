@@ -1,6 +1,8 @@
 #include "core/Application.h"
+#include "graphics/Font.h"
 
 int main() {
+    ttf_init();
     auto app = Application::get_instance();
 
     app->initialize({
@@ -9,6 +11,7 @@ int main() {
     });
 
     app->run();
+    ttf_quit();
 
     return 0;
 }
