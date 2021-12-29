@@ -231,3 +231,24 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
         }
     }
 }
+
+void Renderer::render_text(std::string text, const TTFFont &font) {
+    Rect src;
+    src.x_pos = 0;
+    src.y_pos = 0;
+
+    Rect dest = src;
+    dest.x_pos = 20;
+    dest.y_pos = 20;
+    for (auto c : text) {
+        auto glyph = font.get_glyph(c);
+        src.width = glyph.width;
+        src.height = glyph.height;
+        dest.width = glyph.width;
+        dest.height = glyph.height;
+
+        render_texture(*glyph.texture, src, dest);
+        dest.x_pos += (glyph.advance / 64);
+    }
+}
+

@@ -4,6 +4,7 @@
 #include "Core.h"
 #include "../core/Application.h"
 #include "Texture.h"
+#include "Font.h"
 
 class Renderer : EventObserver<WindowEvent> {
 public:
@@ -17,6 +18,7 @@ public:
     bool render();
 
     void render_texture(const Texture &texture, const Rect &src, const Rect &dest);
+    void render_text(std::string text, const TTFFont &font);
     void on_event(const WindowEvent &event) override;
 
     int m_height;

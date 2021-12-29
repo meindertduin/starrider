@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Texture.h"
+#include "Core.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -15,7 +16,9 @@ void ttf_quit();
 struct Glyph {
     int width;
     int height;
+    V2I bearing;
     Texture *texture;
+    int advance;
 };
 
 class BitmapFont {
@@ -31,7 +34,7 @@ class TTFFont {
 public:
     TTFFont(std::string path);
     ~TTFFont();
-    Glyph get_glyph(char c);
+    Glyph get_glyph(char c) const;
 private:
     FT_Face m_face;
     Glyph m_glyphs[127];

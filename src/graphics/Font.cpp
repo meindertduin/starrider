@@ -65,8 +65,18 @@ TTFFont::TTFFont(std::string path) {
         glyph.texture = from_char(c);
         glyph.width = m_face->glyph->bitmap.width;
         glyph.height = m_face->glyph->bitmap.rows;
+        glyph.bearing = V2I(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top);
+        glyph.advance = m_face->glyph->advance.x;
 
         m_glyphs[c] = glyph;
+    }
+}
+
+
+TTFFont::~TTFFont() {
+    FT_Done_Face(m_face);
+    for (auto glyph : m_glyphs) {
+        delete glyph.texture;
     }
 }
 
@@ -79,11 +89,7 @@ Texture* TTFFont::from_char(char c) {
     return texture;
 }
 
-TTFFont::~TTFFont() {
-    FT_Done_Face(m_face);
-}
-
-Glyph TTFFont::get_glyph(char c) {
+Glyph TTFFont::get_glyph(char c) const {
     // TODO: as i understand the buffer for the face->glyph needs to be re-rendered everytime it's used.
     // This may or may not be optimizable
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
