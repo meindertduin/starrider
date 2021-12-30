@@ -32,7 +32,7 @@ bool GWindow::initialize(int width, int height) {
     set_attr.override_redirect = true;
 
     // TODO add some sort of setting for the window on startup
-    //XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
+    XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
     XResizeWindow(p_display, m_window, m_width, m_height);
 
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);

@@ -86,9 +86,13 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
        renderer.render_text("Hello World", ttf_font, { 20, 20 });
 
-       renderer.render();
 
         auto dt = get_program_ticks_ms() - cycle_start;
+        string time_text = std::to_string(static_cast<int>(dt));
+        renderer.render_text(time_text, ttf_font, {20, 52});
+
+       renderer.render();
+
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
         if (cycle_delay > 0) {
             delay(cycle_delay);
