@@ -18,7 +18,7 @@ public:
     bool render();
 
     void render_texture(const Texture &texture, const Rect &src, const Rect &dest);
-    void render_text(std::string text, const TTFFont &font);
+    void render_text(std::string text, const TTFFont &font, const Point &point);
     void on_event(const WindowEvent &event) override;
 
     int m_height;

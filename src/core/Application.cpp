@@ -84,7 +84,7 @@ void Application::run() {
         });
 
        render_pipeline.render_viewport(*p_camera, renderables);
-       renderer.render_text("Hello World", ttf_font);
+       renderer.render_text("Hello World", ttf_font, { 20, 20 });
 
        renderer.render();
 
