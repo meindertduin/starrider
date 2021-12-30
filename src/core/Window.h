@@ -17,6 +17,8 @@ public:
     bool ready_for_render = true;
     int m_width;
     int m_height;
+    int m_res_x;
+    int m_res_y;
 
     bool initialize(int width, int height);
     bool poll_event(WindowEvent &event);

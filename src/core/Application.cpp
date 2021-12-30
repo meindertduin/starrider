@@ -45,7 +45,7 @@ void Application::run() {
     m_running = true;
 
     p_camera = new Camera();
-    p_camera->set_viewport(m_window.m_width, m_window.m_height);
+    p_camera->set_viewport(m_window.m_res_x, m_window.m_res_y);
 
     m_cursor.initialize(&m_window);
 
@@ -62,7 +62,12 @@ void Application::run() {
     mesh.load_from_obj_file("monkey0.obj");
     mesh.texture = &brick_texture;
 
+    Mesh terrain;
+    terrain.load_from_obj_file("terrain.obj");
+    terrain.texture = &brick_texture;
+
     Transform monkey_transform = Transform(V4F(0, 0, 3));
+    Transform terrain_transform = Transform(V4F(0, -4, 0));
 
     Matrix4F vp = p_camera->get_view_projection();
 
@@ -81,6 +86,11 @@ void Application::run() {
         renderables.push_back({
             .transform = &monkey_transform,
             .mesh = &mesh,
+        });
+
+        renderables.push_back({
+            .transform = &terrain_transform,
+            .mesh = &terrain,
         });
 
        render_pipeline.render_viewport(*p_camera, renderables);
@@ -123,8 +133,7 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
-                p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
-
+                //p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
                 emit_event(event, event.event_type);
             }
             break;

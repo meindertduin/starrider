@@ -23,6 +23,8 @@ public:
 
     int m_height;
     int m_width;
+    int m_res_x;
+    int m_res_y;
 private:
     GWindow *p_window = nullptr;
     Visual* p_visual = nullptr;

@@ -15,6 +15,9 @@ Renderer::Renderer() {
     m_width = p_window->m_width;
     m_height = p_window->m_height;
 
+    m_res_x = p_window->m_res_x;
+    m_res_y = p_window->m_res_y;
+
     p_app->listen(this, WindowEventType::WinExpose);
 
     m_gc = XCreateGC(p_window->get_display(), p_window->get_window(), 0, nullptr);
@@ -64,8 +67,8 @@ void Renderer::on_event(const WindowEvent &event) {
 }
 
 void Renderer::create_framebuffer() {
-    p_framebuffer = new Pixel[m_width * m_height];
-    for (auto i = 0u; i < m_width * m_height; ++i) {
+    p_framebuffer = new Pixel[m_res_x * m_res_y];
+    for (auto i = 0u; i < m_res_x * m_res_y; ++i) {
         (*(p_framebuffer+i)).value = 0x00000000;
     }
 }
@@ -76,9 +79,25 @@ bool Renderer::render() {
     }
 
     // copy all the data from the frame_buffer to the shm buffer
-    for (auto i = 0u; i < m_width *m_height; i++) {
-		*((int*) m_shm_info.shmaddr+i) = (*(p_framebuffer + i)).value;
-	}
+    // for (auto i = 0u; i < m_res_x * m_res_y; i++) {
+	// 	*((int*) m_shm_info.shmaddr+i) = (*(p_framebuffer + i)).value;
+	// }
+
+    float x_step = (float)m_res_x / (float)m_width;
+    float y_step = (float)m_res_y / (float)m_height;
+
+    float y = 0;
+    for (int y_out = 0; y_out < m_height; y_out++) {
+        float x = 0;
+        for (int x_out = 0; x_out < m_width; x_out++) {
+            auto value = get_pixel(std::round(x), std::round(y));
+		    *((int*) m_shm_info.shmaddr + m_width * y_out + x_out) = value.value;
+
+            x += x_step;
+        }
+
+        y += y_step;
+    }
 
     Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
 
@@ -86,7 +105,6 @@ bool Renderer::render() {
         printf("Something went wrong with rendering the shm Image\n");
         return false;
     }
-
 
     return true;
 }
@@ -183,23 +201,23 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 void Renderer::clear_screen() {
-    for (auto i = 0u; i < m_width * m_height; ++i) {
+    for (auto i = 0u; i < m_res_x * m_res_y; ++i) {
 		(*(p_framebuffer+i)).value = 0x00000000;
 	}
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
-    if (x_pos < m_width) {
-        p_framebuffer[m_width * y_pos + x_pos].value = value;
+    if (x_pos < m_res_x) {
+        p_framebuffer[m_res_x * y_pos + x_pos].value = value;
     }
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, const Pixel &value) {
-    p_framebuffer[m_width * y_pos + x_pos] = value;
+    p_framebuffer[m_res_x * y_pos + x_pos] = value;
 }
 
 Pixel Renderer::get_pixel(int x_pos, int y_pos) {
-    return p_framebuffer[m_width * y_pos + x_pos];
+    return p_framebuffer[m_res_x * y_pos + x_pos];
 }
 
 
@@ -244,7 +262,7 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
         src.width = glyph.width;
         src.height = glyph.height;
 
-        // glyphs are rendered from top to bottom, so we need to offset smaller glyphs
+        // fonts are rendered from top to bottom, so we need to offset smaller glyphs
         int render_from = font.get_font_size() - src.height;
         Rect dest = src;
         dest.x_pos = dest_x_pos;

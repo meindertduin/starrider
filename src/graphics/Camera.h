@@ -9,7 +9,8 @@ public:
     ~Camera();
     void set_viewport(int width, int height);
     Matrix4F get_view_projection() const;
-    int width, height;
+    int width;
+    int height;
 
     void on_event(const WindowEvent &event) override;
     Transform m_transform;
