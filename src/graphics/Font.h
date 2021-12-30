@@ -18,7 +18,7 @@ struct Glyph {
     int height;
     V2I bearing;
     Texture *texture;
-    int advance;
+    int advance; // 1 = 1/64 of a pixel. See freetype documentation
 };
 
 class BitmapFont {
@@ -32,12 +32,14 @@ private:
 
 class TTFFont {
 public:
-    TTFFont(std::string path);
+    TTFFont(std::string path, int size);
     ~TTFFont();
     Glyph get_glyph(char c) const;
+    int get_font_size() const;
 private:
     FT_Face m_face;
     Glyph m_glyphs[127];
+    int m_font_size;
 
     Texture* from_char(char c);
 };

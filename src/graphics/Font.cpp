@@ -55,9 +55,9 @@ Glyph BitmapFont::get_glyph(char c) {
     return *m_glyphs[c];
 }
 
-TTFFont::TTFFont(std::string path) {
+TTFFont::TTFFont(std::string path, int size) : m_font_size(size) {
     FT_New_Face(library, path.c_str(), 0, &m_face);
-    FT_Set_Pixel_Sizes(m_face, 0, 32);
+    FT_Set_Pixel_Sizes(m_face, size, size);
 
     for (char c = 0; c < 127; c++) {
         Glyph glyph;
@@ -66,7 +66,7 @@ TTFFont::TTFFont(std::string path) {
         glyph.width = m_face->glyph->bitmap.width;
         glyph.height = m_face->glyph->bitmap.rows;
         glyph.bearing = V2I(m_face->glyph->bitmap_left, m_face->glyph->bitmap_top);
-        glyph.advance = m_face->glyph->advance.x;
+        glyph.advance = m_face->glyph->advance.x / 64; // advance is measured in 1/64 of a pixel
 
         m_glyphs[c] = glyph;
     }
@@ -94,4 +94,8 @@ Glyph TTFFont::get_glyph(char c) const {
     // This may or may not be optimizable
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
     return m_glyphs[c];
+}
+
+int TTFFont::get_font_size() const {
+    return m_font_size;
 }

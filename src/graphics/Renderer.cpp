@@ -237,19 +237,23 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
     src.x_pos = 0;
     src.y_pos = 0;
 
-    Rect dest = src;
-    dest.x_pos = point.x;
-    dest.y_pos = point.y;
+    int dest_x_pos = point.x;
 
     for (auto c : text) {
         auto glyph = font.get_glyph(c);
         src.width = glyph.width;
         src.height = glyph.height;
+
+        // glyphs are rendered from top to bottom, so we need to offset smaller glyphs
+        int render_from = font.get_font_size() - src.height;
+        Rect dest = src;
+        dest.x_pos = dest_x_pos;
+        dest.y_pos = point.y + render_from;
         dest.width = glyph.width;
         dest.height = glyph.height;
 
         render_texture(*glyph.texture, src, dest);
-        dest.x_pos += (glyph.advance / 64);
+        dest_x_pos += glyph.advance;
     }
 }
 

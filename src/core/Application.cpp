@@ -66,7 +66,7 @@ void Application::run() {
 
     Matrix4F vp = p_camera->get_view_projection();
 
-    TTFFont ttf_font("arial.ttf");
+    TTFFont ttf_font("arial.ttf", 32);
 
     while (m_running) {
         m_cursor.reset_pos_middle();
