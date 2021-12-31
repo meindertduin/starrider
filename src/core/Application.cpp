@@ -71,7 +71,7 @@ void Application::run() {
 
     Matrix4F vp = p_camera->get_view_projection();
 
-    TTFFont ttf_font("arial.ttf", 32);
+    TTFFont ttf_font("arial.ttf", 24);
 
     while (m_running) {
         m_cursor.reset_pos_middle();
@@ -94,21 +94,23 @@ void Application::run() {
         });
 
        render_pipeline.render_viewport(*p_camera, renderables);
+
+       renderer.render_framebuffer();
        renderer.render_text("Hello World", ttf_font, { 20, 20 });
 
 
-        auto dt = get_program_ticks_ms() - cycle_start;
-        string time_text = std::to_string(static_cast<int>(dt));
-        renderer.render_text(time_text, ttf_font, {20, 52});
+       auto dt = get_program_ticks_ms() - cycle_start;
+       string time_text = std::to_string(static_cast<int>(dt));
+       renderer.render_text(time_text, ttf_font, {20, 52});
 
-       renderer.render();
+       renderer.render_final();
 
-        int cycle_delay = (1000.0f / (float)m_fps) - dt;
-        if (cycle_delay > 0) {
-            delay(cycle_delay);
-        }
+       int cycle_delay = (1000.0f / (float)m_fps) - dt;
+       if (cycle_delay > 0) {
+           delay(cycle_delay);
+       }
 
-        emit_mouse_motion_event();
+       emit_mouse_motion_event();
     }
 }
 

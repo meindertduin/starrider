@@ -15,11 +15,11 @@ public:
     void set_frame_pixel(int x_pos, int y_pos, uint32_t value);
     void set_frame_pixel(int x_pos, int y_pos, const Pixel &value);
     void clear_screen();
-    bool render();
-
+    void render_framebuffer();
     void render_texture(const Texture &texture, const Rect &src, const Rect &dest);
     void render_text(std::string text, const TTFFont &font, const Point &point);
     void on_event(const WindowEvent &event) override;
+    bool render_final();
 
     int m_height;
     int m_width;

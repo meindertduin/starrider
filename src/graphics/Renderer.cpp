@@ -73,15 +73,10 @@ void Renderer::create_framebuffer() {
     }
 }
 
-bool Renderer::render() {
+void Renderer::render_framebuffer() {
     while (!p_window->ready_for_render) {
         // block untill drawing is complete
     }
-
-    // copy all the data from the frame_buffer to the shm buffer
-    // for (auto i = 0u; i < m_res_x * m_res_y; i++) {
-	// 	*((int*) m_shm_info.shmaddr+i) = (*(p_framebuffer + i)).value;
-	// }
 
     float x_step = (float)m_res_x / (float)m_width;
     float y_step = (float)m_res_y / (float)m_height;
@@ -98,15 +93,6 @@ bool Renderer::render() {
 
         y += y_step;
     }
-
-    Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
-
-    if (status == 0) {
-        printf("Something went wrong with rendering the shm Image\n");
-        return false;
-    }
-
-    return true;
 }
 
 
@@ -222,7 +208,7 @@ Pixel Renderer::get_pixel(int x_pos, int y_pos) {
 
 
 void Renderer::render_texture(const Texture &texture, const Rect &src, const Rect &dest) {
-    if (dest.x_pos >= 0 && dest.width + dest.x_pos <= m_width
+    if(dest.x_pos >= 0 && dest.width + dest.x_pos <= m_width
             && dest.y_pos >= 0 && dest.height + dest.y_pos <= m_height)
     {
         float x_step = (float)src.width / (float)dest.width;
@@ -240,7 +226,7 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
                         pixel.rgba.blend(current.rgba);
                     }
 
-                    set_frame_pixel(x_out + dest.x_pos, y_out + dest.y_pos, pixel.value);
+		            *((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;
                 }
 
                 x += x_step;
@@ -275,3 +261,14 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
     }
 }
 
+
+bool Renderer::render_final() {
+    Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
+
+    if (status == 0) {
+        printf("Something went wrong with rendering the shm Image\n");
+        return false;
+    }
+
+    return true;
+}
