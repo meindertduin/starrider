@@ -68,7 +68,7 @@ void Renderer::on_event(const WindowEvent &event) {
 
 void Renderer::create_framebuffer() {
     p_framebuffer = new Pixel[m_res_x * m_res_y];
-    for (auto i = 0u; i < m_res_x * m_res_y; ++i) {
+    for (int i = 0; i < m_res_x * m_res_y; ++i) {
         (*(p_framebuffer+i)).value = 0x00000000;
     }
 }
@@ -188,7 +188,7 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 void Renderer::clear_screen() {
-    for (auto i = 0u; i < m_res_x * m_res_y; ++i) {
+    for (int i = 0; i < m_res_x * m_res_y; ++i) {
 		(*(p_framebuffer+i)).value = 0x00000000;
 	}
 }

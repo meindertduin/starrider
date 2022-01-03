@@ -62,7 +62,7 @@ Texture& Texture::operator=(Texture &&other) noexcept {
     height = other.height;
     format = other.format;
 
-    return *this;
+   return *this;
 }
 
 Texture::~Texture() {

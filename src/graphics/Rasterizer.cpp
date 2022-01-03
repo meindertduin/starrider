@@ -30,7 +30,7 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
      {
          Vertex initial_vertex = vertices[0];
 
-         for (int i = 1; i < vertices.size() - 1; i++) {
+         for (int i = 1; i < static_cast<int>(vertices.size()) - 1; i++) {
              Triangle draw_triangle;
              draw_triangle.p[0] = initial_vertex;
              draw_triangle.p[1] = vertices[i];
