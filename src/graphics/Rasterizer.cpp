@@ -83,9 +83,7 @@ void Rasterizer::fill_triangle(Triangle &triangle, const Texture &texture) {
 }
 
 void Rasterizer::clear_depth_buffer() {
-    for (int i = 0; i < m_width * m_height; i++) {
-        p_z_buffer[i] = INFINITY;
-    }
+    std::fill(p_z_buffer, p_z_buffer + m_width * m_height, INFINITY);
 }
 
 void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture) {

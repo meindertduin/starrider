@@ -193,9 +193,11 @@ void Renderer::draw_line(const Point &p1, const Point &p2, const Color &color) {
 }
 
 void Renderer::clear_screen() {
-    for (int i = 0; i < m_res_x * m_res_y; ++i) {
-		(*(p_framebuffer+i)).value = 0x00000000;
-	}
+    Pixel value = {
+        .value = 0x00000000
+    };
+
+    std::fill(p_framebuffer, p_framebuffer + m_res_x * m_res_y, value);
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
