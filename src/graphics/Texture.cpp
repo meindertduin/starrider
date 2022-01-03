@@ -5,46 +5,69 @@
 Texture::Texture() {
 }
 
-Texture::Texture(const Texture &other) : m_bitmap(other.m_bitmap),
-    height(other.height), width(other.width)
+Texture::Texture(const Texture &other) : pixels(nullptr),
+    height(other.height), width(other.width), format(other.format)
 {
+    if (other.pixels != nullptr) {
+        std::size_t size(other.width * other.height);
+        switch (other.format) {
+            case Format::RED:
+                this->pixels = new unsigned char[size];
+                break;
+            case Format::RGBA:
+                this->pixels = new uint32_t[size];
+                break;
+        }
 
+        std::memcpy(pixels, other.pixels, size);
+    }
+}
+
+Texture::Texture(Texture &&other) noexcept : pixels(nullptr), width(other.width), height(other.height),
+    format(other.format)
+{
+    pixels = other.pixels;
+    other.pixels = nullptr;
+}
+
+Texture::Texture(Format format, int width, int height, void* data) {
+    this->format = format;
+    this->width = width;
+    this->height = height;
+
+    pixels = data;
 }
 
 Texture& Texture::operator=(const Texture &other) {
-    m_bitmap = other.m_bitmap;
-    height = other.height;
-    width = other.width;
+    *this = Texture(other);
+    return *this;
+}
 
+Texture& Texture::operator=(Texture &&other) noexcept {
+    *this = Texture(std::move(other));
     return *this;
 }
 
 Texture::~Texture() {
-    m_bitmap.free();
-}
-
-void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
-    this->width = width;
-    this->height = height;
-
-    m_bitmap = Bitmap(format, width, height, data);
+    if (pixels != nullptr)
+        delete[] reinterpret_cast<char*>(pixels);
 }
 
 void Texture::load_from_bmp(std::string path) {
-    m_bitmap = Bitmap(path);
-    width = m_bitmap.width;
-    height = m_bitmap.height;
-}
+    BmpReader bmp_reader;
 
-void Texture::load_from_bitmap(Bitmap &&bitmap) {
-    m_bitmap = bitmap;
-    width = m_bitmap.width;
-    width = m_bitmap.height;
+    // TODO fix this
+    // fucntion call allocates memory for pixels
+    bmp_reader.read_file(path, pixels);
+    format = Format::RGBA;
+
+    width = bmp_reader.get_width();
+    height = bmp_reader.get_height();
 }
 
 Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
     Pixel r = {
-        .value = m_bitmap.get_value(x_pos, y_pos)
+        .value = get_pixel_value(x_pos, y_pos),
     };
 
     r.rgba.blue *= light_amount;
@@ -56,20 +79,33 @@ Pixel Texture::get_pixel(int x_pos, int y_pos, float light_amount) const {
 
 Pixel Texture::get_pixel(int x_pos, int y_pos) const {
     return {
-        .value = m_bitmap.get_value(x_pos, y_pos),
+        .value = get_pixel_value(x_pos, y_pos),
     };
+
+}
+
+inline uint32_t Texture::get_pixel_value(int x_pos, int y_pos) const {
+    switch(format) {
+        case Format::RED:
+            {
+                uint32_t val = reinterpret_cast<unsigned char*>(pixels)[width * y_pos + x_pos];
+                return (val << 24) | (val << 16) | (val << 8) | val;
+            }
+        case Format::RGBA:
+            return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
+        default:
+            return 0;
+    }
 }
 
 Texture* Texture::from_section(Rect src) {
-    Texture *r = new Texture();
     uint32_t *data = new uint32_t[src.width * src.height];
-    auto pixels = static_cast<uint32_t*>(m_bitmap.pixels);
+    auto pixels = static_cast<uint32_t*>(this->pixels);
 
     for (int y = 0; y < src.height; y++)
         for (int x = 0; x < src.width; x++)
-            data[src.width * y + x] = m_bitmap.get_value(x + src.x_pos, y + src.y_pos);
+            data[src.width * y + x] = get_pixel_value(x + src.x_pos, y + src.y_pos);
 
-    r->load_from_bitmap(std::move(Bitmap(Format::RGBA, src.width, src.height, data)));
-
-    return r;
+    // TODO dont allocate when returning except when in pointer
+    return new Texture(Format::RGBA, src.width, src.height, data);
 }

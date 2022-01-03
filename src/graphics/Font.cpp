@@ -84,9 +84,10 @@ Texture* TTFFont::from_char(char c) {
     FT_Set_Pixel_Sizes(m_face, 0, 32);
 
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
-    Texture *texture = new Texture();
-    texture->load_from_bitmap(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
-    return texture;
+
+    // TODO dont allocate when returning except when in pointer
+    return new Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
+
 }
 
 Glyph TTFFont::get_glyph(char c) const {
