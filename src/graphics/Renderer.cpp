@@ -257,7 +257,7 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
         dest.width = glyph.width;
         dest.height = glyph.height;
 
-        render_texture(*glyph.texture, src, dest);
+        render_texture(glyph.texture, src, dest);
         dest_x_pos += glyph.advance;
     }
 }

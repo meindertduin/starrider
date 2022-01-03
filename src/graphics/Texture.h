@@ -56,7 +56,7 @@ public:
     Texture& operator=(Texture &&other) noexcept;
 
     void load_from_bmp(std::string path);
-    Texture* from_section(Rect src);
+    Texture from_section(Rect src);
 
     Pixel get_pixel(int x_pos, int y_pos, float light_amount) const;
     Pixel get_pixel(int x_pos, int y_pos) const;

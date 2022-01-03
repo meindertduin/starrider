@@ -46,7 +46,6 @@ BitmapFont::BitmapFont(std::string bitmap_path) {
 
 BitmapFont::~BitmapFont() {
     for(auto item : m_glyphs) {
-        delete item.second->texture;
         delete item.second;
     }
 }
@@ -75,18 +74,14 @@ TTFFont::TTFFont(std::string path, int size) : m_font_size(size) {
 
 TTFFont::~TTFFont() {
     FT_Done_Face(m_face);
-    for (auto glyph : m_glyphs) {
-        delete glyph.texture;
-    }
 }
 
-Texture* TTFFont::from_char(char c) {
+Texture TTFFont::from_char(char c) {
     FT_Set_Pixel_Sizes(m_face, 0, 32);
 
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
 
-    // TODO dont allocate when returning except when in pointer
-    return new Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
+    return Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
 
 }
 

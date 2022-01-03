@@ -35,7 +35,19 @@ Texture::Texture(Format format, int width, int height, void* data) {
     this->width = width;
     this->height = height;
 
-    pixels = data;
+    if (data != nullptr) {
+        std::size_t size(width * height);
+        switch (format) {
+            case Format::RED:
+                this->pixels = new unsigned char[size];
+                break;
+            case Format::RGBA:
+                this->pixels = new uint32_t[size];
+                break;
+        }
+
+        std::memcpy(pixels, data, size);
+    }
 }
 
 Texture& Texture::operator=(const Texture &other) {
@@ -44,7 +56,12 @@ Texture& Texture::operator=(const Texture &other) {
 }
 
 Texture& Texture::operator=(Texture &&other) noexcept {
-    *this = Texture(std::move(other));
+    pixels = other.pixels;
+    other.pixels = nullptr;
+    width = other.width;
+    height = other.height;
+    format = other.format;
+
     return *this;
 }
 
@@ -98,7 +115,7 @@ inline uint32_t Texture::get_pixel_value(int x_pos, int y_pos) const {
     }
 }
 
-Texture* Texture::from_section(Rect src) {
+Texture Texture::from_section(Rect src) {
     uint32_t *data = new uint32_t[src.width * src.height];
     auto pixels = static_cast<uint32_t*>(this->pixels);
 
@@ -106,6 +123,5 @@ Texture* Texture::from_section(Rect src) {
         for (int x = 0; x < src.width; x++)
             data[src.width * y + x] = get_pixel_value(x + src.x_pos, y + src.y_pos);
 
-    // TODO dont allocate when returning except when in pointer
-    return new Texture(Format::RGBA, src.width, src.height, data);
+    return Texture(Format::RGBA, src.width, src.height, data);
 }
