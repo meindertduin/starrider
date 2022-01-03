@@ -85,7 +85,12 @@ void Renderer::render_framebuffer() {
     for (int y_out = 0; y_out < m_height; y_out++) {
         float x = 0;
         for (int x_out = 0; x_out < m_width; x_out++) {
-            auto value = get_pixel(std::round(x), std::round(y));
+            // auto value = get_pixel(std::round(x), std::round(y));
+            // set_shared_mem_pixel(value, x_out, y_out);
+
+            // auto value = p_framebuffer[m_res_x * static_cast<int>(std::round(y)) + static_cast<int>(std::round(x))];
+
+            auto value = p_framebuffer[m_res_x * static_cast<int>(y) + static_cast<int>(x)];
 		    *((int*) m_shm_info.shmaddr + m_width * y_out + x_out) = value.value;
 
             x += x_step;
@@ -194,16 +199,14 @@ void Renderer::clear_screen() {
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
-    if (x_pos < m_res_x) {
-        p_framebuffer[m_res_x * y_pos + x_pos].value = value;
-    }
+    p_framebuffer[m_res_x * y_pos + x_pos].value = value;
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, const Pixel &value) {
     p_framebuffer[m_res_x * y_pos + x_pos] = value;
 }
 
-Pixel Renderer::get_pixel(int x_pos, int y_pos) {
+inline Pixel Renderer::get_pixel(int x_pos, int y_pos) {
     return p_framebuffer[m_res_x * y_pos + x_pos];
 }
 
@@ -219,7 +222,7 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
         for (int y_out = 0; y_out < dest.height; y_out++) {
             float x = 0;
             for (int x_out = 0; x_out < dest.width; x_out++) {
-                auto pixel = texture.get_pixel(std::round(x + src.x_pos), std::round(y + src.y_pos));
+                auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
 
                 if (pixel.rgba.alpha > 0) {
                     if (pixel.rgba.alpha != 0xFF) {

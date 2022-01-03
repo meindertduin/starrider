@@ -12,14 +12,15 @@ public:
     ~Renderer();
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);
-    void set_frame_pixel(int x_pos, int y_pos, uint32_t value);
-    void set_frame_pixel(int x_pos, int y_pos, const Pixel &value);
     void clear_screen();
     void render_framebuffer();
     void render_texture(const Texture &texture, const Rect &src, const Rect &dest);
     void render_text(std::string text, const TTFFont &font, const Point &point);
     void on_event(const WindowEvent &event) override;
     bool render_final();
+
+    void set_frame_pixel(int x_pos, int y_pos, uint32_t value);
+    void set_frame_pixel(int x_pos, int y_pos, const Pixel &value);
 
     int m_height;
     int m_width;
@@ -41,4 +42,5 @@ private:
     void create_framebuffer();
     void remove_shared_memory();
     Pixel get_pixel(int x_pos, int y_pos);
+    void set_shared_mem_pixel(const Pixel &pixel, int x_pos, int y_pos);
 };
