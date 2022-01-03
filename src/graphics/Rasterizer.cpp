@@ -135,6 +135,7 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
         int index = i + j * m_width;
         if (p_z_buffer[index] > depth) {
             float z = 1.0f / one_over_z;
+
             int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);
             int src_y = (int)((text_coord_y * z) * (texture.height - 1) + 0.5f);
 

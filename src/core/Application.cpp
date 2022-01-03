@@ -45,7 +45,7 @@ void Application::run() {
     m_running = true;
 
     p_camera = new Camera();
-    p_camera->set_viewport(m_window.m_res_x, m_window.m_res_y);
+    p_camera->set_viewport(m_window.m_width, m_window.m_height);
 
     m_cursor.initialize(&m_window);
 
@@ -96,11 +96,10 @@ void Application::run() {
 
        render_pipeline.render_viewport(*p_camera, renderables);
 
-       renderer.render_framebuffer();
-
        string time_text = std::to_string(dt) + "MS";
        renderer.render_text(time_text, ttf_font, {20, 52});
-       renderer.render_final();
+
+       renderer.render_framebuffer();
 
        dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
 
@@ -134,7 +133,7 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
-                //p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
+                p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
                 emit_event(event, event.event_type);
             }
             break;

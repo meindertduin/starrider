@@ -18,8 +18,6 @@ GWindow::~GWindow() {
 bool GWindow::initialize(int width, int height) {
     m_width = width;
     m_height = height;
-    m_res_x = 960;
-    m_res_y = 540;
 
     p_display = XOpenDisplay(NULL);
     if (p_display == nullptr) {

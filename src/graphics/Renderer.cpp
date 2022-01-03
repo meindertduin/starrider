@@ -15,9 +15,6 @@ Renderer::Renderer() {
     m_width = p_window->m_width;
     m_height = p_window->m_height;
 
-    m_res_x = p_window->m_res_x;
-    m_res_y = p_window->m_res_y;
-
     p_app->listen(this, WindowEventType::WinExpose);
 
     m_gc = XCreateGC(p_window->get_display(), p_window->get_window(), 0, nullptr);
@@ -67,41 +64,33 @@ void Renderer::on_event(const WindowEvent &event) {
 }
 
 void Renderer::create_framebuffer() {
-    p_framebuffer = new Pixel[m_res_x * m_res_y];
-    for (int i = 0; i < m_res_x * m_res_y; ++i) {
+    p_framebuffer = new Pixel[m_width * m_height];
+    for (int i = 0; i < m_width * m_height; ++i) {
         (*(p_framebuffer+i)).value = 0x00000000;
     }
 }
 
-void Renderer::render_framebuffer() {
+bool Renderer::render_framebuffer() {
     while (!p_window->ready_for_render) {
         // block untill drawing is complete
     }
 
-    float x_step = (float)m_res_x / (float)m_width;
-    float y_step = (float)m_res_y / (float)m_height;
-
-    float y = 0;
     for (int y_out = 0; y_out < m_height; y_out++) {
-        float x = 0;
         for (int x_out = 0; x_out < m_width; x_out++) {
-            // auto value = get_pixel(std::round(x), std::round(y));
-            // set_shared_mem_pixel(value, x_out, y_out);
-
-            // auto value = p_framebuffer[m_res_x * static_cast<int>(std::round(y)) + static_cast<int>(std::round(x))];
-
-            auto value = p_framebuffer[m_res_x * static_cast<int>(y) + static_cast<int>(x)];
+            auto value = p_framebuffer[m_width * y_out + x_out];
 		    *((int*) m_shm_info.shmaddr + m_width * y_out + x_out) = value.value;
-
-            x += x_step;
         }
-
-        y += y_step;
     }
 
+    Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
+
+    if (status == 0) {
+        printf("Something went wrong with rendering the shm Image\n");
+        return false;
+    }
+
+    return true;
 }
-
-
 
 bool Renderer::setup_shared_memory() {
     auto shm_available = XShmQueryExtension(p_window->get_display());
@@ -197,19 +186,19 @@ void Renderer::clear_screen() {
         .value = 0x00000000
     };
 
-    std::fill(p_framebuffer, p_framebuffer + m_res_x * m_res_y, value);
+    std::fill(p_framebuffer, p_framebuffer + m_width * m_height, value);
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, uint32_t value) {
-    p_framebuffer[m_res_x * y_pos + x_pos].value = value;
+    p_framebuffer[m_width * y_pos + x_pos].value = value;
 }
 
 void Renderer::set_frame_pixel(int x_pos, int y_pos, const Pixel &value) {
-    p_framebuffer[m_res_x * y_pos + x_pos] = value;
+    p_framebuffer[m_width * y_pos + x_pos] = value;
 }
 
 inline Pixel Renderer::get_pixel(int x_pos, int y_pos) {
-    return p_framebuffer[m_res_x * y_pos + x_pos];
+    return p_framebuffer[m_width * y_pos + x_pos];
 }
 
 
@@ -232,7 +221,8 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
                         pixel.rgba.blend(current.rgba);
                     }
 
-		            *((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;
+		            //*((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;
+                    p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = pixel.value;
                 }
 
                 x += x_step;
@@ -267,14 +257,3 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
     }
 }
 
-
-bool Renderer::render_final() {
-    Status status = XShmPutImage(p_window->get_display(), p_window->get_window(), m_gc, p_screen_image, 0, 0, 0, 0, m_width, m_height, true);
-
-    if (status == 0) {
-        printf("Something went wrong with rendering the shm Image\n");
-        return false;
-    }
-
-    return true;
-}
