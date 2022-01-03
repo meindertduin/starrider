@@ -97,14 +97,13 @@ void Application::run() {
        render_pipeline.render_viewport(*p_camera, renderables);
 
        renderer.render_framebuffer();
-       renderer.render_text("Hello World", ttf_font, { 20, 20 });
 
-       string time_text = std::to_string(dt);
-
+       string time_text = std::to_string(dt) + "MS";
        renderer.render_text(time_text, ttf_font, {20, 52});
        renderer.render_final();
 
        dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
+
        int cycle_delay = (1000.0f / (float)m_fps) - dt;
        if (cycle_delay > 0) {
            delay(cycle_delay);

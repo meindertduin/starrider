@@ -93,6 +93,7 @@ void Renderer::render_framebuffer() {
 
         y += y_step;
     }
+
 }
 
 

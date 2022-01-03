@@ -3,6 +3,8 @@
 #include <string>
 #include "../io/BmpReader.h"
 
+#include <cstring>
+
 enum class Format;
 
 struct Rect {
@@ -14,8 +16,6 @@ struct Rect {
 
 enum class Format {
     RED,
-    RG,
-    RGB,
     RGBA,
 };
 
@@ -30,7 +30,50 @@ struct Bitmap {
         this->format = format;
         this->width = width;
         this->height = height;
+
         pixels = data;
+    }
+
+    Bitmap(const Bitmap &other) {
+        copy_from_other(other);
+    }
+
+    ~Bitmap() {
+        if (pixels != nullptr) {
+            delete static_cast<char*>(pixels);
+        }
+    }
+
+    Bitmap& operator=(const Bitmap& other) {
+        if (this == &other) return *this;
+        copy_from_other(other);
+
+        return *this;
+    }
+
+    void free() {
+        if (pixels != nullptr)
+            delete[] static_cast<char*>(pixels);
+    }
+
+    void copy_from_other(const Bitmap &other) {
+        if (other.pixels != nullptr) {
+            std::size_t size(other.width * other.height);
+            switch (other.format) {
+                case Format::RED:
+                    this->pixels = new unsigned char[size];
+                    break;
+                case Format::RGBA:
+                    this->pixels = new uint32_t[size];
+                    break;
+            }
+
+            std::memcpy(pixels, other.pixels, size);
+        }
+
+        this->width = other.width;
+        this->height = other.height;
+        this->format = other.format;
     }
 
     Bitmap(std::string path) {
@@ -104,7 +147,11 @@ union Pixel {
 class Texture {
 public:
     Texture();
+    Texture(const Texture &other);
     ~Texture();
+
+    Texture& operator=(const Texture &other);
+
     void test_load();
     void load_from_bmp(std::string path);
     void load_from_bitmap(Format format, int width, int height, void* data);

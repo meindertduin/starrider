@@ -1,13 +1,26 @@
 #include "Texture.h"
 #include "Core.h"
 
+
 Texture::Texture() {
 }
 
+Texture::Texture(const Texture &other) : m_bitmap(other.m_bitmap),
+    height(other.height), width(other.width)
+{
+
+}
+
+Texture& Texture::operator=(const Texture &other) {
+    m_bitmap = other.m_bitmap;
+    height = other.height;
+    width = other.width;
+
+    return *this;
+}
+
 Texture::~Texture() {
-    if (m_bitmap.pixels != nullptr) {
-        delete static_cast<char*>(m_bitmap.pixels);
-    }
+    m_bitmap.free();
 }
 
 void Texture::load_from_bitmap(Format format, int width, int height, void* data) {
