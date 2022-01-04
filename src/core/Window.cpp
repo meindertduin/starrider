@@ -15,9 +15,10 @@ GWindow::~GWindow() {
     XCloseDisplay(p_display);
 }
 
-bool GWindow::initialize(int width, int height) {
-    m_width = width;
-    m_height = height;
+bool GWindow::initialize(const WindowSettings &win_settings) {
+    m_width = win_settings.width;
+    m_height = win_settings.height;
+    m_display_mode = WDisplayMode::Normal;
 
     p_display = XOpenDisplay(NULL);
     if (p_display == nullptr) {
@@ -29,40 +30,12 @@ bool GWindow::initialize(int width, int height) {
     int black_color = BlackPixel(p_display, m_screen);
     m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 500, 100, m_width, m_height, 0, black_color, black_color);
 
-    Atom dialog = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
-    Atom window_type = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE", False);
-    XChangeProperty(p_display, m_window, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &dialog, 1);
-
-    // TODO add some sort of setting for the window on startup
-    // XSetWindowAttributes set_attr;
-    // set_attr.override_redirect = true;
-    // XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
-    XResizeWindow(p_display, m_window, m_width, m_height);
+    set_win_display_mode(win_settings.win_display_mode);
 
     XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
     XMapWindow(p_display , m_window);
 
     return true;
-}
-
-void GWindow::toggle_fullscreen() {
-    m_fullscreen = !m_fullscreen;
-
-    Atom wmState = XInternAtom(p_display, "_NET_WM_STATE", False);
-    Atom fullScreen = XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False);
-
-    XEvent xev;
-    xev.xclient.type = ClientMessage;
-    xev.xclient.serial = 0;
-    xev.xclient.send_event = True;
-    xev.xclient.window = m_window;
-    xev.xclient.message_type = wmState;
-    xev.xclient.format= 32;
-    xev.xclient.data.l[0] = (m_fullscreen ? 1 : 0);
-    xev.xclient.data.l[1] = fullScreen;
-    xev.xclient.data.l[2] = 0;
-
-    XSendEvent(p_display, DefaultRootWindow(p_display), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
 Display* GWindow::get_display() {
@@ -132,4 +105,67 @@ void GWindow::resize(int width, int height) {
     e.event_type = WindowEventType::WinExpose;
 
     app->send_window_event(e);
+}
+
+void GWindow::set_win_display_mode(WDisplayMode mode) {
+    switch(mode) {
+        case WDisplayMode::Floating:
+            set_win_float_mode();
+            break;
+        case WDisplayMode::FullScreen:
+            set_fullscreen_mode();
+            break;
+        case WDisplayMode::Normal:
+            set_wind_normal_mode();
+            break;
+    }
+}
+
+void GWindow::set_win_float_mode() {
+    if (m_display_mode == WDisplayMode::Floating)
+        return;
+
+    Atom window_type = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE", False);
+    Atom type_dialog = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+    auto status  =XChangeProperty(p_display, m_window, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_dialog, 1);
+    XResizeWindow(p_display, m_window, m_width, m_height);
+
+    if (status == 0)
+        m_display_mode = WDisplayMode::Floating;
+}
+
+void GWindow::set_wind_normal_mode() {
+    if (m_display_mode == WDisplayMode::Normal)
+        return;
+
+    Atom window_type = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE", False);
+    Atom type_normal = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
+    auto status = XChangeProperty(p_display, m_window, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_normal, 1);
+
+    if (status == 0)
+        m_display_mode = WDisplayMode::Normal;
+}
+
+void GWindow::set_fullscreen_mode() {
+    if (m_display_mode == WDisplayMode::FullScreen)
+        return;
+
+    Atom wm_state_atom = XInternAtom(p_display, "_NET_WM_STATE", False);
+    Atom fullscreen_atom = XInternAtom(p_display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    XEvent xev;
+    xev.xclient.type = ClientMessage;
+    xev.xclient.serial = 0;
+    xev.xclient.send_event = True;
+    xev.xclient.window = m_window;
+    xev.xclient.message_type = wm_state_atom;
+    xev.xclient.format= 32;
+    xev.xclient.data.l[0] = 1;
+    xev.xclient.data.l[1] = fullscreen_atom;
+    xev.xclient.data.l[2] = 0;
+
+    auto status = XSendEvent(p_display, DefaultRootWindow(p_display), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+
+    if (status != 0)
+        m_display_mode = WDisplayMode::FullScreen;
 }

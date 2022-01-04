@@ -32,7 +32,13 @@ Application* Application::get_instance() {
 }
 
 bool Application::initialize(const AppSettings &settings) {
-    bool success = m_window.initialize(settings.win_width, settings.win_height);
+    WindowSettings win_settings = {
+        .width = settings.win_width,
+        .height = settings.win_height,
+        .win_display_mode = WDisplayMode::Floating,
+    };
+
+    bool success = m_window.initialize(win_settings);
     if (!success) {
         printf("Graphics Error: Something went wrong while creating the main window\n");
         return false;
