@@ -28,10 +28,14 @@ bool GWindow::initialize(int width, int height) {
 
     int black_color = BlackPixel(p_display, m_screen);
     m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 500, 100, m_width, m_height, 0, black_color, black_color);
-    XSetWindowAttributes set_attr;
-    set_attr.override_redirect = true;
+
+    Atom dialog = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+    Atom window_type = XInternAtom(p_display, "_NET_WM_WINDOW_TYPE", False);
+    XChangeProperty(p_display, m_window, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &dialog, 1);
 
     // TODO add some sort of setting for the window on startup
+    // XSetWindowAttributes set_attr;
+    // set_attr.override_redirect = true;
     // XChangeWindowAttributes(p_display, m_window, CWOverrideRedirect, &set_attr);
     XResizeWindow(p_display, m_window, m_width, m_height);
 
