@@ -14,7 +14,7 @@ struct AppSettings {
 
 class Application : public MultiEventSubject<WindowEvent> {
 public:
-    ~Application();
+    ~Application() = default;
 
     static std::shared_ptr<Application> get_instance();
     GWindow* get_window();

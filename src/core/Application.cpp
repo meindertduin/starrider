@@ -16,9 +16,6 @@ Application::Application() {
     m_fps = 60;
 }
 
-Application::~Application() {
-}
-
 std::shared_ptr<Application> Application::get_instance() {
     if (sp_instance == nullptr) {
         sp_instance = std::shared_ptr<Application>(new Application());
