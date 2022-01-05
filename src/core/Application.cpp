@@ -10,22 +10,18 @@
 #include "KeyMap.h"
 #include "Time.h"
 
-Application* Application::sp_instance = nullptr;
+std::shared_ptr<Application> Application::sp_instance = std::shared_ptr<Application>(nullptr);
 
 Application::Application() {
     m_fps = 60;
 }
 
 Application::~Application() {
-    delete sp_instance;
-
-    if (p_camera != nullptr)
-        delete p_camera;
 }
 
-Application* Application::get_instance() {
+std::shared_ptr<Application> Application::get_instance() {
     if (sp_instance == nullptr) {
-        sp_instance = new Application();
+        sp_instance = std::shared_ptr<Application>(new Application());
     }
 
     return sp_instance;
@@ -50,7 +46,7 @@ bool Application::initialize(const AppSettings &settings) {
 void Application::run() {
     m_running = true;
 
-    p_camera = new Camera();
+    p_camera = std::make_unique<Camera>();
     p_camera->set_viewport(m_window.m_width, m_window.m_height);
 
     m_cursor.initialize(&m_window);

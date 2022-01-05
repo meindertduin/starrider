@@ -31,7 +31,7 @@ private:
     XShmSegmentInfo m_shm_info;
     GC m_gc;
 
-    Application *p_app = nullptr;
+    std::shared_ptr<Application> p_app {nullptr};
     Pixel* p_framebuffer = nullptr;
 
     bool setup_shared_memory();
