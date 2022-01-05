@@ -49,20 +49,20 @@ void Application::run() {
     m_cursor.initialize(&m_window);
 
     Texture brick_texture;
-    brick_texture.load_from_bmp("test_texture.bmp");
+    brick_texture.load_from_bmp("assets/test_texture.bmp");
     Texture grass_texture;
-    grass_texture.load_from_bmp("grass.bmp");
+    grass_texture.load_from_bmp("assets/grass.bmp");
 
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
 
     // TODO: Values that may belong to a scene?
     Mesh mesh;
-    mesh.load_from_obj_file("monkey0.obj");
+    mesh.load_from_obj_file("assets/monkey.obj");
     mesh.texture = &brick_texture;
 
     Mesh terrain;
-    terrain.load_from_obj_file("terrain.obj");
+    terrain.load_from_obj_file("assets/plateau.obj");
     terrain.texture = &brick_texture;
 
     Transform monkey_transform = Transform(V4F(0, 0, 3));
@@ -70,7 +70,7 @@ void Application::run() {
 
     Matrix4F vp = p_camera->get_view_projection();
 
-    TTFFont ttf_font("arial.ttf", 24);
+    TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
 
     while (m_running) {
