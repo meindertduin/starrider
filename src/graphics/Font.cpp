@@ -78,7 +78,6 @@ TTFFont::~TTFFont() {
 
 Texture TTFFont::from_char(char c) {
     FT_Set_Pixel_Sizes(m_face, 0, 32);
-
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
 
     return Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
@@ -86,9 +85,6 @@ Texture TTFFont::from_char(char c) {
 }
 
 Glyph TTFFont::get_glyph(char c) const {
-    // TODO: as i understand the buffer for the face->glyph needs to be re-rendered everytime it's used.
-    // This may or may not be optimizable
-    FT_Load_Char(m_face, c, FT_LOAD_RENDER);
     return m_glyphs[c];
 }
 
