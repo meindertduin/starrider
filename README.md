@@ -1,19 +1,17 @@
 # Starrider Engine
-A work in progress game engine written in c++, with as much from scrach as possible. Will be finished somewhere in 2040 :P
+A work in progress game engine written in c++. The goal of the project is to do as much from scrach as possible, with a few exceptions. Mainly TTF font rendering, because I hope to be finished before 2040 :P
 
 ![](https://github.com/meindertduin/starrider/docs/rendering_demo.gif)
 
 ## Features
 - Software rasterization
-- Xlib integration
 - 32 bit texture mapping
 - Texture alpha blending
-- TTF and Bitmap font support
-- Loading meshes from .obj files
+- TTF and Bitmap font support 
 
 ## Requirements
-- Freetype2
-- Xlib with MIT-SHM
+- Freetype 2
+- A system with Xlib and MIT-SHM headers available. Most unix systems should be fine with x-server installed.
 
 ## Contributing
 As much as i like the idea of working with multiple people on a game engine, I won't be accepting
