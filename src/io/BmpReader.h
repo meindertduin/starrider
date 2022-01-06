@@ -2,6 +2,7 @@
 
 #include <string>
 #include <fstream>
+#include <memory>
 
 using std::string;
 
@@ -10,7 +11,9 @@ public:
     BmpReader();
     ~BmpReader();
 
-    size_t read_file(string path, void *&bitmap);
+    bool open_file(string path);
+    size_t read_to_buffer(std::unique_ptr<unsigned char> &bitmap);
+    void* read_file(string path);
     uint32_t get_width();
     uint32_t get_height();
 private:
