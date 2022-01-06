@@ -80,6 +80,7 @@ void Texture::load_from_bmp(std::string path) {
     size_t s {0};
     auto bitmap = std::unique_ptr<unsigned char>(nullptr);
     bmp_reader.read_to_buffer(bitmap);
+
     pixels = bitmap.get();
 
     // Ownership is released because this class manages the pointer for a bit extra performance
