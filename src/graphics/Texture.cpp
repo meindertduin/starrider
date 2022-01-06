@@ -86,7 +86,11 @@ void Texture::load_from_bmp(std::string path) {
     // Ownership is released because this class manages the pointer for a bit extra performance
     bitmap.release();
 
-    format = Format::RGBA;
+    if (bmp_reader.get_bits_per_pixel() == 32) {
+        format = Format::RGBA;
+    } else {
+        format = Format::RGB;
+    }
 
     width = bmp_reader.get_width();
     height = bmp_reader.get_height();

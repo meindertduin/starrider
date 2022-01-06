@@ -16,6 +16,7 @@ struct Rect {
 
 enum class Format {
     RED,
+    RGB,
     RGBA,
 };
 
