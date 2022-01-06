@@ -124,6 +124,11 @@ inline uint32_t Texture::get_pixel_value(int x_pos, int y_pos) const {
             }
         case Format::RGBA:
             return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
+        case Format::RGB:
+            {
+                auto rgb =  static_cast<RGB*>(pixels)[width * y_pos + x_pos];
+                return (0x000000FF << 24) | (rgb.red << 16) | (rgb.green << 8) | (rgb.blue);
+            }
         default:
             return 0;
     }

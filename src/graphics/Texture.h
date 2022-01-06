@@ -36,6 +36,12 @@ struct RGBA {
     }
 };
 
+struct RGB {
+    uint32_t blue : 8;
+    uint32_t green : 8;
+    uint32_t red : 8;
+};
+
 
 union Pixel {
     RGBA rgba;
