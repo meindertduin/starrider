@@ -64,9 +64,7 @@ void Renderer::on_event(const WindowEvent &event) {
 
 void Renderer::create_framebuffer() {
     p_framebuffer = new Pixel[m_width * m_height];
-    for (int i = 0; i < m_width * m_height; ++i) {
-        (*(p_framebuffer+i)).value = 0x00000000;
-    }
+    std::fill(p_framebuffer, p_framebuffer + m_width * m_height, Pixel {.value = 0x00000000});
 }
 
 bool Renderer::render_framebuffer() {
