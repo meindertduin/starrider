@@ -72,10 +72,11 @@ bool Renderer::render_framebuffer() {
         // block untill drawing is complete
     }
 
+    auto shm_buffer = reinterpret_cast<int*>(m_shm_info.shmaddr);
     for (int y_out = 0; y_out < m_height; y_out++) {
         for (int x_out = 0; x_out < m_width; x_out++) {
             auto value = p_framebuffer[m_width * y_out + x_out];
-		    *((int*) m_shm_info.shmaddr + m_width * y_out + x_out) = value.value;
+		    *(shm_buffer + m_width * y_out + x_out) = value.value;
         }
     }
 
