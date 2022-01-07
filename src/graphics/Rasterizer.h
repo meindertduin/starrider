@@ -19,9 +19,9 @@ private:
 
     Pixel* p_framebuffer;
 
-    void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture);
-    void scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients);
-    void draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients);
-    void clip_polygon_component(std::vector<Vertex> &vertices, int component_index, float component_factor, std::vector<Vertex> &result);
-    bool clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Vertex> &auxilary_list, int component_index);
+    inline void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture);
+    inline void scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients);
+    inline void draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients);
+    inline void clip_polygon_component(std::vector<Vertex> &vertices, int component_index, float component_factor, std::vector<Vertex> &result);
+    inline bool clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Vertex> &auxilary_list, int component_index);
 };

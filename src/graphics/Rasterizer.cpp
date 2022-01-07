@@ -85,7 +85,7 @@ void Rasterizer::clear_depth_buffer() {
     std::fill(p_z_buffer, p_z_buffer + m_width * m_height, INFINITY);
 }
 
-void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture) {
+inline void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture) {
     Gradients gradients = Gradients(min_y_vert, mid_y_vert, max_y_vert);
 
     Edge bottom_to_top = Edge(min_y_vert, max_y_vert, gradients, 0);
@@ -96,7 +96,7 @@ void Rasterizer::scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_ver
     scan_edges(bottom_to_top, middle_to_top, handedness, texture, gradients);
 }
 
-void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients) {
+inline void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients) {
     int y_start = b.y_start;
     int y_end   = b.y_end;
 
@@ -111,7 +111,7 @@ void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Texture &te
     }
 }
 
-void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients) {
+inline void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients) {
     int x_min = (int)std::ceil(left.x);
     int x_max = (int)std::ceil(right.x);
     float x_prestep = (float)x_min - left.x;
@@ -164,7 +164,7 @@ void Rasterizer::set_viewport(int width, int height) {
     }
 }
 
-bool Rasterizer::clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Vertex> &auxilary_list, int component_index) {
+inline bool Rasterizer::clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Vertex> &auxilary_list, int component_index) {
     clip_polygon_component(vertices, component_index, 1.0f, auxilary_list);
     vertices.clear();
 
@@ -179,7 +179,7 @@ bool Rasterizer::clip_polygon_axis(std::vector<Vertex> &vertices, std::vector<Ve
     return !vertices.empty();
 }
 
-void Rasterizer::clip_polygon_component(std::vector<Vertex> &vertices, int component_index,
+inline void Rasterizer::clip_polygon_component(std::vector<Vertex> &vertices, int component_index,
     float component_factor, std::vector<Vertex> &result)
 {
     Vertex prev_vertex = vertices[vertices.size() -1];
