@@ -6,6 +6,8 @@
 #include "Texture.h"
 #include "Font.h"
 
+#include <memory>
+
 class Renderer : EventObserver<WindowEvent> {
 public:
     Renderer();
@@ -20,6 +22,10 @@ public:
 
     void set_frame_pixel(int x_pos, int y_pos, uint32_t value);
     void set_frame_pixel(int x_pos, int y_pos, const Pixel &value);
+
+    Pixel* get_framebuffer() {
+        return p_framebuffer;
+    }
 
     int m_height;
     int m_width;

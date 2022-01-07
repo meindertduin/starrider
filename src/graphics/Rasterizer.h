@@ -17,6 +17,8 @@ private:
     Renderer* p_renderer = nullptr;
     float *p_z_buffer = nullptr;
 
+    Pixel* p_framebuffer;
+
     void scan_triangle(const Vertex &min_y_vert, const Vertex &mid_y_vert, const Vertex &max_y_vert, bool handedness, const Texture &texture);
     void scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture, const Gradients &gradients);
     void draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients);

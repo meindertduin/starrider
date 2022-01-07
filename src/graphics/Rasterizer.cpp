@@ -140,7 +140,7 @@ void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const
 
             uint32_t value = texture.get_pixel(src_x, src_y, light_amount).value;
 
-            p_renderer->set_frame_pixel(i, j, value);
+            p_framebuffer[m_width * j + i].value = value;
             p_z_buffer[index] = depth;
         }
 
@@ -157,10 +157,10 @@ void Rasterizer::set_viewport(int width, int height) {
         m_width = width;
         m_height = height;
 
-        if (p_z_buffer != nullptr)
-            delete[] p_z_buffer;
+        delete[] p_z_buffer;
 
         p_z_buffer = new float[width * height];
+        p_framebuffer = p_renderer->get_framebuffer();
     }
 }
 
