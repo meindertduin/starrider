@@ -39,8 +39,7 @@ Renderer::~Renderer() {
 
     XDestroyImage(p_screen_image);
 
-    if (p_framebuffer != nullptr)
-       delete[] p_framebuffer;
+    delete[] p_framebuffer;
 
     p_visual = nullptr;
     p_window = nullptr;

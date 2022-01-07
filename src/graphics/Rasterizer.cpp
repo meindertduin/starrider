@@ -4,8 +4,7 @@ Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
 }
 
 Rasterizer::~Rasterizer() {
-    if (p_z_buffer != nullptr)
-        delete[] p_z_buffer;
+    delete[] p_z_buffer;
 }
 
 void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {

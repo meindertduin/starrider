@@ -66,8 +66,7 @@ Texture& Texture::operator=(Texture &&other) noexcept {
 }
 
 Texture::~Texture() {
-    if (pixels != nullptr)
-        delete[] reinterpret_cast<char*>(pixels);
+    delete[] reinterpret_cast<char*>(pixels);
 }
 
 void Texture::load_from_bmp(std::string path) {
