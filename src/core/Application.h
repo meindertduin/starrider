@@ -15,6 +15,11 @@ struct AppSettings {
 class Application : public MultiEventSubject<WindowEvent> {
 public:
     ~Application() = default;
+    Application(const Application &other) = delete;
+    Application(Application &&other) = delete;
+
+    Application& operator=(const Application &other) = delete;
+    Application& operator=(Application &&other) = delete;
 
     static std::shared_ptr<Application> get_instance();
     GWindow* get_window();

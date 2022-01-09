@@ -12,6 +12,7 @@ class Renderer : EventObserver<WindowEvent> {
 public:
     Renderer();
     ~Renderer();
+
     void set_color(const Color &color);
     void draw_line(const Point &p1, const Point &p2, const Color &color);
     void clear_screen();
