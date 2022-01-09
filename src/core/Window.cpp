@@ -6,6 +6,7 @@
 
 #include <X11/Xutil.h>
 #include "KeyMap.h"
+#include "../graphics/XLib.h"
 
 GWindow::GWindow() {
 
@@ -20,20 +21,21 @@ bool GWindow::initialize(const WindowSettings &win_settings) {
     m_height = win_settings.height;
     m_display_mode = WDisplayMode::Normal;
 
-    p_display = XOpenDisplay(NULL);
-    if (p_display == nullptr) {
-        return false;
-    }
+    xlib_init(win_settings.width, win_settings.height);
+    // p_display = XOpenDisplay(NULL);
+    // if (p_display == nullptr) {
+    //     return false;
+    // }
 
-    m_screen = DefaultScreen(p_display);
+    // m_screen = DefaultScreen(p_display);
 
-    int black_color = BlackPixel(p_display, m_screen);
-    m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 500, 100, m_width, m_height, 0, black_color, black_color);
+    // int black_color = BlackPixel(p_display, m_screen);
+    // m_window = XCreateSimpleWindow(p_display, RootWindow(p_display, m_screen), 500, 100, m_width, m_height, 0, black_color, black_color);
 
-    set_win_display_mode(win_settings.win_display_mode);
+    // set_win_display_mode(win_settings.win_display_mode);
 
-    XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
-    XMapWindow(p_display , m_window);
+    // XSelectInput(p_display, m_window, ExposureMask | KeyPressMask | ButtonPressMask);
+    // XMapWindow(p_display , m_window);
 
     return true;
 }

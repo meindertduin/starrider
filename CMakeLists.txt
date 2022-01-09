@@ -25,6 +25,7 @@ set(SOURCES
     src/core/Cursor.cpp
     src/graphics/Texture.cpp
     src/graphics/Font.cpp
+    src/graphics/XLib.cpp
 )
 
 set(HEADERS include)

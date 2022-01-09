@@ -42,6 +42,7 @@ public:
 private:
     Display* p_display = nullptr;
     Window m_window;
+    Visual* p_visual = nullptr;
 
     int m_screen;
     bool m_fullscreen;
