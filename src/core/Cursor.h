@@ -1,9 +1,7 @@
 #pragma once
 
-#include <X11/Xlib.h>
 #include <stdint.h>
 
-typedef Cursor XCursor;
 class GWindow;
 
 namespace Core {
@@ -11,7 +9,6 @@ namespace Core {
 class Cursor {
 public:
     Cursor();
-    ~Cursor();
 
     struct MouseMovement{
         uint32_t x_pos : 16;
@@ -24,9 +21,7 @@ public:
     void reset_pos_middle();
     MouseMovement get_delta_movement();
 private:
-    XCursor m_cursor = 0;
     GWindow *p_window;
-
     uint32_t m_xpos, m_ypos;
 
     void set_empty_cursor();

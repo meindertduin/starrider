@@ -3,31 +3,51 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
-typedef struct {
-    int w, h;
-    Display *display;
-    Colormap color_map;
-    Window win;
-    Visual *vis;
-    XSetWindowAttributes attrs;
-    int screen;
-    int depth; /* bit depth */
-    Window root;
-} XWindow;
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
 
-static XWindow x_window;
+typedef Cursor XCursor;
+
+typedef struct {
+    XImage* screen_image;
+    GC gc;
+} XDisplay;
+
+
+
+XWindow x_window;
+XScreen x_screen;
+
+static XDisplay x_display;
+static XShmSegmentInfo shm_info;
+static XCursor cursor;
+
+bool xsetup_shared_memory();
+void xremove_shared_memory();
+
+inline void xresize(int width, int height);
 
 void xlib_quit() {
     if (x_window.display != nullptr)
         XCloseDisplay(x_window.display);
+
+    if (x_display.screen_image != nullptr)
+        XDestroyImage(x_display.screen_image);
+
+    if (cursor)
+        XFreeCursor(x_window.display, cursor);
+
+
+    xremove_shared_memory();
 }
 
-void xlib_init(int cols, int rows) {
+void xlib_init(int width, int height) {
     XWindowAttributes attr;
     XVisualInfo vis;
 
-    x_window.w = cols;
-    x_window.h = rows;
+    x_window.w = width;
+    x_window.h = height;
 
     x_window.display = XOpenDisplay(NULL);
 
@@ -52,20 +72,32 @@ void xlib_init(int cols, int rows) {
     x_window.attrs.event_mask = ExposureMask | KeyPressMask | ButtonPressMask;
 
     x_window.win = XCreateWindow(x_window.display, x_window.root, 0, 0,
-             cols, rows, 0, x_window.depth, InputOutput,
+             width, height, 0, x_window.depth, InputOutput,
              x_window.vis, CWBackPixel | CWBorderPixel | CWBitGravity
              | CWEventMask | CWColormap, &x_window.attrs);
 
     // add the events
     XSelectInput(x_window.display, x_window.win, x_window.attrs.event_mask);
 
-    set_float_mode();
+    xset_float_mode();
+    xsetup_shared_memory();
+
+    x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
+
+    // might need to be set different than window.w or h when padding is added
+    x_screen.w = x_window.w;
+    x_screen.h = x_window.h;
+
+    x_display.gc = XCreateGC(x_window.display, x_window.win, 0, nullptr);
+    auto black_color = XBlackPixel(x_window.display, x_window.screen);
+    XSetBackground(x_window.display, x_display.gc, black_color);
+
 
     XMapWindow(x_window.display , x_window.win);
     XSync(x_window.display, False);
 }
 
-bool poll_event(WindowEvent &event) {
+bool xpoll_event(WindowEvent &event) {
     if (XPending(x_window.display)) {
         XEvent x_event;
         XNextEvent(x_window.display, &x_event);
@@ -86,7 +118,6 @@ bool poll_event(WindowEvent &event) {
                 event.body.expose_event.height = x_window.h;
 
                 event.event_type = WindowEventType::WinExpose;
-
                 break;
             case KeyPress:
                 event.body.keyboard_event.keysym = XLookupKeysym(&x_event.xkey, 0);
@@ -104,22 +135,37 @@ bool poll_event(WindowEvent &event) {
     return false;
 }
 
-void resize(int width, int height) {
+void xresize_window(int width, int height) {
     XResizeWindow(x_window.display, x_window.win, width, height);
     XMapWindow(x_window.display , x_window.win);
 
-    x_window.w = width;
-    x_window.h = height;
+    xresize(width, height);
 }
 
-void set_float_mode() {
+inline void xresize(int width, int height) {
+    xremove_shared_memory();
+    xsetup_shared_memory();
+
+    x_window.w = width;
+    x_window.h = height;
+
+    x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
+
+    // might need to be set different than window.w or h when padding is added
+    x_screen.w = x_window.w;
+    x_screen.h = x_window.h;
+}
+
+int xset_float_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_dialog = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
     auto status  =XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_dialog, 1);
     XResizeWindow(x_window.display, x_window.win, x_window.w, x_window.h);
+
+    return status;
 }
 
-void set_fullscreen_mode() {
+int xset_fullscreen_mode() {
     Atom wm_state_atom = XInternAtom(x_window.display, "_NET_WM_STATE", False);
     Atom fullscreen_atom = XInternAtom(x_window.display, "_NET_WM_STATE_FULLSCREEN", False);
 
@@ -134,11 +180,84 @@ void set_fullscreen_mode() {
     xev.xclient.data.l[1] = fullscreen_atom;
     xev.xclient.data.l[2] = 0;
 
-    auto status = XSendEvent(x_window.display, x_window.root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+    return XSendEvent(x_window.display, x_window.root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
-void set_wind_normal_mode() {
+int xset_normal_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_normal = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
-    auto status = XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_normal, 1);
+    return XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_normal, 1);
+}
+
+bool xsetup_shared_memory() {
+    auto shm_available = XShmQueryExtension(x_window.display);
+    if (shm_available == 0) {
+        return false;
+    }
+
+    x_display.screen_image = XShmCreateImage(x_window.display, x_window.vis, 24, ZPixmap, nullptr, &shm_info, x_window.w, x_window.h);
+
+    shm_info.shmid = shmget(IPC_PRIVATE, x_display.screen_image->bytes_per_line * x_display.screen_image->height, IPC_CREAT | 0777);
+    if (shm_info.shmid == -1) {
+        return false;
+    }
+
+    shm_info.shmaddr = x_display.screen_image->data = (char*) shmat(shm_info.shmid, nullptr, 0);
+    shm_info.readOnly = false;
+
+    auto shm_attach = XShmAttach(x_window.display, &shm_info);
+    if (shm_attach == 0) {
+        return false;
+    }
+
+    return true;
+}
+
+void xremove_shared_memory() {
+    XShmDetach(x_window.display, &shm_info);
+    shmdt(shm_info.shmaddr);
+    shmctl(shm_info.shmid, IPC_RMID, 0);
+}
+
+void xrender_screen() {
+    Status status = XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_window.w, x_window.h, true);
+
+    if (status == 0) {
+        // TODO add error logging
+    }
+}
+
+void xset_empty_cursor() {
+    XColor color  = { 0 };
+    const char data[] = { 0 };
+
+    Pixmap pixmap = XCreateBitmapFromData(x_window.display, x_window.win, data, 1, 1);
+
+    if (cursor) {
+        XFreeCursor(x_window.display, cursor);
+        cursor = 0;
+    }
+
+    cursor = XCreatePixmapCursor(x_window.display, pixmap, pixmap, &color, &color, 0, 0);
+
+    XFreePixmap(x_window.display, pixmap);
+    XDefineCursor(x_window.display, x_window.win, cursor);
+}
+
+void xset_cursor_pos(int x_pos, int y_pos) {
+    XWarpPointer(x_window.display, None, x_window.win, 0, 0, 0, 0, x_pos, y_pos);
+}
+
+XCursorPos xquery_cursor_pos() {
+    XCursorPos result;
+    int x_pos, y_pos, win_x, win_y;
+    unsigned int mask;
+
+    Window root, child;
+    if (!XQueryPointer(x_window.display, x_window.win, &root, &child, &result.screen_x, &result.screen_y,
+                &result.win_x, &result.win_y, &mask)) {
+        // TODO add logging or error throwing
+    }
+
+    return result;
 }

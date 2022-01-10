@@ -44,7 +44,7 @@ void Application::run() {
     m_running = true;
 
     p_camera = std::make_unique<Camera>();
-    p_camera->set_viewport(m_window.m_width, m_window.m_height);
+    p_camera->set_viewport(m_window.get_width(), m_window.get_height());
 
     m_cursor.initialize(&m_window);
 

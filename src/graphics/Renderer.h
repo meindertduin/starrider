@@ -32,18 +32,12 @@ public:
     int m_width;
 private:
     GWindow *p_window = nullptr;
-    Visual* p_visual = nullptr;
-    XImage* p_screen_image = nullptr;
 
-    XShmSegmentInfo m_shm_info;
-    GC m_gc;
+    ScreenBitmap *p_screen_bitmap;
 
     std::shared_ptr<Application> p_app {nullptr};
     Pixel* p_framebuffer = nullptr;
 
-    bool setup_shared_memory();
-    void shared_memory_resize();
     void create_framebuffer();
-    void remove_shared_memory();
     Pixel get_pixel(int x_pos, int y_pos);
 };

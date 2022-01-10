@@ -10,10 +10,7 @@ int main() {
         .win_height = 720,
     });
 
-    for (;;) {
-
-    }
-    // app->run();
+    app->run();
     ttf_quit();
 
     return 0;
