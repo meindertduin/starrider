@@ -32,14 +32,6 @@ Cursor::MouseMovement Cursor::get_delta_movement() {
         .delta_y = cursor_pos.win_y - static_cast<int>(m_ypos),
     };
 
-    if (cursor_pos.win_x < 0 || p_window->get_width() < cursor_pos.win_x
-            || cursor_pos.win_y < 0 || p_window->get_height() < cursor_pos.win_y) {
-        reset_pos_middle();
-    } else {
-        m_xpos = cursor_pos.win_x;
-        m_ypos = cursor_pos.win_y;
-    }
-
     return result;
 }
 

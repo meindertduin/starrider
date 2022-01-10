@@ -246,6 +246,7 @@ void xset_empty_cursor() {
 
 void xset_cursor_pos(int x_pos, int y_pos) {
     XWarpPointer(x_window.display, None, x_window.win, 0, 0, 0, 0, x_pos, y_pos);
+    XSync(x_window.display, False);
 }
 
 XCursorPos xquery_cursor_pos() {
