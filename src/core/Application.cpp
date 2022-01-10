@@ -74,8 +74,6 @@ void Application::run() {
     int dt = 0;
 
     while (m_running) {
-        m_cursor.reset_pos_middle();
-
         auto cycle_start = get_program_ticks_ms();
 
         poll_window_events();
@@ -113,6 +111,7 @@ void Application::run() {
 
 void Application::emit_mouse_motion_event() {
     auto delta_mouse = m_cursor.get_delta_movement();
+
     WindowEvent mouse_motion;
     mouse_motion.event_type = WindowEventType::MouseMotion;
     mouse_motion.body.mouse_event = {

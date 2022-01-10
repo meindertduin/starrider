@@ -249,15 +249,18 @@ void xset_cursor_pos(int x_pos, int y_pos) {
 }
 
 XCursorPos xquery_cursor_pos() {
-    XCursorPos result;
     int x_pos, y_pos, win_x, win_y;
     unsigned int mask;
 
     Window root, child;
-    if (!XQueryPointer(x_window.display, x_window.win, &root, &child, &result.screen_x, &result.screen_y,
-                &result.win_x, &result.win_y, &mask)) {
-        // TODO add logging or error throwing
+    if (!XQueryPointer(x_window.display, x_window.win, &root, &child, &x_pos, &y_pos, &win_x, &win_y, &mask)) {
+        printf("Couldn't query pointer position\n");
     }
 
-    return result;
+    return {
+        .win_x = win_x,
+        .win_y = win_y,
+        .screen_x = x_pos,
+        .screen_y = y_pos,
+    };
 }
