@@ -22,15 +22,15 @@ bool GWindow::initialize(const WindowSettings &win_settings) {
 }
 
 bool GWindow::poll_event(WindowEvent &event) {
-    if (xpoll_event(event) && event.event_type == WindowEventType::WinExpose) {
+    bool has_event = xpoll_event(event);
+
+    if (has_event && event.event_type == WindowEventType::WinExpose) {
         m_screen_bitmap.buffer = x_screen.buffer;
         m_screen_bitmap.w = x_screen.w;
         m_screen_bitmap.h = x_screen.h;
-
-        return true;
     }
 
-    return false;
+    return has_event;
 }
 
 void GWindow::resize(int width, int height) {

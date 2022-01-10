@@ -73,11 +73,8 @@ void xlib_init(int width, int height) {
 
     x_window.win = XCreateWindow(x_window.display, x_window.root, 0, 0,
              width, height, 0, x_window.depth, InputOutput,
-             x_window.vis, CWBackPixel | CWBorderPixel | CWBitGravity
-             | CWEventMask | CWColormap, &x_window.attrs);
-
-    // add the events
-    XSelectInput(x_window.display, x_window.win, x_window.attrs.event_mask);
+             x_window.vis, CWBackPixel | CWBorderPixel | CWBitGravity | CWEventMask | CWColormap,
+             &x_window.attrs);
 
     xset_float_mode();
     xsetup_shared_memory();
