@@ -2,6 +2,8 @@
 #include <X11/extensions/XShm.h>
 #include "../core/Events.h"
 
+namespace XLib {
+
 typedef struct {
     int w, h;
     Display *display;
@@ -22,22 +24,22 @@ typedef struct {
 extern XWindow x_window;
 extern XScreen x_screen;
 
-void xlib_init(int cols, int rows);
-void xlib_quit();
+void lib_init(int cols, int rows);
+void lib_quit();
 
-bool xpoll_event(WindowEvent &event);
-void xinit_shm(int cols, int rows);
+bool poll_event(WindowEvent &event);
+void init_shm(int cols, int rows);
 
-void xresize_window(int width, int height);
+void resize_window(int width, int height);
 
-int xset_fullscreen_mode();
-int xset_normal_mode();
-int xset_float_mode();
+int set_fullscreen_mode();
+int set_normal_mode();
+int set_float_modem();
 
-void xrender_screen();
+void render_screen();
 
-void xset_empty_cursor();
-void xset_cursor_pos(int x_pos, int y_pos);
+void set_empty_cursor();
+void set_cursor_pos(int x_pos, int y_pos);
 
 typedef struct {
     int win_x;
@@ -46,4 +48,7 @@ typedef struct {
     int screen_y;
 } XCursorPos;
 
-XCursorPos xquery_cursor_pos();
+XCursorPos query_cursor_pos();
+
+}
+

@@ -14,7 +14,7 @@ void Cursor::reset_pos_middle() {
     m_xpos = p_window->get_width() / 2;
     m_ypos = p_window->get_height() / 2;
 
-    xset_cursor_pos(m_xpos, m_ypos);
+    XLib::set_cursor_pos(m_xpos, m_ypos);
 }
 
 void Cursor::initialize(GWindow *root_window) {
@@ -23,7 +23,7 @@ void Cursor::initialize(GWindow *root_window) {
 }
 
 Cursor::MouseMovement Cursor::get_delta_movement() {
-    auto cursor_pos = xquery_cursor_pos();
+    auto cursor_pos = XLib::query_cursor_pos();
 
     MouseMovement result = {
         .x_pos = m_xpos,
@@ -36,7 +36,7 @@ Cursor::MouseMovement Cursor::get_delta_movement() {
 }
 
 void Cursor::set_empty_cursor() {
-    xset_empty_cursor();
+    XLib::set_empty_cursor();
 }
 
 }

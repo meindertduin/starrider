@@ -14,8 +14,7 @@ typedef struct {
     GC gc;
 } XDisplay;
 
-
-
+namespace XLib {
 XWindow x_window;
 XScreen x_screen;
 
@@ -23,12 +22,12 @@ static XDisplay x_display;
 static XShmSegmentInfo shm_info;
 static XCursor cursor;
 
-bool xsetup_shared_memory();
-void xremove_shared_memory();
+bool setup_shared_memory();
+void remove_shared_memory();
 
-inline void xresize(int width, int height);
+inline void resize(int width, int height);
 
-void xlib_quit() {
+void lib_quit() {
     if (x_window.display != nullptr)
         XCloseDisplay(x_window.display);
 
@@ -39,10 +38,10 @@ void xlib_quit() {
         XFreeCursor(x_window.display, cursor);
 
 
-    xremove_shared_memory();
+    remove_shared_memory();
 }
 
-void xlib_init(int width, int height) {
+void lib_init(int width, int height) {
     XWindowAttributes attr;
     XVisualInfo vis;
 
@@ -76,8 +75,8 @@ void xlib_init(int width, int height) {
              x_window.vis, CWBackPixel | CWBorderPixel | CWBitGravity | CWEventMask | CWColormap,
              &x_window.attrs);
 
-    xset_float_mode();
-    xsetup_shared_memory();
+    set_float_modem();
+    setup_shared_memory();
 
     x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
 
@@ -94,7 +93,7 @@ void xlib_init(int width, int height) {
     XSync(x_window.display, False);
 }
 
-bool xpoll_event(WindowEvent &event) {
+bool poll_event(WindowEvent &event) {
     if (XPending(x_window.display)) {
         XEvent x_event;
         XNextEvent(x_window.display, &x_event);
@@ -132,16 +131,16 @@ bool xpoll_event(WindowEvent &event) {
     return false;
 }
 
-void xresize_window(int width, int height) {
+void resize_window(int width, int height) {
     XResizeWindow(x_window.display, x_window.win, width, height);
     XMapWindow(x_window.display , x_window.win);
 
-    xresize(width, height);
+    resize(width, height);
 }
 
-inline void xresize(int width, int height) {
-    xremove_shared_memory();
-    xsetup_shared_memory();
+inline void resize(int width, int height) {
+    remove_shared_memory();
+    setup_shared_memory();
 
     x_window.w = width;
     x_window.h = height;
@@ -153,7 +152,7 @@ inline void xresize(int width, int height) {
     x_screen.h = x_window.h;
 }
 
-int xset_float_mode() {
+int set_float_modem() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_dialog = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
     auto status  =XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_dialog, 1);
@@ -162,7 +161,7 @@ int xset_float_mode() {
     return status;
 }
 
-int xset_fullscreen_mode() {
+int set_fullscreen_mode() {
     Atom wm_state_atom = XInternAtom(x_window.display, "_NET_WM_STATE", False);
     Atom fullscreen_atom = XInternAtom(x_window.display, "_NET_WM_STATE_FULLSCREEN", False);
 
@@ -180,13 +179,13 @@ int xset_fullscreen_mode() {
     return XSendEvent(x_window.display, x_window.root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
-int xset_normal_mode() {
+int set_normal_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_normal = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
     return XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_normal, 1);
 }
 
-bool xsetup_shared_memory() {
+bool setup_shared_memory() {
     auto shm_available = XShmQueryExtension(x_window.display);
     if (shm_available == 0) {
         return false;
@@ -210,13 +209,13 @@ bool xsetup_shared_memory() {
     return true;
 }
 
-void xremove_shared_memory() {
+void remove_shared_memory() {
     XShmDetach(x_window.display, &shm_info);
     shmdt(shm_info.shmaddr);
     shmctl(shm_info.shmid, IPC_RMID, 0);
 }
 
-void xrender_screen() {
+void render_screen() {
     Status status = XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_window.w, x_window.h, true);
 
     if (status == 0) {
@@ -224,7 +223,7 @@ void xrender_screen() {
     }
 }
 
-void xset_empty_cursor() {
+void set_empty_cursor() {
     XColor color  = { 0 };
     const char data[] = { 0 };
 
@@ -241,12 +240,12 @@ void xset_empty_cursor() {
     XDefineCursor(x_window.display, x_window.win, cursor);
 }
 
-void xset_cursor_pos(int x_pos, int y_pos) {
+void set_cursor_pos(int x_pos, int y_pos) {
     XWarpPointer(x_window.display, None, x_window.win, 0, 0, 0, 0, x_pos, y_pos);
     XSync(x_window.display, False);
 }
 
-XCursorPos xquery_cursor_pos() {
+XCursorPos query_cursor_pos() {
     int x_pos, y_pos, win_x, win_y;
     unsigned int mask;
 
@@ -261,4 +260,5 @@ XCursorPos xquery_cursor_pos() {
         .screen_x = x_pos,
         .screen_y = y_pos,
     };
+}
 }
