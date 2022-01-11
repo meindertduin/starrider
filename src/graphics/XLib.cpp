@@ -41,41 +41,44 @@ void lib_quit() {
     remove_shared_memory();
 }
 
-void lib_init(int width, int height) {
+void lib_init(int width, int height, int border_width) {
     XWindowAttributes attr;
     XVisualInfo vis;
 
-    x_window.w = width;
-    x_window.h = height;
-
-    x_window.display = XOpenDisplay(NULL);
+    x_window.w = width + border_width * 2;
+    x_window.h = height + border_width * 2;
+    x_window.border_width = border_width;
 
     if (x_window.display == nullptr) {
         // TODO add error handling
     }
 
+    // creating display and setting defaults
+    x_window.display = XOpenDisplay(NULL);
+
     x_window.root = XDefaultRootWindow(x_window.display);
     x_window.screen = DefaultScreen(x_window.display);
 
+    // Collecting window attributes
     XGetWindowAttributes(x_window.display, x_window.root, &attr);
     x_window.depth = attr.depth;
 
     XMatchVisualInfo(x_window.display, x_window.screen, x_window.depth, TrueColor, &vis);
     x_window.vis = vis.visual;
 
-    x_window.color_map = XCreateColormap(x_window.display, x_window.root, x_window.vis, None);
-
+    // adding events
     x_window.attrs.background_pixel = BlackPixel(x_window.display, x_window.screen);
-    x_window.attrs.border_pixel = 0;
+    x_window.attrs.border_pixel = WhitePixel(x_window.display, x_window.screen);
     x_window.attrs.bit_gravity = NorthWestGravity;
     x_window.attrs.event_mask = ExposureMask | KeyPressMask | ButtonPressMask;
 
+    // window creation
     x_window.win = XCreateWindow(x_window.display, x_window.root, 0, 0,
-             width, height, 0, x_window.depth, InputOutput,
+             width, height, border_width, x_window.depth, InputOutput,
              x_window.vis, CWBackPixel | CWBorderPixel | CWBitGravity | CWEventMask | CWColormap,
              &x_window.attrs);
 
-    set_float_modem();
+    set_win_float_mode();
     setup_shared_memory();
 
     x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
@@ -85,9 +88,6 @@ void lib_init(int width, int height) {
     x_screen.h = x_window.h;
 
     x_display.gc = XCreateGC(x_window.display, x_window.win, 0, nullptr);
-    auto black_color = XBlackPixel(x_window.display, x_window.screen);
-    XSetBackground(x_window.display, x_display.gc, black_color);
-
 
     XMapWindow(x_window.display , x_window.win);
     XSync(x_window.display, False);
@@ -152,7 +152,7 @@ inline void resize(int width, int height) {
     x_screen.h = x_window.h;
 }
 
-int set_float_modem() {
+int set_win_float_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_dialog = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
     auto status  =XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_dialog, 1);
@@ -161,7 +161,7 @@ int set_float_modem() {
     return status;
 }
 
-int set_fullscreen_mode() {
+int set_win_fullscreen_mode() {
     Atom wm_state_atom = XInternAtom(x_window.display, "_NET_WM_STATE", False);
     Atom fullscreen_atom = XInternAtom(x_window.display, "_NET_WM_STATE_FULLSCREEN", False);
 
@@ -179,7 +179,7 @@ int set_fullscreen_mode() {
     return XSendEvent(x_window.display, x_window.root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
-int set_normal_mode() {
+int set_win_normal_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_normal = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
     return XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_normal, 1);

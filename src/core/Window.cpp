@@ -15,7 +15,7 @@ GWindow::~GWindow() {
 
 bool GWindow::initialize(const WindowSettings &win_settings) {
     m_display_mode = WDisplayMode::Normal;
-    XLib::lib_init(win_settings.width, win_settings.height);
+    XLib::lib_init(win_settings.width, win_settings.height, 0);
     create_screen_bitmap();
 
     return true;
@@ -63,7 +63,7 @@ void GWindow::set_win_float_mode() {
     if (m_display_mode == WDisplayMode::Floating)
         return;
 
-    if (XLib::set_float_modem() == 0)
+    if (XLib::set_win_float_mode() == 0)
         m_display_mode = WDisplayMode::Floating;
 }
 
@@ -71,7 +71,7 @@ void GWindow::set_wind_normal_mode() {
     if (m_display_mode == WDisplayMode::Normal)
         return;
 
-    if (XLib::set_normal_mode() == 0)
+    if (XLib::set_win_normal_mode() == 0)
         m_display_mode = WDisplayMode::Normal;
 }
 
@@ -79,7 +79,7 @@ void GWindow::set_fullscreen_mode() {
     if (m_display_mode == WDisplayMode::FullScreen)
         return;
 
-    if (XLib::set_fullscreen_mode() != 0)
+    if (XLib::set_win_fullscreen_mode() != 0)
         m_display_mode = WDisplayMode::FullScreen;
 }
 

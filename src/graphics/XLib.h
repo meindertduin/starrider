@@ -6,13 +6,13 @@ namespace XLib {
 
 typedef struct {
     int w, h;
+    int border_width;
     Display *display;
-    Colormap color_map;
     Window win;
     Visual *vis;
     XSetWindowAttributes attrs;
     int screen;
-    int depth; /* bit depth */
+    int depth; /* bit depth, usally 24 */
     Window root;
 } XWindow;
 
@@ -24,7 +24,7 @@ typedef struct {
 extern XWindow x_window;
 extern XScreen x_screen;
 
-void lib_init(int cols, int rows);
+void lib_init(int cols, int rows, int border_width);
 void lib_quit();
 
 bool poll_event(WindowEvent &event);
@@ -32,9 +32,9 @@ void init_shm(int cols, int rows);
 
 void resize_window(int width, int height);
 
-int set_fullscreen_mode();
-int set_normal_mode();
-int set_float_modem();
+int set_win_fullscreen_mode();
+int set_win_normal_mode();
+int set_win_float_mode();
 
 void render_screen();
 
