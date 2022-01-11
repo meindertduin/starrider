@@ -6,6 +6,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <stdio.h>
+#include <stdexcept>
 
 typedef Cursor XCursor;
 
@@ -49,12 +50,11 @@ void lib_init(int width, int height, int border_width) {
     x_window.h = height + border_width * 2;
     x_window.border_width = border_width;
 
-    if (x_window.display == nullptr) {
-        // TODO add error handling
-    }
-
     // creating display and setting defaults
     x_window.display = XOpenDisplay(NULL);
+
+    if (x_window.display == nullptr)
+        throw std::runtime_error("Display could not be opened");
 
     x_window.root = XDefaultRootWindow(x_window.display);
     x_window.screen = DefaultScreen(x_window.display);
@@ -140,7 +140,9 @@ void resize_window(int width, int height) {
 
 inline void resize(int width, int height) {
     remove_shared_memory();
-    setup_shared_memory();
+
+    if (!setup_shared_memory())
+        throw std::runtime_error("Could not setup shared_memory");
 
     x_window.w = width;
     x_window.h = height;

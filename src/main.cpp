@@ -2,17 +2,22 @@
 #include "graphics/Font.h"
 
 int main() {
-    ttf_init();
-    auto app = Application::get_instance();
+    try {
+        if (!ttf_init())
+            throw std::runtime_error("TTF could not be initialized");
+        auto app = Application::get_instance();
 
-    app->initialize({
-        .win_width = 1280,
-        .win_height = 720,
-    });
+        app->initialize({
+            .win_width = 1280,
+            .win_height = 720,
+        });
 
-    app->run();
-    ttf_quit();
+        app->run();
+        ttf_quit();
+    } catch(const std::exception) {
+        return EXIT_FAILURE;
+    };
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
