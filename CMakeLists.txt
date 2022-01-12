@@ -26,6 +26,8 @@ set(SOURCES
     src/graphics/Texture.cpp
     src/graphics/Font.cpp
     src/graphics/XLib.cpp
+    src/math/Vector.h
+    src/math/Parmetric.h
 )
 
 set(HEADERS include)
