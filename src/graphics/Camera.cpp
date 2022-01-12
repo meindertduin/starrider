@@ -1,14 +1,15 @@
 #include "Camera.h"
-#include "../math/Radians.h"
 #include "../core/Application.h"
 #include "../core/KeyMap.h"
+
+#include "../math/Core.h"
 
 Camera::Camera() {
     m_zfar = 1000.0f;
     m_znear = 0.1f;
     m_fov = 90.0f;
 
-    m_projection.init_perspective(deg_to_half_rad(m_fov), 1.0f, m_znear, m_zfar);
+    m_projection.init_perspective(DEG_TO_RAD(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
 
     auto app = Application::get_instance();
     app->listen(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
@@ -63,7 +64,7 @@ void Camera::set_viewport(int width, int height) {
     this->height = height;
 
     float aspect_ratio = (float) width / (float) height;
-    m_projection.init_perspective(deg_to_half_rad(m_fov) / aspect_ratio, aspect_ratio, m_znear, m_zfar);
+    m_projection.init_perspective(DEG_TO_RAD(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
 }
 
 Matrix4F Camera::get_view_projection() const {

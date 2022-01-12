@@ -28,6 +28,10 @@ set(SOURCES
     src/graphics/XLib.cpp
     src/math/Vector.h
     src/math/Parmetric.h
+    src/math/Plane.h
+    src/math/Polar.h
+    src/math/Core.h
+    src/math/Quaternion.h
 )
 
 set(HEADERS include)

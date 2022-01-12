@@ -1,7 +1,5 @@
 #pragma once
 
-namespace Math {
-
 typedef int FixP16;
 typedef int *FixP16_Ptr;
 
@@ -22,4 +20,12 @@ const int FixP16_ROUND_UP = 0x00008000;
 const float EPSILON_E4 = 1E-4f;
 const float EPSILON_E5 = 1E-5f;
 const float EPSILON_E6 = 1E-6f;
-}
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) < (b)) ? (b) : (a))
+
+#define SWAP(a, b, c) { c = a; a = b; b = c; }
+#define DEG_TO_RAD(ang) ((ang) * PI / 180.0f)
+#define RAD_TO_DEG(rads) ((rads) * 180.0f / PI)
+
+#define RAND_RANGE(x, y) ((x) + rand()%((y) - (x) + 1))
