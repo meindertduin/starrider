@@ -9,12 +9,6 @@ using std::string;
 class BmpReader {
 public:
     BmpReader();
-    ~BmpReader();
-
-    BmpReader(const BmpReader &other) = delete;
-    BmpReader(BmpReader &&other) = delete;
-    BmpReader& operator=(const BmpReader &other) = delete;
-    BmpReader& operator=(BmpReader &&other) = delete;
 
     bool open_file(string path);
     size_t read_to_buffer(std::unique_ptr<unsigned char> &bitmap);

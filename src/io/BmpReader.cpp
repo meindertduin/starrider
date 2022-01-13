@@ -3,12 +3,6 @@
 
 BmpReader::BmpReader() {}
 
-BmpReader::~BmpReader() {
-    if (m_ifs.is_open()) {
-        m_ifs.close();
-    }
-}
-
 bool BmpReader::open_file(string path) {
     m_ifs = std::ifstream(path, std::ios::in | std::ios::binary);
 
