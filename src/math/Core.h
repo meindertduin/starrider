@@ -14,7 +14,7 @@ static constexpr float PI_INV = 0.318309886f;
 // fixed point math consts
 static constexpr int FixP16_SHIFT = 16;
 static constexpr int FixP16_MAG = 65536;
-static constexpr int FixP16_DP_MKASK = 0x0000FFFF;
+static constexpr int FixP16_DP_MASK = 0x0000FFFF;
 static constexpr int FixP16_WP_MASK = 0xFFFF0000;
 static constexpr int FixP16_ROUND_UP = 0x00008000;
 
@@ -38,6 +38,26 @@ static constexpr float deg_to_rad(const float ang) {
 
 static constexpr float rad_to_deg(const float rads) {
     return rads / 180.0f * PI;
+}
+
+static constexpr FixP16 FIXP16_WP(FixP16 f) {
+    return f >> FixP16_SHIFT;
+}
+
+static constexpr FixP16 FixP16_DP(FixP16 f) {
+    return f & FixP16_DP_MASK;
+}
+
+static constexpr FixP16 INT_TO_FIXP16(int i) {
+    return i << FixP16_SHIFT;
+}
+
+static constexpr FixP16 FLOAT_TO_FIXP16(float f) {
+    return f * FixP16_MAG + 0.5;
+}
+
+static constexpr float FIXP16_TO_FLOAT(FixP16 f) {
+    return static_cast<float>(f) / FixP16_MAG;
 }
 
 }
