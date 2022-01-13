@@ -53,11 +53,16 @@ static constexpr FixP16 INT_TO_FIXP16(int i) {
 }
 
 static constexpr FixP16 FLOAT_TO_FIXP16(float f) {
-    return f * FixP16_MAG + 0.5;
+    return f * FixP16_MAG + 0.5f;
 }
 
 static constexpr float FIXP16_TO_FLOAT(FixP16 f) {
     return static_cast<float>(f) / FixP16_MAG;
 }
 
+float fast_sin(float theta);
+float fast_cos(float theta);
+
+int fast_distance_2d(int x, int y);
+float fast_distance_3d(float x, float y, float z);
 }
