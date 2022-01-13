@@ -8,8 +8,8 @@ int main() {
         auto app = Application::get_instance();
 
         app->initialize({
-            .win_width = 1280,
-            .win_height = 720,
+            .win_width = 1920,
+            .win_height = 1080,
         });
 
         app->run();

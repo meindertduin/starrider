@@ -552,7 +552,7 @@ struct Edge {
         light_amount_step = gradients.light_amount_ystep + gradients.light_amount_xstep * x_step;
     }
 
-    inline void step() {
+    constexpr void step() {
         x += x_step;
         text_coord_x += text_coord_xstep;
         text_coord_y += text_coord_ystep;

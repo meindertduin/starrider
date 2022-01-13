@@ -3,6 +3,7 @@
 #include "../core/KeyMap.h"
 
 #include "../math/Core.h"
+#include "../math/Matrix.h"
 
 Camera::Camera() {
     m_zfar = 1000.0f;
