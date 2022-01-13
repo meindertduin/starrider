@@ -12,12 +12,9 @@ typedef struct V2D_Type {
     };
 
     V2D_Type() = default;
-    V2D_Type(float x, float y, float z) {
-        this->x = x;
-        this->y = y;
-    }
+    V2D_Type(float x, float y) : x(x), y(y) {  }
 
-    inline void zero() {
+    constexpr void zero() {
         x = y = 0.0f;
     }
 
@@ -32,13 +29,9 @@ typedef struct V3D_Type {
     };
 
     V3D_Type() = default;
-    V3D_Type(float x, float y, float z) {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
+    V3D_Type(float x, float y, float z) : x(x), y(y), z(z) {  }
 
-    inline void zero() {
+    constexpr void zero() {
         x = y = z = 0.0f;
     }
 } V3D, Point3D, *V3D_Ptr, *Point3D_Ptr;
@@ -52,14 +45,9 @@ typedef struct V4D_Type {
     };
 
     V4D_Type() = default;
-    V4D_Type(float x, float y, float z, float w) {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->w = w;
-    }
+    constexpr V4D_Type(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {  }
 
-    inline void zero() {
+    constexpr void zero() {
         x = y = z = w = 0.0f;
     }
 } V4D, Point4D, *V4D_Ptr, *Point4D_Ptr;
