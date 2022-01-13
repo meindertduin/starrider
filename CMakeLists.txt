@@ -27,6 +27,7 @@ set(SOURCES
     src/graphics/Font.cpp
     src/graphics/XLib.cpp
     src/math/Matrix.cpp
+    src/math/Core.cpp
 )
 
 set(HEADERS include)

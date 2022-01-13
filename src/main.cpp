@@ -1,8 +1,11 @@
 #include "core/Application.h"
 #include "graphics/Font.h"
 
+#include "math/Core.h"
+
 int main() {
     try {
+        Math::build_lookup_tables();
         if (!ttf_init())
             throw std::runtime_error("TTF could not be initialized");
         auto app = Application::get_instance();
