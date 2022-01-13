@@ -13,11 +13,15 @@ typedef struct Matrix1x2_Type {
     };
 
     Matrix1x2_Type() = default;
+
     Matrix1x2_Type(const Matrix1x2_Type &other);
     Matrix1x2_Type(Matrix1x2_Type &&other);
 
     Matrix1x2_Type& operator=(const Matrix1x2_Type &other);
     Matrix1x2_Type& operator=(Matrix1x2_Type &&other);
+
+    Matrix1x2_Type operator*(const Matrix1x2_Type &other);
+    Matrix1x2_Type operator*=(const Matrix1x2_Type &other);
 
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x2_Type));
@@ -39,6 +43,9 @@ typedef struct Matrix1x3_Type {
     Matrix1x3_Type& operator=(const Matrix1x3_Type &other);
     Matrix1x3_Type& operator=(Matrix1x3_Type &&other);
 
+    Matrix1x3_Type operator*(const Matrix1x3_Type &other);
+    Matrix1x3_Type operator*=(const Matrix1x3_Type &other);
+
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x3_Type));
     }
@@ -58,6 +65,9 @@ typedef struct Matrix1x4_Type {
 
     Matrix1x4_Type& operator=(const Matrix1x4_Type &other);
     Matrix1x4_Type& operator=(Matrix1x4_Type &&other);
+
+    Matrix1x4_Type operator*(const Matrix1x4_Type &other);
+    Matrix1x4_Type operator*=(const Matrix1x4_Type &other);
 
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x4_Type));
@@ -81,6 +91,9 @@ typedef struct Matrix4x4_Type {
 
     Matrix4x4_Type& operator=(const Matrix4x4_Type &other);
     Matrix4x4_Type& operator=(Matrix4x4_Type &&other);
+
+    Matrix4x4_Type operator*(const Matrix4x4_Type &other);
+    Matrix4x4_Type operator*=(const Matrix4x4_Type &other);
 
     constexpr void zero() {
         std::memset(m, 1, sizeof(Matrix4x4_Type));

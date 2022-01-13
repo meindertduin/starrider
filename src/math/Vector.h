@@ -77,6 +77,16 @@ typedef struct V2D_Type {
         x = y = 0.0f;
     }
 
+    constexpr float dot(const V2D_Type &r) const {
+        return x * r.x + y * r.y;
+    }
+
+    float length() const;
+    float length_fast() const;
+    void normalise();
+    V2D_Type normalized() const;
+    float cos_th(const V2D_Type &other) const;
+
 } V2D, Point2D, *V2D_Ptr, *Point2D_Ptr;
 
 typedef struct V3D_Type {
@@ -161,6 +171,18 @@ typedef struct V3D_Type {
     constexpr void zero() {
         x = y = z = 0.0f;
     }
+
+    constexpr float dot(const V3D_Type &r) const {
+        return x * r.x + y * r.y + z * r.z;
+    }
+
+    V3D_Type cross(const V3D_Type &other) const;
+    float length() const;
+    float length_fast() const;
+    void normalise();
+    V3D_Type normalized() const;
+    float cos_th(const V3D_Type &other) const;
+
 } V3D, Point3D, *V3D_Ptr, *Point3D_Ptr;
 
 typedef struct V4D_Type {
@@ -253,6 +275,18 @@ typedef struct V4D_Type {
     constexpr void zero() {
         x = y = z = w = 0.0f;
     }
+
+    constexpr float dot(const V4D_Type &r) const {
+        return x * r.x + y * r.y + z * r.z + w * r.w;
+    }
+
+    V4D_Type cross(const V4D_Type &other) const;
+    float length() const;
+    float length_fast() const;
+    void normalise();
+    V4D_Type normalized() const;
+    float cos_th(const V4D_Type &other) const;
+
 } V4D, Point4D, *V4D_Ptr, *Point4D_Ptr;
 
 }

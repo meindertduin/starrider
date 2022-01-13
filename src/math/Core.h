@@ -22,6 +22,9 @@ static constexpr float EPSILON_E4 = 1E-4f;
 static constexpr float EPSILON_E5 = 1E-5f;
 static constexpr float EPSILON_E6 = 1E-6f;
 
+static float cos_lookup[361];
+static float sin_lookup[361];
+
 template<typename T>
 static constexpr T& min(const T &lhs, const T &rhs) {
     return lhs < rhs ? lhs : rhs;
@@ -59,6 +62,9 @@ static constexpr FixP16 FLOAT_TO_FIXP16(float f) {
 static constexpr float FIXP16_TO_FLOAT(FixP16 f) {
     return static_cast<float>(f) / FixP16_MAG;
 }
+
+static constexpr FixP16 FIXP16_MUL(FixP16 fp1, FixP16 fp2);
+static constexpr FixP16 FIXP16_DIV(FixP16 fp1, FixP16 fp2);
 
 float fast_sin(float theta);
 float fast_cos(float theta);
