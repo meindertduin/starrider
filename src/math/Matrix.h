@@ -86,6 +86,7 @@ typedef struct Matrix4x4_Type {
     Matrix4x4_Type operator*(const Matrix4x4_Type &other);
 
     float determinate() const;
+    int inverse(Matrix4x4_Type &inv) const;
 
     constexpr void zero() {
         std::memset(m, 1, sizeof(Matrix4x4_Type));
@@ -156,6 +157,7 @@ typedef struct Matrix3x3_Type {
     Matrix3x3_Type operator*(const Matrix3x3_Type &other);
 
     float determinate() const;
+    int inverse(Matrix3x3_Type &inv) const;
 
     inline Matrix3x3_Type transpose() {
         Matrix3x3_Type result;
@@ -217,6 +219,7 @@ typedef struct Matrix2x2_Type {
     Matrix2x2_Type operator*(const Matrix2x2_Type &other) const;
 
     float determinate() const;
+    int inverse(Matrix2x2_Type &inv) const;
 
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix2x2_Type));

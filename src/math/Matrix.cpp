@@ -220,4 +220,88 @@ float Matrix4x4::determinate() const {
         - (m01 * m10 * m23 * m32) - (m00 * m13 * m22 * m31);
 }
 
+/* Inverses */
+
+int Matrix2x2::inverse(Matrix2x2_Type &inv) const {
+    auto det = determinate();
+    if (det == 0) {
+        return 0;
+    }
+
+    inv.m00 = m11 / det;
+    inv.m01 = -m01 / det;
+    inv.m10 = -m10 / det;
+    inv.m11 = m00 / det;
+
+    return 1;
+}
+
+int Matrix3x3_Type::inverse(Matrix3x3_Type &inv) const {
+    auto det = determinate();
+
+    if (det == 0) {
+        return 0;
+    }
+
+    inv.m00 = (m11 * m22 - m21 * m12) / det;
+    inv.m01 = (m02 * m21 - m01 * m22) / det;
+    inv.m02 = (m01 * m12 - m02 * m11) / det;
+    inv.m10 = (m12 * m20 - m10 * m22) / det;
+    inv.m11 = (m00 * m22 - m02 * m20) / det;
+    inv.m12 = (m10 * m02 - m00 * m12) / det;
+    inv.m20 = (m10 * m21 - m20 * m11) / det;
+    inv.m21 = (m20 * m01 - m00 * m21) / det;
+    inv.m22 = (m00 * m11 - m10 * m01) / det;
+
+    return 1;
+}
+
+int Matrix4x4::inverse(Matrix4x4_Type &inv) const {
+    auto det = determinate();
+
+    if (det == 0) {
+        return 0;
+    }
+
+    det = 1.0f / det;
+
+    float A2323 = m22 * m33 - m23 * m32;
+    float A1323 = m21 * m33 - m23 * m31;
+    float A1223 = m21 * m32 - m22 * m31;
+    float A0323 = m20 * m33 - m23 * m30;
+    float A0223 = m20 * m32 - m22 * m30;
+    float A0123 = m20 * m31 - m21 * m30;
+    float A2313 = m12 * m33 - m13 * m32;
+    float A1313 = m11 * m33 - m13 * m31;
+    float A1213 = m11 * m32 - m12 * m31;
+    float A2312 = m12 * m23 - m13 * m22;
+    float A1312 = m11 * m23 - m13 * m21;
+    float A1212 = m11 * m22 - m12 * m21;
+    float A0313 = m10 * m33 - m13 * m30;
+    float A0213 = m10 * m32 - m12 * m30;
+    float A0312 = m10 * m23 - m13 * m20;
+    float A0212 = m10 * m22 - m12 * m20;
+    float A0113 = m10 * m31 - m11 * m30;
+    float A0112 = m10 * m21 - m11 * m20;
+
+    inv.m00 =  (m11 * A2323 - m12 * A1323 + m13 * A1223) / det;
+    inv.m01 = -(m01 * A2323 - m02 * A1323 + m03 * A1223) / det;
+    inv.m02 =  (m01 * A2313 - m02 * A1313 + m03 * A1213) / det;
+    inv.m03 = -(m01 * A2312 - m02 * A1312 + m03 * A1212) / det;
+    inv.m10 = -(m10 * A2323 - m12 * A0323 + m13 * A0223) / det;
+    inv.m11 =  (m00 * A2323 - m02 * A0323 + m03 * A0223) / det;
+    inv.m12 = -(m00 * A2313 - m02 * A0313 + m03 * A0213) / det;
+    inv.m13 =  (m00 * A2312 - m02 * A0312 + m03 * A0212) / det;
+    inv.m20 =  (m10 * A1323 - m11 * A0323 + m13 * A0123) / det;
+    inv.m21 = -(m00 * A1323 - m01 * A0323 + m03 * A0123) / det;
+    inv.m22 =  (m00 * A1313 - m01 * A0313 + m03 * A0113) / det;
+    inv.m23 = -(m00 * A1312 - m01 * A0312 + m03 * A0112) / det;
+    inv.m30 = -(m10 * A1223 - m11 * A0223 + m12 * A0123) / det;
+    inv.m31 =  (m00 * A1223 - m01 * A0223 + m02 * A0123) / det;
+    inv.m32 = -(m00 * A1213 - m01 * A0213 + m02 * A0113) / det;
+    inv.m33 =  (m00 * A1212 - m01 * A0212 + m02 * A0112) / det;
+
+    return 1;
+}
+
 }
