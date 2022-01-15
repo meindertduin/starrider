@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstring>
-#include <initializer_list>
+#include "Vector.h"
 
 namespace Math {
 typedef struct Matrix1x2_Type {
@@ -96,7 +96,8 @@ typedef struct Matrix4x4_Type {
     Matrix4x4_Type& operator=(const Matrix4x4_Type &other);
     Matrix4x4_Type& operator=(Matrix4x4_Type &&other);
 
-    Matrix4x4_Type operator*(const Matrix4x4_Type &other);
+    Matrix4x4_Type operator*(const Matrix4x4_Type &other) const;
+    V4D_Type operator*(const V4D_Type &v) const;
 
     float determinate() const;
     int inverse(Matrix4x4_Type &inv) const;
@@ -181,7 +182,8 @@ typedef struct Matrix3x3_Type {
     Matrix3x3_Type& operator=(const Matrix3x3_Type &other);
     Matrix3x3_Type& operator=(Matrix3x3_Type &&other);
 
-    Matrix3x3_Type operator*(const Matrix3x3_Type &other);
+    Matrix3x3_Type operator*(const Matrix3x3_Type &other) const;
+    V3D_Type operator*(const V3D_Type &v) const;
 
     float determinate() const;
     int inverse(Matrix3x3_Type &inv) const;
@@ -251,6 +253,7 @@ typedef struct Matrix2x2_Type {
     Matrix2x2_Type& operator=(Matrix2x2_Type &&other);
 
     Matrix2x2_Type operator*(const Matrix2x2_Type &other) const;
+    V2D_Type operator*(const V2D_Type &v) const;
 
     float determinate() const;
     int inverse(Matrix2x2_Type &inv) const;
@@ -266,5 +269,18 @@ typedef struct Matrix2x2_Type {
 } Matrix2x2, *Matrix2x2Ptr;
 
 Matrix1x2 mat_mul_1x2_3x2(const Matrix1x2 &ma, const Matrix3x2 &mb);
+
+Matrix4x4_Type mat_4x4_screen_space(float half_width, float half_height);
+Matrix4x4_Type mat_4x4_translation(float x, float y, float z);
+Matrix4x4_Type mat_4x4_rotation_x(float x);
+Matrix4x4_Type mat_4x4_rotation_y(float y);
+Matrix4x4_Type mat_4x4_rotation_z(float z);
+Matrix4x4_Type mat_4x4_rotation(float x, float y, float z);
+Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up);
+Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up, const V4D_Type &right);
+Matrix4x4_Type mat_4x4_scale(float x, float y, float z);
+Matrix4x4_Type mat_4x4_perspective(float fov, float aspect_ratio, float z_near, float z_far);
+Matrix4x4_Type mat_4x4_orthographic(float left, float right, float bottom, float top, float near, float far);
+
 
 }

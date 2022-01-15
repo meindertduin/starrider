@@ -1,4 +1,5 @@
 #include "Matrix.h"
+#include "Core.h"
 
 namespace Math {
 
@@ -161,7 +162,7 @@ Matrix2x2 Matrix2x2::operator*(const Matrix2x2_Type &other) const {
     return r;
 }
 
-Matrix3x3_Type Matrix3x3::operator*(const Matrix3x3_Type &other) {
+Matrix3x3_Type Matrix3x3::operator*(const Matrix3x3_Type &other) const {
     Matrix3x3_Type r;
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -171,7 +172,7 @@ Matrix3x3_Type Matrix3x3::operator*(const Matrix3x3_Type &other) {
     return r;
 }
 
-Matrix4x4_Type Matrix4x4::operator*(const Matrix4x4_Type &other) {
+Matrix4x4_Type Matrix4x4::operator*(const Matrix4x4_Type &other) const {
     Matrix4x4_Type r;
     for (int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
@@ -302,6 +303,137 @@ int Matrix4x4::inverse(Matrix4x4_Type &inv) const {
     inv.m33 =  (m00 * A1212 - m01 * A0212 + m02 * A0112) / det;
 
     return 1;
+}
+
+/* Vector transforms */
+
+V2D_Type Matrix2x2_Type::operator*(const V2D_Type &v) const {
+    return V2D_Type {
+        m[0][0] * v.x + m[1][0] * v.y,
+        m[1][0] * v.x + m[1][1] * v.y
+    };
+}
+
+V3D_Type Matrix3x3::operator*(const V3D_Type &v) const {
+    return V3D_Type {
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z
+    };
+}
+
+V4D_Type Matrix4x4_Type::operator*(const V4D_Type &v) const {
+    return V4D_Type {
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
+        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
+        m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
+    };
+}
+
+/* Matrix initialize functions */
+Matrix4x4_Type mat_4x4_screen_space(float half_width, float half_height) {
+    return Matrix4x4_Type {
+        half_width, 0, 0, half_width - 0.5f,
+        0, -half_width, 0, half_width - 0.5f,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_translation(float x, float y, float z) {
+    return Matrix4x4_Type {
+        1, 0, 0, x,
+        0, 1, 0, y,
+        0, 0, 1, z,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_rotation_x(float x) {
+    return Matrix4x4_Type {
+        1, 0, 0, 0,
+        0, fast_cos(x), fast_sin(x), 0,
+        0, -fast_sin(x), fast_cos(x), 0,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_rotation_y(float y) {
+    return Matrix4x4_Type {
+        fast_cos(y), 0, -fast_sin(y), 0,
+        0, 1, 0, 0,
+        fast_sin(y), 0, fast_cos(y), 0,
+        0, 0, 0, 1,
+    };
+}
+
+Matrix4x4_Type mat_4x4_rotation_z(float z) {
+    return Matrix4x4_Type {
+        fast_cos(z), fast_sin(z), 0, 0,
+        -fast_sin(z), fast_cos(z), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_rotation(float x, float y, float z) {
+    auto mat_x = mat_4x4_rotation_x(x);
+    auto mat_y = mat_4x4_rotation_y(y);
+    auto mat_z = mat_4x4_rotation_y(z);
+
+    return mat_x * mat_y * mat_z;
+}
+
+Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up) {
+    auto f = forward.normalized();
+    auto r = up.normalized();
+    r = r.cross(f);
+
+    auto u = f.cross(r);
+    return mat_4x4_rotation(f, u, r);
+}
+
+Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up, const V4D_Type &right) {
+    return Matrix4x4_Type {
+        right.x, right.y, right.z, 0,
+        up.x, up.y, up.z, 0,
+        forward.x, forward.y, forward.z, 0,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_scale(float x, float y, float z) {
+    return Matrix4x4_Type {
+        x, 0, 0, 0,
+        0, y, 0, 0,
+        0, 0, z, 0,
+        0, 0, 0, 1
+    };
+}
+
+Matrix4x4_Type mat_4x4_perspective(float fov, float aspect_ratio, float z_near, float z_far) {
+    float z_range = z_near - z_far;
+
+    return Matrix4x4_Type {
+        fov * aspect_ratio, 0, 0, 0,
+        0, 1.0f / fov, 0, 0,
+        0, 0, (-z_near - z_far) / z_range, z_far * z_near / z_range,
+        0, 0, 1, 0
+    };
+}
+
+Matrix4x4_Type mat_4x4_orthographic(float left, float right, float bottom, float top, float near, float far) {
+    float width = right - left;
+    float height = top - bottom;
+    float depth = far - near;
+
+    return Matrix4x4_Type {
+        2.0f / width, 0, 0, -(right + left) / width,
+        0, 2.0f / height, 0, -(top + bottom) / height,
+        0, 0, 2.0f / depth, -(far + near) / depth,
+        0, 0, 0, 1
+    };
 }
 
 }
