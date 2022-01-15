@@ -78,8 +78,7 @@ namespace Math {
 
     V4D_Type V4D_Type::normalized() const {
         float l = length();
-        V4D_Type r { x / l, y / l, z / l };
-        return r;
+        return V4D_Type { x / l, y / l, z / l, w };
     }
 
     float V4D_Type::cos_th(const V4D_Type &other) const {

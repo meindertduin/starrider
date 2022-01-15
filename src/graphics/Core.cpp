@@ -27,7 +27,7 @@ void Vertex::normal_transform(const Matrix4x4 &normal_matrix) {
 
 Vertex Vertex::transform(const Matrix4x4 &transform, const Matrix4x4 &normal) {
     V4D v = transform.transform(pos.to_v4d());
-    V4D n = normal * this->normal.to_v4d().normalized();
+    V4D n = (normal * this->normal.to_v4d()).normalized();
     return Vertex(V4F(v.x, v.y, v.z, v.w), text_coords, V4F(n.x, n.y, n.z, n.w));
 }
 
