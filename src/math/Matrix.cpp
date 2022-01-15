@@ -335,7 +335,7 @@ V4D_Type Matrix4x4_Type::operator*(const V4D_Type &v) const {
 Matrix4x4_Type mat_4x4_screen_space(float half_width, float half_height) {
     return Matrix4x4_Type {
         half_width, 0, 0, half_width - 0.5f,
-        0, -half_width, 0, half_width - 0.5f,
+        0, -half_height, 0, half_height - 0.5f,
         0, 0, 1, 0,
         0, 0, 0, 1
     };
@@ -380,7 +380,7 @@ Matrix4x4_Type mat_4x4_rotation_z(float z) {
 Matrix4x4_Type mat_4x4_rotation(float x, float y, float z) {
     auto mat_x = mat_4x4_rotation_x(x);
     auto mat_y = mat_4x4_rotation_y(y);
-    auto mat_z = mat_4x4_rotation_y(z);
+    auto mat_z = mat_4x4_rotation_z(z);
 
     return mat_x * mat_y * mat_z;
 }

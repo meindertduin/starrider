@@ -16,17 +16,17 @@ float saturate(float val) {
 }
 
 Vertex Vertex::transform(const Matrix4x4 &m) {
-    V4D v = m * pos.to_v4d();
+    V4D v = m.transform(pos.to_v4d());
     return Vertex(V4F(v.x, v.y, v.z, v.w), text_coords, normal);
 }
 
 void Vertex::normal_transform(const Matrix4x4 &normal_matrix) {
-    auto temp_normal = (normal_matrix * normal.to_v4d()).normalized();
+    auto temp_normal = (normal_matrix.transform(normal.to_v4d())).normalized();
     normal = V4F(temp_normal.x, temp_normal.y, temp_normal.z, temp_normal.w);
 }
 
 Vertex Vertex::transform(const Matrix4x4 &transform, const Matrix4x4 &normal) {
-    V4D v = transform * pos.to_v4d();
+    V4D v = transform.transform(pos.to_v4d());
     V4D n = normal * this->normal.to_v4d().normalized();
     return Vertex(V4F(v.x, v.y, v.z, v.w), text_coords, V4F(n.x, n.y, n.z, n.w));
 }

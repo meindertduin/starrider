@@ -131,7 +131,7 @@ inline void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j
     for(int i = x_min; i < x_max; i++)
     {
         int index = i + j * m_width;
-        if (index < m_width * m_height && p_z_buffer[index] > depth) {
+        if (p_z_buffer[index] > depth) {
             float z = 1.0f / one_over_z;
 
             int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);

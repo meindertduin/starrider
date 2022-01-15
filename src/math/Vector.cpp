@@ -67,7 +67,7 @@ namespace Math {
     }
 
     float V4D_Type::length() const {
-        return sqrtf(x * x + y * y + z * z + w * w);
+        return std::sqrt(x * x + y * y + z * z + w * w);
     }
 
     V4D_Type& V4D_Type::normalise() {
