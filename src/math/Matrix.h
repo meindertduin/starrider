@@ -14,6 +14,7 @@ typedef struct Matrix1x2_Type {
 
     Matrix1x2_Type() = default;
 
+    constexpr Matrix1x2_Type(float m00, float m01) : m00(m00), m01(m01) {}
     Matrix1x2_Type(const Matrix1x2_Type &other);
     Matrix1x2_Type(Matrix1x2_Type &&other);
 
@@ -34,6 +35,8 @@ typedef struct Matrix1x3_Type {
     };
 
     Matrix1x3_Type() = default;
+    constexpr Matrix1x3_Type(float m00, float m01, float m02) : m00(m00), m01(m01), m02(m02) {}
+
     Matrix1x3_Type(const Matrix1x3_Type &other);
     Matrix1x3_Type(Matrix1x3_Type &&other);
 
@@ -49,11 +52,12 @@ typedef struct Matrix1x4_Type {
     union {
         float m[4];
         struct {
-            float m00, m01, m02, m04;
+            float m00, m01, m02, m03;
         };
     };
 
     Matrix1x4_Type() = default;
+    constexpr Matrix1x4_Type(float m00, float m01, float m02, float m03) : m00(m00), m01(m01), m02(m02), m03(m03) {}
     Matrix1x4_Type(const Matrix1x4_Type &other);
     Matrix1x4_Type(Matrix1x4_Type &&other);
 
@@ -77,6 +81,15 @@ typedef struct Matrix4x4_Type {
     };
 
     Matrix4x4_Type() = default;
+    constexpr Matrix4x4_Type(float m00, float m01, float m02, float m03,
+            float m10, float m11, float m12, float m13,
+            float m20, float m21, float m22, float m23,
+            float m30, float m31, float m32, float m33)
+        : m00(m00), m01(m01), m02(m02), m03(m03),
+        m10(m10), m11(m11), m12(m12), m13(m13),
+        m20(m20), m21(m21), m22(m22), m23(m23),
+        m30(m30), m31(m31), m32(m32), m33(m33) {}
+
     Matrix4x4_Type(const Matrix4x4_Type &other);
     Matrix4x4_Type(Matrix4x4_Type &&other);
 
@@ -120,6 +133,14 @@ typedef struct Matrix4x3_Type {
     };
 
     Matrix4x3_Type() = default;
+    constexpr Matrix4x3_Type(float m00, float m01, float m02,
+            float m10, float m11, float m12,
+            float m20, float m21, float m22,
+            float m30, float m31, float m32)
+        : m00(m00), m01(m01), m02(m02),
+        m10(m10), m11(m11), m12(m12),
+        m20(m20), m21(m21), m22(m22),
+        m30(m30), m31(m31), m32(m32) {}
     Matrix4x3_Type(const Matrix4x3_Type &other);
     Matrix4x3_Type(Matrix4x3_Type &&other);
 
@@ -148,6 +169,12 @@ typedef struct Matrix3x3_Type {
     };
 
     Matrix3x3_Type() = default;
+    constexpr Matrix3x3_Type(float m00, float m01, float m02,
+            float m10, float m11, float m12,
+            float m20, float m21, float m22)
+        : m00(m00), m01(m01), m02(m02),
+        m10(m10), m11(m11), m12(m12),
+        m20(m20), m21(m21), m22(m22) {}
     Matrix3x3_Type(const Matrix3x3_Type &other);
     Matrix3x3_Type(Matrix3x3_Type &&other);
 
@@ -189,6 +216,10 @@ typedef struct Matrix3x2_Type {
     };
 
     Matrix3x2_Type() = default;
+    constexpr Matrix3x2_Type(float m00, float m01, float m10, float m11,
+            float m20, float m21)
+        : m00(m00), m01(m01), m10(m10), m11(m11), m20(m20), m21(m21) {}
+
     Matrix3x2_Type(const Matrix3x2_Type &other);
     Matrix3x2_Type(Matrix3x2_Type &&other);
 
@@ -210,6 +241,9 @@ typedef struct Matrix2x2_Type {
     };
 
     Matrix2x2_Type() = default;
+    constexpr Matrix2x2_Type(float m00, float m01, float m10, float m11)
+        : m00(m00), m01(m01), m10(m10), m11(m11) {}
+
     Matrix2x2_Type(const Matrix2x2_Type &other);
     Matrix2x2_Type(Matrix2x2_Type &&other);
 
