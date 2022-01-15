@@ -20,9 +20,6 @@ typedef struct Matrix1x2_Type {
     Matrix1x2_Type& operator=(const Matrix1x2_Type &other);
     Matrix1x2_Type& operator=(Matrix1x2_Type &&other);
 
-    Matrix1x2_Type operator*(const Matrix1x2_Type &other);
-    Matrix1x2_Type operator*=(const Matrix1x2_Type &other);
-
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x2_Type));
     }
@@ -43,9 +40,6 @@ typedef struct Matrix1x3_Type {
     Matrix1x3_Type& operator=(const Matrix1x3_Type &other);
     Matrix1x3_Type& operator=(Matrix1x3_Type &&other);
 
-    Matrix1x3_Type operator*(const Matrix1x3_Type &other);
-    Matrix1x3_Type operator*=(const Matrix1x3_Type &other);
-
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x3_Type));
     }
@@ -65,9 +59,6 @@ typedef struct Matrix1x4_Type {
 
     Matrix1x4_Type& operator=(const Matrix1x4_Type &other);
     Matrix1x4_Type& operator=(Matrix1x4_Type &&other);
-
-    Matrix1x4_Type operator*(const Matrix1x4_Type &other);
-    Matrix1x4_Type operator*=(const Matrix1x4_Type &other);
 
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix1x4_Type));
@@ -93,7 +84,8 @@ typedef struct Matrix4x4_Type {
     Matrix4x4_Type& operator=(Matrix4x4_Type &&other);
 
     Matrix4x4_Type operator*(const Matrix4x4_Type &other);
-    Matrix4x4_Type operator*=(const Matrix4x4_Type &other);
+
+    float determinate() const;
 
     constexpr void zero() {
         std::memset(m, 1, sizeof(Matrix4x4_Type));
@@ -161,6 +153,10 @@ typedef struct Matrix3x3_Type {
     Matrix3x3_Type& operator=(const Matrix3x3_Type &other);
     Matrix3x3_Type& operator=(Matrix3x3_Type &&other);
 
+    Matrix3x3_Type operator*(const Matrix3x3_Type &other);
+
+    float determinate() const;
+
     inline Matrix3x3_Type transpose() {
         Matrix3x3_Type result;
         result.m00 = m00; result.m01 = m10; result.m02 = m20;
@@ -218,6 +214,10 @@ typedef struct Matrix2x2_Type {
     Matrix2x2_Type& operator=(const Matrix2x2_Type &other);
     Matrix2x2_Type& operator=(Matrix2x2_Type &&other);
 
+    Matrix2x2_Type operator*(const Matrix2x2_Type &other) const;
+
+    float determinate() const;
+
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix2x2_Type));
     }
@@ -227,5 +227,7 @@ typedef struct Matrix2x2_Type {
     }
 
 } Matrix2x2, *Matrix2x2Ptr;
+
+Matrix1x2 mat_mul_1x2_3x2(const Matrix1x2 &ma, const Matrix3x2 &mb);
 
 }
