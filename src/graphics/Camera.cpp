@@ -10,7 +10,7 @@ Camera::Camera() {
     m_znear = 0.1f;
     m_fov = 90.0f;
 
-    m_projection.init_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
+    m_projection = Math::mat_4x4_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
 
     auto app = Application::get_instance();
     app->listen(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
@@ -65,14 +65,13 @@ void Camera::set_viewport(int width, int height) {
     this->height = height;
 
     float aspect_ratio = (float) width / (float) height;
-    m_projection.init_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
+    m_projection = Math::mat_4x4_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
 }
 
-Matrix4F Camera::get_view_projection() const {
+Matrix4x4 Camera::get_view_projection() const {
     V4F camera_pos = m_transform.pos * -1;
 
-    Matrix4F camera_trans;
-    camera_trans.init_translation(camera_pos.x, camera_pos.y, camera_pos.z);
+    auto camera_trans = Math::mat_4x4_translation(camera_pos.x, camera_pos.y, camera_pos.z);
 
     return  camera_trans * m_transform.rot.conjugate().to_rotation_matrix() * m_projection;
 }

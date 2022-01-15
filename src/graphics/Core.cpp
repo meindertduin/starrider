@@ -15,16 +15,20 @@ float saturate(float val) {
     return val;
 }
 
-Vertex Vertex::transform(const Matrix4F &m) {
-    return Vertex(m.transform(pos), text_coords, normal);
+Vertex Vertex::transform(const Matrix4x4 &m) {
+    V4D v = m * pos.to_v4d();
+    return Vertex(V4F(v.x, v.y, v.z, v.w), text_coords, normal);
 }
 
-void Vertex::normal_transform(const Matrix4F &normal_matrix) {
-    normal = normal_matrix.transform(normal).normalized();
+void Vertex::normal_transform(const Matrix4x4 &normal_matrix) {
+    auto temp_normal = (normal_matrix * normal.to_v4d()).normalized();
+    normal = V4F(temp_normal.x, temp_normal.y, temp_normal.z, temp_normal.w);
 }
 
-Vertex Vertex::transform(const Matrix4F &transform, const Matrix4F &normal) {
-    return Vertex(transform.transform(pos), text_coords, normal.transform(this->normal).normalized());
+Vertex Vertex::transform(const Matrix4x4 &transform, const Matrix4x4 &normal) {
+    V4D v = transform * pos.to_v4d();
+    V4D n = normal * this->normal.to_v4d().normalized();
+    return Vertex(V4F(v.x, v.y, v.z, v.w), text_coords, V4F(n.x, n.y, n.z, n.w));
 }
 
 bool Mesh::load_from_obj_file(std::string path) {

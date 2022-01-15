@@ -8,7 +8,7 @@ public:
     Camera();
     ~Camera();
     void set_viewport(int width, int height);
-    Matrix4F get_view_projection() const;
+    Matrix4x4 get_view_projection() const;
     int width;
     int height;
 
@@ -19,6 +19,6 @@ private:
     float m_znear;
     float m_fov;
 
-    Matrix4F m_projection;
+    Matrix4x4 m_projection;
     V4F y_axis = V4F(0, 1, 0);
 };

@@ -41,9 +41,8 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
 }
 
 void Rasterizer::fill_triangle(Triangle &triangle, const Texture &texture) {
-    Matrix4F screen_space, identity;
-    screen_space.init_screen_space_transform((float)m_width / 2.0f, (float)m_height / 2.0f);
-    identity.init_identity();
+    auto screen_space = Math::mat_4x4_screen_space((float)m_width / 2.0f, (float)m_height / 2.0f);
+    auto identity = Math::Mat_4x4_Identity;
 
     Vertex min_y_vert = triangle.p[0].transform(screen_space, identity).perspective_divide();
 	Vertex mid_y_vert = triangle.p[1].transform(screen_space, identity).perspective_divide();
@@ -132,7 +131,7 @@ inline void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j
     for(int i = x_min; i < x_max; i++)
     {
         int index = i + j * m_width;
-        if (p_z_buffer[index] > depth) {
+        if (index < m_width * m_height && p_z_buffer[index] > depth) {
             float z = 1.0f / one_over_z;
 
             int src_x = (int)((text_coord_x * z) * (texture.width - 1) + 0.5f);

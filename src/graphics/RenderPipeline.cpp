@@ -15,7 +15,7 @@ void RenderPipeline::render_viewport(const Camera &camera, std::vector<Renderabl
     auto vp = camera.get_view_projection();
 
     for (auto renderable : renderables) {
-        Matrix4F transform = renderable.transform->get_matrix_transformation();
+        Matrix4x4 transform = renderable.transform->get_matrix_transformation();
         for (auto triangle : renderable.mesh->triangles) {
             Triangle translated_tri;
             translated_tri.p[0] = triangle.p[0].transform(transform);

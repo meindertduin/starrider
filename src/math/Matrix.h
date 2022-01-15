@@ -270,6 +270,13 @@ typedef struct Matrix2x2_Type {
 
 Matrix1x2 mat_mul_1x2_3x2(const Matrix1x2 &ma, const Matrix3x2 &mb);
 
+static constexpr Matrix4x4_Type Mat_4x4_Identity = Matrix4x4_Type {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+};
+
 Matrix4x4_Type mat_4x4_screen_space(float half_width, float half_height);
 Matrix4x4_Type mat_4x4_translation(float x, float y, float z);
 Matrix4x4_Type mat_4x4_rotation_x(float x);

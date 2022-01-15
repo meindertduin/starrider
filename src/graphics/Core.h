@@ -9,10 +9,15 @@
 
 #include "../io/BmpReader.h"
 #include "Texture.h"
+#include "../math/Matrix.h"
+#include "../math/Vector.h"
 
 class Texture;
 
 float saturate(float val);
+
+using Math::Matrix4x4;
+using Math::V4D;
 
 
 struct Color {
@@ -68,7 +73,6 @@ struct Point {
     int x, y;
 };
 
-struct Matrix4F;
 struct Quaternion;
 
 
@@ -202,6 +206,13 @@ struct V4F {
         w = w / f;
         return *this;
     }
+
+    // TODO delete this
+    V4D to_v4d() const {
+        return V4D {
+            x, y, z, w
+        };
+    }
 };
 
 struct Vertex {
@@ -225,9 +236,9 @@ struct Vertex {
         normal = in_normal;
     }
 
-    Vertex transform(const Matrix4F &m);
-    Vertex transform(const Matrix4F &transform, const Matrix4F &normal);
-    void normal_transform(const Matrix4F &normal_matrix);
+    Vertex transform(const Matrix4x4 &m);
+    Vertex transform(const Matrix4x4 &transform, const Matrix4x4 &normal);
+    void normal_transform(const Matrix4x4 &normal_matrix);
 
     Vertex& perspective_divide() {
         if (pos.w != 0.0) {
@@ -363,127 +374,6 @@ struct Gradients {
     }
 };
 
-struct Matrix4F {
-    float m[4][4];
-
-    void init_identity() {
-        m[0][0] = 1;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = 0;
-		m[1][0] = 0;	m[1][1] = 1;	m[1][2] = 0;	m[1][3] = 0;
-		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
-    void init_screen_space_transform(float half_width, float half_height) {
-        m[0][0] = half_width;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = half_width - 0.5f;
-		m[1][0] = 0;	m[1][1] = -half_height;	m[1][2] = 0;	m[1][3] = half_height - 0.5f;
-		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = 0;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
-    void init_translation(float x, float y, float z) {
-        m[0][0] = 1;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = x;
-		m[1][0] = 0;	m[1][1] = 1;	m[1][2] = 0;	m[1][3] = y;
-		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 1;	m[2][3] = z;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
-    void init_rotation_x(float x) {
-        m[0][0] = 1;	m[0][1] = 0;			m[0][2] = 0;				m[0][3] = 0;
-        m[1][0] = 0;	m[1][1] = std::cos(x);  m[1][2] = std::sin(x);    m[1][3] = 0;
-        m[2][0] = 0;	m[2][1] = -std::sin(x);  m[2][2] = std::cos(x);      m[2][3] = 0;
-        m[3][0] = 0;	m[3][1] = 0;			m[3][2] = 0;				m[3][3] = 1;
-    }
-
-    void init_rotation_y(float y) {
-        m[0][0] = std::cos(y);      m[0][1] = 0;	m[0][2] = - std::sin(y);    m[0][3] = 0;
-		m[1][0] = 0;			    m[1][1] = 1;	m[1][2] = 0;				m[1][3] = 0;
-		m[2][0] = std::sin(y);      m[2][1] = 0;	m[2][2] = std::cos(y);      m[2][3] = 0;
-		m[3][0] = 0;			    m[3][1] = 0;	m[3][2] = 0;			    m[3][3] = 1;
-    }
-
-    void init_rotation_z(float z) {
-        m[0][0] = std::cos(z);  m[0][1] = std::sin(z);    m[0][2] = 0;	m[0][3] = 0;
-		m[1][0] = - std::sin(z);  m[1][1] = std::cos(z);      m[1][2] = 0;	m[1][3] = 0;
-		m[2][0] = 0;			m[2][1] = 0;				m[2][2] = 1;	m[2][3] = 0;
-		m[3][0] = 0;			m[3][1] = 0;				m[3][2] = 0;	m[3][3] = 1;
-    }
-
-
-    void init_rotation(float x, float y, float z) {
-        Matrix4F rot_x, rot_y, rot_z;
-
-        rot_x.init_rotation_x(x);
-        rot_y.init_rotation_y(y);
-        rot_z.init_rotation_z(z);
-
-        auto matrix = (rot_x * rot_y * rot_z);
-
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                m[i][j] = matrix.m[i][j];
-    }
-
-    void init_rotation(const V4F &forward, const V4F &up) {
-        V4F f = forward.normalized();
-        V4F r = up.normalized();
-        r = r.cross(f);
-
-        V4F u = f.cross(r);
-        init_rotation(f, u, r);
-    }
-
-    void init_rotation(const V4F &forward, const V4F &up, const V4F &right) {
-        m[0][0] = right.x;      m[0][1] = right.y;      m[0][2] = right.z;      m[0][3] = 0;
-        m[1][0] = up.x;         m[1][1] = up.y;         m[1][2] = up.z;         m[1][3] = 0;
-        m[2][0] = forward.x;    m[2][1] = forward.y;    m[2][2] = forward.z;    m[2][3] = 0;
-        m[3][0] = 0;            m[3][1] = 0;            m[3][2] = 0;            m[3][3] = 1;
-    }
-
-    void init_scale(float x, float y, float z) {
-        m[0][0] = x;	m[0][1] = 0;	m[0][2] = 0;	m[0][3] = 0;
-		m[1][0] = 0;	m[1][1] = y;	m[1][2] = 0;	m[1][3] = 0;
-		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = z;	m[2][3] = 0;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
-    void init_perspective(float fov, float aspect_ratio, float znear, float zfar) {
-        float zrange = znear - zfar;
-
-        m[0][0] = fov * aspect_ratio;	            m[0][1] = 0.0f;	            m[0][2] = 0.0f;	m[0][3] = 0.0f;
-		m[1][0] = 0.0f;                             m[1][1] = 1.0f / fov;	m[1][2] = 0;	m[1][3] = 0.0f;
-		m[2][0] = 0.0f;	                            m[2][1] = 0.0f;				m[2][2] = (-znear - zfar)/zrange;	m[2][3] = zfar * znear / zrange;
-		m[3][0] = 0.0f;	                            m[3][1] = 0.0f;				m[3][2] = 1.0f;	m[3][3] = 0.0f;
-    }
-
-    void init_orthographic(float left, float right, float bottom, float top, float near, float far) {
-        float width = right - left;
-		float height = top - bottom;
-		float depth = far - near;
-
-		m[0][0] = 2.0f/width; m[0][1] = 0;	m[0][2] = 0;	m[0][3] = -(right + left)/width;
-		m[1][0] = 0;	m[1][1] = 2.0f/height;m[1][2] = 0;	m[1][3] = -(top + bottom)/height;
-		m[2][0] = 0;	m[2][1] = 0;	m[2][2] = 2.0f/depth;m[2][3] = -(far + near)/depth;
-		m[3][0] = 0;	m[3][1] = 0;	m[3][2] = 0;	m[3][3] = 1;
-    }
-
-    V4F transform(const V4F &r) const {
-        return V4F(
-            m[0][0] * r.x + m[0][1] * r.y + m[0][2] * r.z + m[0][3] * r.w,
-            m[1][0] * r.x + m[1][1] * r.y + m[1][2] * r.z + m[1][3] * r.w,
-            m[2][0] * r.x + m[2][1] * r.y + m[2][2] * r.z + m[2][3] * r.w,
-            m[3][0] * r.x + m[3][1] * r.y + m[3][2] * r.z + m[3][3] * r.w
-        );
-    }
-
-    Matrix4F operator*(const Matrix4F &m1) {
-        Matrix4F matrix;
-		for (int c = 0; c < 4; c++)
-			for (int r = 0; r < 4; r++)
-				matrix.m[r][c] = m1.m[r][0] * m[0][c] + m1.m[r][1] * m[1][c] + m1.m[r][2] * m[2][c] + m1.m[r][3] * m[3][c];
-		return matrix;
-    }
-};
-
 struct Triangle {
     Vertex p[3];
     Triangle() {};
@@ -599,7 +489,7 @@ struct Quaternion {
         w = cos_half_angle;
     }
 
-    Quaternion(const Matrix4F &rot) {
+    Quaternion(const Matrix4x4 &rot) {
         float trace = rot.m[0][0] + rot.m[1][1] + rot.m[2][2];
 
         if (trace > 0) {
@@ -657,13 +547,12 @@ struct Quaternion {
         return x * r.x + y * r.y + z * r.z + w * r.w;
     }
 
-    Matrix4F to_rotation_matrix() {
+    Matrix4x4 to_rotation_matrix() {
         V4F forward =  V4F(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
 		V4F up = V4F(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
-		V4F right = V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
+		V4F right =  V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
 
-        Matrix4F r;
-        r.init_rotation(forward.normalized(), up.normalized(), right.normalized());
+        auto r = Math::mat_4x4_rotation(forward.normalized().to_v4d(), up.normalized().to_v4d(), right.normalized().to_v4d());
 
         return r;
     }
@@ -760,12 +649,12 @@ struct Transform {
         set_pos(pos + (dir * amt));
     }
 
-    Matrix4F get_matrix_transformation() {
-        Matrix4F translation, rotation, scale, identity;
+    Matrix4x4 get_matrix_transformation() {
+        Matrix4x4 translation, rotation, scale, identity;
 
-        translation.init_translation(pos.x,  pos.y, pos.z);
+        translation = Math::mat_4x4_translation(pos.x,  pos.y, pos.z);
         rotation = rot.conjugate().to_rotation_matrix();
-        scale.init_scale(this->scale.x, this->scale.y, this->scale.z);
+        scale = Math::mat_4x4_scale(this->scale.x, this->scale.y, this->scale.z);
 
         return rotation * translation * scale;
     }
@@ -781,8 +670,8 @@ struct Transform {
     }
 
     Transform& look_at(const V4F &point, const V4F &up) {
-        Matrix4F mat_look_at;
-        mat_look_at.init_rotation(point, up);
+        Matrix4x4 mat_look_at;
+        mat_look_at = Math::mat_4x4_rotation(point.to_v4d(), up.to_v4d());
         this->rot = Quaternion(mat_look_at);
 
         return *this;
