@@ -1,6 +1,7 @@
 #include "Vector.h"
 #include <math.h>
 #include "Core.h"
+#include "Quaternion.h"
 
 namespace Math {
     float V2D_Type::length() const {
@@ -83,5 +84,17 @@ namespace Math {
 
     float V4D_Type::cos_th(const V4D_Type &other) const {
         return fast_cos(dot(other) / (length() * other.length()));
+    }
+
+    V4D_Type V4D_Type::rotate(const Quat_Type &rot) {
+        Quat_Type conj = rot.conjugated();
+        Quat_Type new_rot = rot * *this * conj;
+
+        x = new_rot.x;
+        y = new_rot.y;
+        z = new_rot.z;
+        w = 1.0f;
+
+        return *this;
     }
 }

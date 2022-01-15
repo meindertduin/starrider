@@ -30,6 +30,7 @@ set(SOURCES
     src/math/Core.cpp
     src/math/Polar.cpp
     src/math/Vector.cpp
+    src/math/Quaternion.cpp
 )
 
 set(HEADERS include)

@@ -1,16 +1,20 @@
 #pragma once
 
 #include "Vector.h"
+#include "Matrix.h"
+
 #include <cstring>
 
 namespace Math {
     typedef struct Quat_Type {
         union {
             float m[4];
-            struct {
-                float q0;
-                V3D qv;
-            };
+            // TODO make this viable later on. If this is uncommented it get_instancea a
+            // constructor not allowed in anonymous aggregate error.
+            // struct {
+            //     V3D_Type qv;
+            //     float q0;
+            // };
             struct {
                 float x, y, z, w;
             };
@@ -18,7 +22,9 @@ namespace Math {
 
         Quat_Type() = default;
         constexpr Quat_Type(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {  }
-        constexpr Quat_Type(const V3D &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {  }
+        constexpr Quat_Type(const V3D_Type &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {  }
+        Quat_Type(const V4D_Type &axis, float angle);
+        Quat_Type(const Matrix4x4 &rot);
 
         Quat_Type(const Quat_Type &other);
         Quat_Type(Quat_Type &&other);
@@ -64,6 +70,37 @@ namespace Math {
             r.w = w / f;
 
             return r;
+        }
+
+        float length() const;
+        Quat_Type normalized() const;
+        Quat_Type conjugated() const;
+        float dot(const Quat_Type &r) const;
+
+        Matrix4x4_Type to_rotation_matrix() const;
+
+        V4D_Type get_forward() const {
+            return V4D_Type(0, 0, 1, 1).rotate(*this);
+        }
+
+        V4D_Type get_back() const {
+            return V4D_Type(0, 0, -1, 1).rotate(*this);
+        }
+
+        V4D_Type get_right() const {
+            return V4D_Type(1, 0, 0, 1).rotate(*this);
+        }
+
+        V4D_Type get_left() const {
+            return V4D_Type(-1, 0, 0, 1).rotate(*this);
+        }
+
+        V4D_Type get_up() const {
+            return V4D_Type(0, 1, 0, 1).rotate(*this);
+        }
+
+        V4D_Type get_down() const {
+            return V4D_Type(0, -1, 0, 1).rotate(*this);
         }
 
         constexpr void zero() {

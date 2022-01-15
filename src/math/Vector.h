@@ -2,6 +2,8 @@
 
 namespace Math {
 
+struct Quat_Type;
+
 typedef struct V2D_Type {
     union   {
         float m[2];
@@ -289,6 +291,7 @@ typedef struct V4D_Type {
     V4D_Type& normalise();
     V4D_Type normalized() const;
     float cos_th(const V4D_Type &other) const;
+    V4D_Type rotate(const Quat_Type &rot);
 
 } V4D, Point4D, *V4D_Ptr, *Point4D_Ptr;
 
