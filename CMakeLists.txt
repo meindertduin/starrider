@@ -29,6 +29,7 @@ set(SOURCES
     src/math/Matrix.cpp
     src/math/Core.cpp
     src/math/Polar.cpp
+    src/math/Vector.cpp
 )
 
 set(HEADERS include)
