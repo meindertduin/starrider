@@ -4,6 +4,17 @@
 
 namespace Math {
 
+
+void build_lookup_tables() {
+    sin_lookup[360] = 0;
+    cos_lookup[360] = 0;
+
+    for (int i = 0; i < 360; ++i) {
+        sin_lookup[i] = std::sin(i);
+        cos_lookup[i] = std::cos(i);
+    }
+}
+
 float fast_sin(float theta) {
     theta = fmodf(theta, 360);
 
@@ -26,17 +37,6 @@ float fast_cos(float theta) {
     float theta_frac = theta - theta_int;
 
     return (cos_lookup[theta_int] + theta_frac * (cos_lookup[theta_int + 1] - cos_lookup[theta_int]));
-}
-
-void build_lookup_tables() {
-    sin_lookup[360] = 0;
-    cos_lookup[360] = 0;
-
-    for (int i = 0; i < 360; ++i) {
-        sin_lookup[i] = std::sin(i);
-        cos_lookup[i] = std::cos(i);
-    }
-
 }
 
 }

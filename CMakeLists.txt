@@ -28,6 +28,7 @@ set(SOURCES
     src/graphics/XLib.cpp
     src/math/Matrix.cpp
     src/math/Core.cpp
+    src/math/Polar.cpp
 )
 
 set(HEADERS include)

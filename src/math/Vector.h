@@ -11,7 +11,7 @@ typedef struct V2D_Type {
     };
 
     V2D_Type() = default;
-    V2D_Type(float x, float y) : x(x), y(y) {  }
+    constexpr V2D_Type(float x, float y) : x(x), y(y) {  }
 
     V2D_Type operator+(const V2D_Type &rhs) const {
         V2D_Type r;
