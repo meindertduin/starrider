@@ -11,6 +11,7 @@
 #include "Texture.h"
 #include "../math/Matrix.h"
 #include "../math/Vector.h"
+#include "../math/Quaternion.h"
 
 class Texture;
 
@@ -18,7 +19,7 @@ float saturate(float val);
 
 using Math::Matrix4x4;
 using Math::V4D;
-
+using Math::Quat_Type;
 
 struct Color {
     float r, g, b;
@@ -68,13 +69,9 @@ struct Color {
     }
 };
 
-
 struct Point {
     int x, y;
 };
-
-struct Quaternion;
-
 
 struct V2I {
     int x, y;
@@ -86,132 +83,6 @@ struct V2I {
     V2I(int x, int y) {
         this->x = x;
         this->y = y;
-    }
-};
-
-struct V4F {
-    float x, y, z, w;
-    V4F() {
-        x = y = z = 0;
-        w = 1;
-    }
-
-    V4F(const float &in_x, const float &in_y, const float &in_z) {
-        x = in_x;
-        y = in_y;
-        z = in_z;
-        w = 1;
-    }
-
-    V4F(const float &in_x, const float &in_y, const float &in_z, const float &in_w) {
-        x = in_x;
-        y = in_y;
-        z = in_z;
-        w = in_w;
-    }
-
-    V4F lerp(V4F dest, float amt) {
-        return (dest - *this) * amt + *this;
-    }
-
-    float length() const {
-        return sqrtf(x * x + y * y + z * z + w * w);
-    }
-
-    void normalise() {
-        float l = length();
-        x /= l; y /= l; z /= l;
-    }
-
-    V4F normalized() const {
-        V4F r = *this;
-        r.normalise();
-        return r;
-    }
-
-    float dot(const V4F &r) const {
-        return x * r.x + y * r.y + z * r.z + w * r.w;
-    }
-
-    float prod(const V4F& b) const {
-        return (x * b.x + y * b.y + z * b.z);
-    }
-
-    V4F cross(const V4F &v) {
-        V4F r;
-        r.x = y * v.z - z * v.y;
-        r.y = z * v.x - x * v.z;
-        r.z = x * v.y - y * v.x;
-        r.w = 1.0f;
-
-        return r;
-    }
-
-    V4F normal() {
-        return *this / length();
-    }
-
-    V4F& rotate(const Quaternion &rot);
-
-    V4F operator+(const V4F& rhs) const {
-        V4F r;
-        r.x = this->x + rhs.x;
-        r.y = this->y + rhs.y;
-        r.z = this->z + rhs.z;
-        r.w = this->w + rhs.w;
-        return r;
-    }
-
-    V4F operator-(const V4F& rhs) const {
-        V4F r;
-        r.x = this->x - rhs.x;
-        r.y = this->y - rhs.y;
-        r.z = this->z - rhs.z;
-        r.w = this->w - rhs.w;
-        return r;
-    }
-
-    V4F operator*(float f) const {
-        V4F r;
-        r.x = x * f;
-        r.y = y * f;
-        r.z = z * f;
-        r.w = w * f;
-
-        return r;
-    }
-
-    V4F operator/(float f) const {
-        V4F r;
-        r.x = x / f;
-        r.y = y / f;
-        r.z = z / f;
-        r.w = w / f;
-
-        return r;
-    }
-
-    V4F& operator*=(float f) {
-        x = x * f;
-        y = y * f;
-        z = z * f;
-        w = w * f;
-        return *this;
-    }
-
-    V4F& operator/=(float f) {
-        x = x / f;
-        y = y / f;
-        z = z / f;
-        w = w / f;
-        return *this;
-    }
-
-    // TODO delete this
-    V4D to_v4d() const {
-        return V4D {
-            x, y, z, w
-        };
     }
 };
 
@@ -462,190 +333,30 @@ struct Mesh {
     bool load_from_obj_file(std::string path);
 };
 
-struct Quaternion {
-    float x, y, z, w;
-
-    Quaternion() {
-        x = y = z = w = 0;
-    }
-
-    Quaternion(float x, float y, float z, float w) {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->w = w;
-    }
-
-    Quaternion(V4D axis, float angle) {
-        angle = angle /360 * (float)M_PI * 2;
-
-        float sin_half_angle = std::sin(angle / 2.0f);
-        float cos_half_angle = std::cos(angle / 2.0f);
-
-        x = axis.x * sin_half_angle;
-        y = axis.y * sin_half_angle;
-        z = axis.z * sin_half_angle;
-
-        w = cos_half_angle;
-    }
-
-    Quaternion(const Matrix4x4 &rot) {
-        float trace = rot.m[0][0] + rot.m[1][1] + rot.m[2][2];
-
-        if (trace > 0) {
-            float s = 0.5f / std::sqrt(trace + 1.0f);
-			w = 0.25f / s;
-			x = (rot.m[1][2] - rot.m[2][1]) * s;
-			y = (rot.m[2][0] - rot.m[0][2]) * s;
-			z = (rot.m[0][1] - rot.m[1][0]) * s;
-        } else {
-            if (rot.m[0][0] > rot.m[1][1] && rot.m[0][0] > rot.m[2][2]) {
-                float s = 2.0f * std::sqrt(1.0f + rot.m[0][0] - rot.m[1][1] - rot.m[2][2]);
-				w = (rot.m[1][2] - rot.m[2][1] / s);
-				x = 0.25f * s;
-				y = (rot.m[1][0] + rot.m[0][1]) / s;
-				z = (rot.m[2][0] + rot.m[0][2]) / s;
-            }
-            else if (rot.m[1][1] > rot.m[2][2]) {
-                float s = 2.0f * std::sqrt(1.0f + rot.m[1][1] - rot.m[0][0] - rot.m[2][2]);
-				w = (rot.m[2][0] - rot.m[0][2]) / s;
-				x = (rot.m[1][0] + rot.m[0][1]) / s;
-				y = 0.25f * s;
-				z = (rot.m[2][1] + rot.m[1][2]) / s;
-            }
-            else {
-                float s = 2.0f * std::sqrt(1.0f + rot.m[2][2] - rot.m[0][0] - rot.m[1][1]);
-				w = (rot.m[0][1] - rot.m[1][0]) / s;
-				x = (rot.m[2][0] + rot.m[0][2]) / s;
-				y = (rot.m[1][2] + rot.m[2][1]) / s;
-				z = 0.25f * s;
-            }
-        }
-
-        float length = std::sqrt(x*x + y*y + z*z + w*w);
-        x /= length;
-        y /= length;
-        z /= length;
-        w /= length;
-    }
-
-    float length() {
-        return std::sqrt(x*x + y*y + z*z + w*w);
-    }
-
-    Quaternion normalized() {
-        float l = length();
-
-        return Quaternion(x / l, y / l, z / l, w / l);
-    }
-
-    Quaternion conjugate() const {
-        return Quaternion(-x, -y, -z, w);
-    }
-
-    float dot(Quaternion r) {
-        return x * r.x + y * r.y + z * r.z + w * r.w;
-    }
-
-    Matrix4x4 to_rotation_matrix() {
-        V4D forward =  V4D(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
-		V4D up = V4D(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
-		V4D right =  V4D(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
-
-        auto r = Math::mat_4x4_rotation(forward.normalized(), up.normalized(), right.normalized());
-
-        return r;
-    }
-
-    V4F get_forward() const {
-        return V4F(0, 0, 1, 1).rotate(*this);
-    }
-
-    V4F get_back() const {
-        return V4F(0, 0, -1, 1).rotate(*this);
-    }
-
-    V4F get_right() const {
-        return V4F(1, 0, 0, 1).rotate(*this);
-    }
-
-    V4F get_left() const {
-        return V4F(-1, 0, 0, 1).rotate(*this);
-    }
-
-    V4F get_up() const {
-        return V4F(0, 1, 0, 1).rotate(*this);
-    }
-
-    V4F get_down() const {
-        return V4F(0, -1, 0, 1).rotate(*this);
-    }
-
-    Quaternion operator*(const Quaternion &q) const {
-        Quaternion r;
-        r.w = w * q.w - x * q.x - y * q.y - z * q.z;
-		r.x = x * q.w + w * q.x + y * q.z - z * q.y;
-		r.y = y * q.w + w * q.y + z * q.x - x * q.z;
-		r.z = z * q.w + w * q.z + x * q.y - y * q.x;
-
-        return r;
-    }
-
-    Quaternion operator*(const V4F &v) const {
-        Quaternion r;
-        r.w = -x * v.x - y * v.y - z * v.z;
-        r.x =  w * v.x + y * v.z - z * v.y;
-        r.y =  w * v.y + z * v.x - x * v.z;
-        r.z =  w * v.z + x * v.y - y * v.x;
-
-        return r;
-    }
-
-    Quaternion operator*(float f) const {
-        Quaternion r;
-        r.x = x * f;
-        r.y = y * f;
-        r.z = z * f;
-        r.w = w * f;
-
-        return r;
-    }
-
-    Quaternion operator/(float f) const {
-        Quaternion r;
-        r.x = x / f;
-        r.y = y / f;
-        r.z = z / f;
-        r.w = w / f;
-
-        return r;
-    }
-};
-
 struct Transform {
-    V4F pos;
-    Quaternion rot;
-    V4F scale;
+    V4D pos;
+    Quat_Type rot;
+    V4D scale;
 
     Transform() {
-        this->pos = V4F(0, 0, 0, 0);
-        this->rot = Quaternion(0, 0, 0, 1);
-        this->scale = V4F(1, 1, 1, 1);
+        this->pos = V4D(0, 0, 0, 0);
+        this->rot = Quat_Type(0, 0, 0, 1);
+        this->scale = V4D(1, 1, 1, 1);
     }
 
-    Transform(const V4F &pos) {
+    Transform(const V4D &pos) {
         this->pos = pos;
-        this->rot = Quaternion(0, 0, 0, 1);
-        this->scale = V4F(1, 1, 1, 1);
+        this->rot = Quat_Type(0, 0, 0, 1);
+        this->scale = V4D(1, 1, 1, 1);
     }
 
-    Transform(const V4F &pos, const Quaternion &rot, const V4F &scale) {
+    Transform(const V4D &pos, const Quat_Type &rot, const V4D &scale) {
         this->pos = pos;
         this->rot = rot;
         this->scale = scale;
     }
 
-    void move(const V4F &dir, float amt) {
+    void move(const V4D &dir, float amt) {
         set_pos(pos + (dir * amt));
     }
 
@@ -653,30 +364,26 @@ struct Transform {
         Matrix4x4 translation, rotation, scale, identity;
 
         translation = Math::mat_4x4_translation(pos.x,  pos.y, pos.z);
-        rotation = rot.conjugate().to_rotation_matrix();
+        rotation = rot.conjugated().to_rotation_matrix();
         scale = Math::mat_4x4_scale(this->scale.x, this->scale.y, this->scale.z);
 
         return rotation * translation * scale;
     }
 
-    void set_pos(const V4F &pos) {
+    void set_pos(const V4D &pos) {
         this->pos = pos;
     }
 
-    Transform& rotate(const Quaternion &rotation) {
+    Transform& rotate(const Quat_Type &rotation) {
         this->rot = (rotation * rot).normalized();
 
         return *this;
     }
 
-    Transform& look_at(const V4F &point, const V4F &up) {
-        Matrix4x4 mat_look_at;
-        mat_look_at = Math::mat_4x4_rotation(point.to_v4d(), up.to_v4d());
-        this->rot = Quaternion(mat_look_at);
+    Transform& look_at(const V4D &point, const V4D &up) {
+        auto mat_look_at = Math::mat_4x4_rotation(point, up);
+        this->rot = Quat_Type(mat_look_at);
 
         return *this;
     }
 };
-
-V4F vector_intersect_plane(V4F &plane_p, V4F &plane_n, V4F &line_start, V4F &line_end);
-int triangle_clip_against_plane(V4F plane_p, V4F plane_n, Triangle &in_tri, Triangle &out_tri1, Triangle &out_tri2);

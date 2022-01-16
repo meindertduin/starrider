@@ -20,5 +20,5 @@ private:
     float m_fov;
 
     Matrix4x4 m_projection;
-    V4F y_axis = V4F(0, 1, 0);
+    V4D y_axis = V4D(0, 1, 0);
 };

@@ -8,6 +8,8 @@
 
 #include <memory>
 
+using Math::Point2D;
+
 class Renderer : EventObserver<WindowEvent> {
 public:
     Renderer();

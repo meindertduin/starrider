@@ -37,15 +37,3 @@ bool Mesh::load_from_obj_file(std::string path) {
     triangles = obj_reader.create_vertices();
     return true;
 }
-
-V4F& V4F::rotate(const Quaternion &rot) {
-    Quaternion conj = rot.conjugate();
-    Quaternion new_rot = rot * *this * conj;
-
-    x = new_rot.x;
-    y = new_rot.y;
-    z = new_rot.z;
-    w = 1.0f;
-
-    return *this;
-}

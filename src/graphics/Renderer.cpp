@@ -13,6 +13,7 @@ Renderer::Renderer() {
     m_height = p_window->get_height();
 
     create_framebuffer();
+
     p_screen_bitmap = p_window->get_screen_bitmap();
     p_app->listen(this, WindowEventType::WinExpose);
 }

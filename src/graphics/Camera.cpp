@@ -38,10 +38,10 @@ void Camera::on_event(const WindowEvent &event) {
                     m_transform.move(m_transform.rot.get_right(), 0.2f);
                     break;
                 case K_q:
-                    m_transform = m_transform.rotate(Quaternion(V4D(0, 1, 0), -1.0f));
+                    m_transform = m_transform.rotate(Quat_Type(V4D(0, 1, 0), -1.0f));
                     break;
                 case K_e:
-                    m_transform = m_transform.rotate(Quaternion(V4D(0, 1, 0), 1.0f));
+                    m_transform = m_transform.rotate(Quat_Type(V4D(0, 1, 0), 1.0f));
                 default:
                     break;
             }
@@ -51,9 +51,9 @@ void Camera::on_event(const WindowEvent &event) {
                 float d_xmovment = (float)event.body.mouse_event.d_xpos;
                 float d_ymovment = (float)event.body.mouse_event.d_ypos;
 
-                m_transform.rotate(Quaternion(V4D(0, 1, 0), 1.0f * (d_xmovment / 100.f)));
+                m_transform.rotate(Quat_Type(V4D(0, 1, 0), 1.0f * (d_xmovment / 100.f)));
                 auto right = m_transform.rot.get_right();
-                m_transform.rotate(Quaternion(V4D(right.x, right.y, right.z, right.w), 1.0f * (d_ymovment / 100.f)));
+                m_transform.rotate(Quat_Type(V4D(right.x, right.y, right.z, right.w), 1.0f * (d_ymovment / 100.f)));
             }
             break;
         default:
@@ -70,10 +70,9 @@ void Camera::set_viewport(int width, int height) {
 }
 
 Matrix4x4 Camera::get_view_projection() const {
-    V4F camera_pos = m_transform.pos * -1;
-
+    V4D camera_pos = m_transform.pos * -1;
     auto camera_trans = Math::mat_4x4_translation(camera_pos.x, camera_pos.y, camera_pos.z);
 
-    return  camera_trans * m_transform.rot.conjugate().to_rotation_matrix() * m_projection;
+    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix() * m_projection;
 }
 

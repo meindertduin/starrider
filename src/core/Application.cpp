@@ -65,8 +65,8 @@ void Application::run() {
     terrain.load_from_obj_file("assets/plateau.obj");
     terrain.texture = &brick_texture;
 
-    Transform monkey_transform = Transform(V4F(0, 0, 3));
-    Transform terrain_transform = Transform(V4F(0, -4, 0));
+    Transform monkey_transform = Transform(V4D(0, 0, 3));
+    Transform terrain_transform = Transform(V4D(0, -4, 0));
 
     Matrix4x4 vp = p_camera->get_view_projection();
 
@@ -80,7 +80,7 @@ void Application::run() {
 
         poll_window_events();
 
-        monkey_transform.rotate(Quaternion(V4D(0, 1, 0), 0.5f));
+        monkey_transform.rotate(Quat_Type(V4D(0, 1, 0), 0.5f));
 
         std::vector<Renderable> renderables;
         renderables.push_back({
