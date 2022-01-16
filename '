@@ -278,7 +278,7 @@ typedef struct V4D_Type {
         return *this;
     }
 
-    V4D_Type lerp(const V4D_Type &dest, float amt) {
+    constexpr V4D lerp(const V4D_Type &dest, float amt) {
         return (dest - *this) * amt + *this;
     }
 

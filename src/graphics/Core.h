@@ -216,21 +216,21 @@ struct V4F {
 };
 
 struct Vertex {
-    V4F pos;
-    V4F text_coords;
-    V4F normal;
+    V4D pos;
+    V4D text_coords;
+    V4D normal;
 
     Vertex() {}
 
     Vertex(float x, float y, float z) {
-        pos = V4F(x, y, z);
+        pos = V4D(x, y, z);
     }
 
     Vertex(float x, float y, float z, float w) {
-        pos = V4F(x, y, z, w);
+        pos = V4D(x, y, z, w);
     }
 
-    Vertex(const V4F &in_pos, const V4F &in_text_coords, const V4F &in_normal) {
+    Vertex(const V4D &in_pos, const V4D &in_text_coords, const V4D &in_normal) {
         pos = in_pos;
         text_coords = in_text_coords;
         normal = in_normal;
@@ -300,7 +300,7 @@ struct Vertex {
 };
 
 struct Gradients {
-    V4F text_coords[3];
+    V4D text_coords[3];
     float one_over_z[3];
     float depth[3];
     float light_amount[3];
@@ -332,7 +332,7 @@ struct Gradients {
         depth[1] = mid_y_vert.pos.z;
         depth[2] = max_y_vert.pos.z;
 
-        V4F light_dir = V4F(0, 0, -1);
+        V4D light_dir = V4D(0, 0, -1);
         light_amount[0] = saturate(min_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
         light_amount[1] = saturate(mid_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
         light_amount[2] = saturate(max_y_vert.normal.dot(light_dir)) * 0.9f + 0.1f;
@@ -476,7 +476,7 @@ struct Quaternion {
         this->w = w;
     }
 
-    Quaternion(V4F axis, float angle) {
+    Quaternion(V4D axis, float angle) {
         angle = angle /360 * (float)M_PI * 2;
 
         float sin_half_angle = std::sin(angle / 2.0f);
@@ -548,11 +548,11 @@ struct Quaternion {
     }
 
     Matrix4x4 to_rotation_matrix() {
-        V4F forward =  V4F(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
-		V4F up = V4F(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
-		V4F right =  V4F(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
+        V4D forward =  V4D(2.0f * (x * z - w * y), 2.0f * (y * z + w * x), 1.0f - 2.0f * (x * x + y * y));
+		V4D up = V4D(2.0f * (x * y + w * z), 1.0f - 2.0f * (x * x + z * z), 2.0f * (y * z - w * x));
+		V4D right =  V4D(1.0f - 2.0f * (y * y + z * z), 2.0f * (x * y - w * z), 2.0f * (x * z + w * y));
 
-        auto r = Math::mat_4x4_rotation(forward.normalized().to_v4d(), up.normalized().to_v4d(), right.normalized().to_v4d());
+        auto r = Math::mat_4x4_rotation(forward.normalized(), up.normalized(), right.normalized());
 
         return r;
     }

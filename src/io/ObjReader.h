@@ -20,10 +20,10 @@ public:
     bool read_file(string path);
     vector<Triangle> create_vertices();
 private:
-    vector<V4F> m_vertices;
-    vector<V4F> m_tex_coords;
+    vector<V4D> m_vertices;
+    vector<V4D> m_tex_coords;
     vector<ObjIndex> m_indices;
-    vector<V4F> m_normals;
+    vector<V4D> m_normals;
 
     bool has_tex_coords = false;
     bool has_normal_indices = false;

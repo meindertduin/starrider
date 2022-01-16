@@ -30,20 +30,20 @@ bool ObjReader::read_file(string path) {
             float x, y, z;
             ss >> x >> y >> z;
 
-            m_vertices.push_back(V4F(x, y, z));
+            m_vertices.push_back(V4D(x, y, z));
         }
 
         if (first_token == "vt") {
             float x, y;
             ss >> x >> y;
 
-            m_tex_coords.push_back(V4F(x, y, 0));
+            m_tex_coords.push_back(V4D(x, y, 0));
         }
 
         if (first_token == "vn") {
             float x, y, z;
             ss >> x >> y >> z;
-            m_normals.push_back(V4F(x, y, z, 0)); // normals dont have positions so w == 0
+            m_normals.push_back(V4D(x, y, z, 0)); // normals dont have positions so w == 0
         }
 
         if (first_token == "f") {
