@@ -157,6 +157,10 @@ typedef struct Matrix4x3_Type {
     Matrix4x3_Type& operator=(const Matrix4x3_Type &other);
     Matrix4x3_Type& operator=(Matrix4x3_Type &&other);
 
+    Matrix4x3_Type operator*(const Matrix4x3_Type &other) const;
+    V4D_Type operator*(const V4D_Type &v) const;
+    V3D_Type operator*(const V3D_Type &v) const;
+
     void swap_column(int c, Matrix1x4_Type &other) {
         m[0][c] = other.m[0]; m[1][c]= other.m[1];
         m[2][c] = other.m[2]; m[3][c]= other.m[3];
@@ -236,6 +240,9 @@ typedef struct Matrix3x2_Type {
 
     Matrix3x2_Type& operator=(const Matrix3x2_Type &other);
     Matrix3x2_Type& operator=(Matrix3x2_Type &&other);
+
+    Matrix3x2_Type operator*(const Matrix3x2_Type &other) const;
+    V2D_Type operator*(const V2D_Type &v) const;
 
     constexpr void zero() {
         std::memset(m, 0, sizeof(Matrix3x2_Type));

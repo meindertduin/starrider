@@ -164,8 +164,8 @@ Matrix2x2 Matrix2x2::operator*(const Matrix2x2_Type &other) const {
 
 Matrix3x3_Type Matrix3x3::operator*(const Matrix3x3_Type &other) const {
     Matrix3x3_Type r;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
             r.m[j][i] = other.m[j][0] * m[0][i]
                 + other.m[j][1] * m[1][i]
                 + other.m[j][2] * m[2][i];
@@ -180,6 +180,25 @@ Matrix4x4_Type Matrix4x4::operator*(const Matrix4x4_Type &other) const {
                 + other.m[j][1] * m[1][i]
                 + other.m[j][2] * m[2][i]
                 + other.m[j][3] * m[3][i];
+    return r;
+}
+
+Matrix4x3_Type Matrix4x3_Type::operator*(const Matrix4x3_Type &other) const {
+    Matrix4x3_Type r;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 3; j++)
+            r.m[j][i] = other.m[j][0] * m[0][i]
+                + other.m[j][1] * m[1][i]
+                + other.m[j][2] * m[2][i];
+    return r;
+}
+
+Matrix3x2_Type Matrix3x2_Type::operator*(const Matrix3x2_Type &other) const {
+    Matrix3x2_Type r;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 2; j++)
+            r.m[j][i] = other.m[j][0] * m[0][i]
+                + other.m[j][1] * m[1][i];
     return r;
 }
 
@@ -310,7 +329,7 @@ int Matrix4x4::inverse(Matrix4x4_Type &inv) const {
 V2D_Type Matrix2x2_Type::operator*(const V2D_Type &v) const {
     return V2D_Type {
         m[0][0] * v.x + m[1][0] * v.y,
-        m[1][0] * v.x + m[1][1] * v.y
+        m[1][0] * v.x + m[1][1] * v.y,
     };
 }
 
@@ -318,7 +337,7 @@ V3D_Type Matrix3x3::operator*(const V3D_Type &v) const {
     return V3D_Type {
         m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
         m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
-        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
     };
 }
 
@@ -327,7 +346,31 @@ V4D_Type Matrix4x4_Type::operator*(const V4D_Type &v) const {
         m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w,
         m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
         m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
-        m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
+        m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w,
+    };
+}
+
+V3D_Type Matrix4x3::operator*(const V3D_Type &v) const {
+    return V3D_Type {
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
+    };
+}
+
+V4D_Type Matrix4x3::operator*(const V4D_Type &v) const {
+    return V4D_Type {
+        m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+        m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+        m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z,
+        v.w,
+    };
+}
+
+V2D_Type Matrix3x2::operator*(const V2D_Type &v) const {
+    return V2D_Type {
+        m[0][0] * v.x + m[0][1] * v.y,
+        m[1][0] * v.x + m[1][1] * v.y,
     };
 }
 
