@@ -5,16 +5,27 @@
 
 namespace Math {
     Quat_Type::Quat_Type(const V4D_Type &axis, float angle) {
-        angle = angle / 360 * PI * 2.0f;
+        angle = angle / 180 * PI;
 
-        float sin_half_angle = fast_sin(angle / 2.0f);
-        float cos_half_angle = fast_cos(angle / 2.0f);
+        if (angle >= 0) {
+            float sin_half_angle = fast_sin(angle / 2.0f);
+            float cos_half_angle = fast_cos(angle / 2.0f);
 
-        x = axis.x * sin_half_angle;
-        y = axis.y * sin_half_angle;
-        z = axis.z * sin_half_angle;
+            x = axis.x * sin_half_angle;
+            y = axis.y * sin_half_angle;
+            z = axis.z * sin_half_angle;
 
-        w = cos_half_angle;
+            w = cos_half_angle;
+        } else {
+            float sin_half_angle = fast_sin(-angle / 2.0f);
+            float cos_half_angle = fast_cos(-angle / 2.0f);
+
+            x = axis.x * sin_half_angle;
+            y = axis.y * sin_half_angle;
+            z = axis.z * sin_half_angle;
+
+            w = cos_half_angle * -1;
+        }
     }
 
     Quat_Type::Quat_Type(const Matrix4x4 &rot) {
