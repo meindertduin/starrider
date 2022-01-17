@@ -1,7 +1,5 @@
 # Starrider Engine
-A work in progress game engine written in c++. The goal of the project is to do as much from scrach as possible, with a few exceptions. Mainly TTF font rendering, because I hope to be finished before 2040 :P
-
-![](https://github.com/meindertduin/starrider/docs/rendering_demo.gif)
+A work in progress game engine written in c++. The goal of the project is to do as much from scratch as possible. That being said, compromises have to be made. For example: for now I use FreeType 2 for font rendering because I wanted to be able to render TTF fonts early on. But i'm hoping in the future to maybe also provide my own TTF (or other font-types) rendering solutions.
 
 ## Features
 - Software rasterization
