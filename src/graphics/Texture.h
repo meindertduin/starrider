@@ -65,8 +65,22 @@ public:
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
-    Pixel get_pixel(int x_pos, int y_pos, float light_amount) const;
-    Pixel get_pixel(int x_pos, int y_pos) const;
+    constexpr Pixel get_pixel(int x_pos, int y_pos, float light_amount) const {
+        Pixel r = {
+            .value = get_pixel_value(x_pos, y_pos),
+        };
+
+        r.rgba.blue *= light_amount;
+        r.rgba.red *= light_amount;
+        r.rgba.green *= light_amount;
+
+        return r;
+    }
+    constexpr Pixel get_pixel(int x_pos, int y_pos) const {
+        return {
+            .value = get_pixel_value(x_pos, y_pos),
+        };
+    };
 
     int width;
     int height;
@@ -74,7 +88,24 @@ private:
     void *pixels = nullptr;
     Format format;
 
-    inline uint32_t get_pixel_value(int x_pos, int y_pos) const;
+    constexpr uint32_t get_pixel_value(int x_pos, int y_pos) const {
+        switch(format) {
+            case Format::RED:
+                {
+                    uint32_t val = reinterpret_cast<unsigned char*>(pixels)[width * y_pos + x_pos];
+                    return (val << 24) | (val << 16) | (val << 8) | val;
+                }
+            case Format::RGBA:
+                return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
+            case Format::RGB:
+                {
+                    auto rgb =  static_cast<RGB*>(pixels)[width * y_pos + x_pos];
+                    return (0x000000FF << 24) | (rgb.red << 16) | (rgb.green << 8) | (rgb.blue);
+                }
+            default:
+                return 0;
+        }
+    }
 };
 
 
