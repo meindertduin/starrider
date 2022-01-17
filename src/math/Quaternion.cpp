@@ -4,12 +4,10 @@
 #include <math.h>
 
 namespace Math {
-    Quat_Type::Quat_Type(const V4D_Type &axis, float angle) {
-        angle = angle / 180 * PI;
-
-        if (angle >= 0) {
-            float sin_half_angle = fast_sin(angle / 2.0f);
-            float cos_half_angle = fast_cos(angle / 2.0f);
+    Quat_Type::Quat_Type(const V4D_Type &axis, float theta) {
+        if (theta >= 0) {
+            float sin_half_angle = fast_sin(theta / 2.0f);
+            float cos_half_angle = fast_cos(theta / 2.0f);
 
             x = axis.x * sin_half_angle;
             y = axis.y * sin_half_angle;
@@ -17,8 +15,8 @@ namespace Math {
 
             w = cos_half_angle;
         } else {
-            float sin_half_angle = fast_sin(-angle / 2.0f);
-            float cos_half_angle = fast_cos(-angle / 2.0f);
+            float sin_half_angle = fast_sin(-theta / 2.0f);
+            float cos_half_angle = fast_cos(-theta / 2.0f);
 
             x = axis.x * sin_half_angle;
             y = axis.y * sin_half_angle;

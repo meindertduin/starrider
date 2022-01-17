@@ -23,7 +23,8 @@ namespace Math {
         Quat_Type() = default;
         constexpr Quat_Type(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {  }
         constexpr Quat_Type(const V3D_Type &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {  }
-        Quat_Type(const V4D_Type &axis, float angle);
+
+        Quat_Type(const V4D_Type &axis, float theta);
         Quat_Type(const Matrix4x4 &rot);
 
         Quat_Type(const Quat_Type &other);
