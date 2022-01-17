@@ -150,7 +150,6 @@ Matrix2x2_Type& Matrix2x2_Type::operator=(Matrix2x2_Type &&other) {
 }
 
 /* Matrix operator overloads */
-
 Matrix2x2 Matrix2x2::operator*(const Matrix2x2_Type &other) const {
     Matrix2x2_Type r;
     r.m00 = m00 * other.m00 + m01 * other.m10;
