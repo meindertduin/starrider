@@ -214,7 +214,7 @@ typedef struct Matrix3x3_Type {
         std::memset(m, 0, sizeof(Matrix3x3_Type));
     }
 
-    void swap_column(int c, Matrix1x3_Type &other) {
+    void swap_column(int c, const Matrix1x3_Type &other) {
         m[0][c] = other.m[0]; m[1][c]= other.m[1]; m[2][c] = other.m[2];
     }
 } Matrix3x3, *Matrix3x3Ptr;
@@ -278,11 +278,24 @@ typedef struct Matrix2x2_Type {
         std::memset(m, 0, sizeof(Matrix2x2_Type));
     }
 
-    void swap_column(int c, Matrix1x2_Type &other) {
+    void swap_column(int c, const Matrix1x2_Type &other) {
         m[0][c] = other.m[0]; m[1][c]= other.m[1];
     }
 
 } Matrix2x2, *Matrix2x2Ptr;
+
+
+/*
+ * Solves a 2x2 system with kramer's rule
+ * Returns 1 if solution was found, otherwise will return 0
+ * */
+int solve_2x2_system(const Matrix2x2 &a, Matrix1x2 &x, const Matrix1x2 &b);
+
+/*
+ * Solves a 3x3 system with kramer's rule
+ * Returns 1 if solution was found, otherwise will return 0
+ * */
+int solve_3x3_system(const Matrix3x3 &a, Matrix1x3 &x, const Matrix1x3 &b);
 
 Matrix1x2 mat_mul_1x2_3x2(const Matrix1x2 &ma, const Matrix3x2 &mb);
 

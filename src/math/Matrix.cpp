@@ -1,7 +1,55 @@
 #include "Matrix.h"
 #include "Core.h"
 
+#include <math.h>
+
 namespace Math {
+
+int solve_2x2_system(const Matrix2x2 &a, Matrix1x2 &x, const Matrix1x2 &b) {
+    float det_a = a.determinate();
+    if (std::fabs(det_a) < EPSILON_E5)
+        return 0;
+
+    Matrix2x2 mat_work { a };
+    mat_work.swap_column(0, b);
+
+    float det_abx = mat_work.determinate();
+    x.m00 = det_abx / det_a;
+
+    mat_work = { a };
+    mat_work.swap_column(1, b);
+
+    float det_aby = mat_work.determinate();
+    x.m01 = det_aby / det_a;
+
+    return 1;
+}
+
+int solve_3x3_system(const Matrix3x3 &a, Matrix1x3 &x, const Matrix1x3 &b) {
+    float det_a = a.determinate();
+    if (std::fabs(det_a) < EPSILON_E5)
+        return 0;
+
+    Matrix3x3 mat_work { a };
+    mat_work.swap_column(0, b);
+
+    float det_abx = mat_work.determinate();
+    x.m00 = det_abx / det_a;
+
+    mat_work = { a };
+    mat_work.swap_column(1, b);
+
+    float det_aby = mat_work.determinate();
+    x.m01 = det_aby / det_a;
+
+    mat_work = { a };
+    mat_work.swap_column(2, b);
+
+    float det_abz = mat_work.determinate();
+    x.m02 = det_abz / det_a;
+
+    return 1;
+}
 
 /* Copy and move constructors */
 
