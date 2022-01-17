@@ -7,6 +7,8 @@
 #include "../graphics/Texture.h"
 #include "../graphics//Font.h"
 
+#include "../math/Core.h"
+
 #include "KeyMap.h"
 #include "Time.h"
 
@@ -80,7 +82,7 @@ void Application::run() {
 
         poll_window_events();
 
-        monkey_transform.rotate(Quat_Type(V4D(0, 1, 0), 0.5f));
+        monkey_transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(0.5f)));
 
         std::vector<Renderable> renderables;
         renderables.push_back({

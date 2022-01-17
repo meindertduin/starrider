@@ -75,7 +75,10 @@ namespace Math {
 
         float length() const;
         Quat_Type normalized() const;
+
         Quat_Type conjugated() const;
+
+        Quat_Type inverse() const;
         float dot(const Quat_Type &r) const;
 
         Matrix4x4_Type to_rotation_matrix() const;

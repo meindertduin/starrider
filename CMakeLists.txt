@@ -32,7 +32,6 @@ set(SOURCES
     src/math/Vector.cpp
     src/math/Quaternion.cpp
     src/math/Parametric.cpp
-    src/math/Plane.cpp
 )
 
 set(HEADERS include)

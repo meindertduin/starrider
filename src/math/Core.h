@@ -63,9 +63,6 @@ static constexpr float FIXP16_TO_FLOAT(FixP16 f) {
     return static_cast<float>(f) / FixP16_MAG;
 }
 
-static constexpr FixP16 FIXP16_MUL(FixP16 fp1, FixP16 fp2);
-static constexpr FixP16 FIXP16_DIV(FixP16 fp1, FixP16 fp2);
-
 // needs to be called at program startup to initialize the cos and sin tables
 void build_lookup_tables();
 
