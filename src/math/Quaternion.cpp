@@ -5,9 +5,10 @@
 
 namespace Math {
     Quat_Type::Quat_Type(const V4D_Type &axis, float theta) {
+        float half_theta = theta * 0.5f;
         if (theta >= 0) {
-            float sin_half_angle = fast_sin(theta / 2.0f);
-            float cos_half_angle = fast_cos(theta / 2.0f);
+            float sin_half_angle = fast_sin(half_theta);
+            float cos_half_angle = fast_cos(half_theta);
 
             x = axis.x * sin_half_angle;
             y = axis.y * sin_half_angle;
@@ -15,8 +16,8 @@ namespace Math {
 
             w = cos_half_angle;
         } else {
-            float sin_half_angle = fast_sin(-theta / 2.0f);
-            float cos_half_angle = fast_cos(-theta / 2.0f);
+            float sin_half_angle = fast_sin(-half_theta);
+            float cos_half_angle = fast_cos(-half_theta);
 
             x = axis.x * sin_half_angle;
             y = axis.y * sin_half_angle;
