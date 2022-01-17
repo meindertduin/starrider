@@ -11,14 +11,26 @@
 typedef Cursor XCursor;
 
 typedef struct {
+    int border_width;
+    Display *display;
+    Window win;
+    Visual *vis;
+    XSetWindowAttributes attrs;
+    int screen;
+    int depth; /* bit depth, usally 24 */
+    Window root;
+} XWindow;
+
+typedef struct {
     XImage* screen_image;
     GC gc;
 } XDisplay;
 
 namespace XLib {
-XWindow x_window;
+
 XScreen x_screen;
 
+static XWindow x_window;
 static XDisplay x_display;
 static XShmSegmentInfo shm_info;
 static XCursor cursor;
@@ -46,8 +58,8 @@ void lib_init(int width, int height, int border_width) {
     XWindowAttributes attr;
     XVisualInfo vis;
 
-    x_window.w = width + border_width * 2;
-    x_window.h = height + border_width * 2;
+    x_screen.width = width + border_width * 2;
+    x_screen.height = height + border_width * 2;
     x_window.border_width = border_width;
 
     // creating display and setting defaults
@@ -84,8 +96,8 @@ void lib_init(int width, int height, int border_width) {
     x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
 
     // might need to be set different than window.w or h when padding is added
-    x_screen.w = x_window.w;
-    x_screen.h = x_window.h;
+    x_screen.width = x_screen.width;
+    x_screen.height = x_screen.height;
 
     x_display.gc = XCreateGC(x_window.display, x_window.win, 0, nullptr);
 
@@ -103,15 +115,15 @@ bool poll_event(WindowEvent &event) {
                 XWindowAttributes attributes;
                 XGetWindowAttributes(x_window.display, x_window.win, &attributes);
 
-                if (attributes.width == x_window.w && attributes.height == x_window.h) {
+                if (attributes.width == x_screen.width && attributes.height == x_screen.height) {
                     return false;
                 }
 
-                x_window.w = attributes.width;
-                x_window.h = attributes.height;
+                x_screen.width = attributes.width;
+                x_screen.height = attributes.height;
 
-                event.body.expose_event.width = x_window.w;
-                event.body.expose_event.height = x_window.h;
+                event.body.expose_event.width = x_screen.width;
+                event.body.expose_event.height = x_screen.height;
 
                 event.event_type = WindowEventType::WinExpose;
                 break;
@@ -144,21 +156,21 @@ inline void resize(int width, int height) {
     if (!setup_shared_memory())
         throw std::runtime_error("Could not setup shared_memory");
 
-    x_window.w = width;
-    x_window.h = height;
+    x_screen.width = width;
+    x_screen.height = height;
 
     x_screen.buffer = reinterpret_cast<unsigned int*>(shm_info.shmaddr);
 
     // might need to be set different than window.w or h when padding is added
-    x_screen.w = x_window.w;
-    x_screen.h = x_window.h;
+    x_screen.width = x_screen.width;
+    x_screen.height = x_screen.height;
 }
 
 int set_win_float_mode() {
     Atom window_type = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE", False);
     Atom type_dialog = XInternAtom(x_window.display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
     auto status  =XChangeProperty(x_window.display, x_window.win, window_type, XA_ATOM, 32, PropModeReplace, (unsigned char*) &type_dialog, 1);
-    XResizeWindow(x_window.display, x_window.win, x_window.w, x_window.h);
+    XResizeWindow(x_window.display, x_window.win, x_screen.width, x_screen.height);
 
     return status;
 }
@@ -193,7 +205,7 @@ bool setup_shared_memory() {
         return false;
     }
 
-    x_display.screen_image = XShmCreateImage(x_window.display, x_window.vis, 24, ZPixmap, nullptr, &shm_info, x_window.w, x_window.h);
+    x_display.screen_image = XShmCreateImage(x_window.display, x_window.vis, 24, ZPixmap, nullptr, &shm_info, x_screen.width, x_screen.height);
 
     shm_info.shmid = shmget(IPC_PRIVATE, x_display.screen_image->bytes_per_line * x_display.screen_image->height, IPC_CREAT | 0777);
     if (shm_info.shmid == -1) {
@@ -218,7 +230,7 @@ void remove_shared_memory() {
 }
 
 void render_screen() {
-    Status status = XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_window.w, x_window.h, true);
+    Status status = XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_screen.width, x_screen.height, true);
 
     if (status == 0) {
         // TODO add error logging

@@ -26,8 +26,8 @@ bool GWindow::poll_event(WindowEvent &event) {
 
     if (has_event && event.event_type == WindowEventType::WinExpose) {
         m_screen_bitmap.buffer = XLib::x_screen.buffer;
-        m_screen_bitmap.w = XLib::x_screen.w;
-        m_screen_bitmap.h = XLib::x_screen.h;
+        m_screen_bitmap.w = XLib::x_screen.width;
+        m_screen_bitmap.h = XLib::x_screen.height;
     }
 
     return has_event;
@@ -37,8 +37,8 @@ void GWindow::resize(int width, int height) {
     XLib::resize_window(width, height);
 
     WindowEvent e;
-    e.body.expose_event.width = XLib::x_window.w;
-    e.body.expose_event.height = XLib::x_window.h;
+    e.body.expose_event.width = XLib::x_screen.width;
+    e.body.expose_event.height = XLib::x_screen.height;
     e.event_type = WindowEventType::WinExpose;
 
     auto app = Application::get_instance();
@@ -84,18 +84,18 @@ void GWindow::set_fullscreen_mode() {
 }
 
 int GWindow::get_width() {
-    return XLib::x_window.w;
+    return XLib::x_screen.width;
 }
 
 int GWindow::get_height() {
-    return XLib::x_window.h;
+    return XLib::x_screen.height;
 }
 
 inline void GWindow::create_screen_bitmap() {
     m_screen_bitmap = {
         .buffer = XLib::x_screen.buffer,
-        .w = XLib::x_screen.w,
-        .h = XLib::x_screen.h,
+        .w = XLib::x_screen.width,
+        .h = XLib::x_screen.height,
     };
 }
 

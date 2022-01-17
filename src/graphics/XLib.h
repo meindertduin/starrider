@@ -5,23 +5,10 @@
 namespace XLib {
 
 typedef struct {
-    int w, h;
-    int border_width;
-    Display *display;
-    Window win;
-    Visual *vis;
-    XSetWindowAttributes attrs;
-    int screen;
-    int depth; /* bit depth, usally 24 */
-    Window root;
-} XWindow;
-
-typedef struct {
     unsigned int* buffer;
-    int w, h;
+    int width, height;
 } XScreen;
 
-extern XWindow x_window;
 extern XScreen x_screen;
 
 void lib_init(int cols, int rows, int border_width);
