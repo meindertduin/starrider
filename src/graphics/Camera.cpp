@@ -69,10 +69,10 @@ void Camera::set_viewport(int width, int height) {
     m_projection = Math::mat_4x4_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
 }
 
-Matrix4x4 Camera::get_transformation_matrix() const {
+Matrix4x4 Camera::get_view_projection() const {
     V4D camera_pos = m_transform.pos * -1;
     auto camera_trans = Math::mat_4x4_translation(camera_pos.x, camera_pos.y, camera_pos.z);
 
-    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix();
+    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix() * m_projection;
 }
 

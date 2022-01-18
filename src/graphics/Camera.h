@@ -8,11 +8,7 @@ public:
     Camera();
     ~Camera();
     void set_viewport(int width, int height);
-    Matrix4x4 get_transformation_matrix() const;
-
-    Matrix4x4 get_projection_matrix() const {
-        return m_projection;
-    }
+    Matrix4x4 get_view_projection() const;
     int width;
     int height;
 
