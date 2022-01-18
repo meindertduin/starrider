@@ -70,8 +70,6 @@ void Application::run() {
     Transform monkey_transform = Transform(V4D(0, 0, 3));
     Transform terrain_transform = Transform(V4D(0, -4, 0));
 
-    Matrix4x4 vp = p_camera->get_view_projection();
-
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
 

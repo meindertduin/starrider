@@ -287,7 +287,7 @@ typedef struct V4D_Type {
     }
 
     constexpr float dot(const V4D_Type &r) const {
-        return x * r.x + y * r.y + z * r.z + w * r.w;
+        return x * r.x + y * r.y + z * r.z;
     }
 
     V4D_Type cross(const V4D_Type &other) const;
