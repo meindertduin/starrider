@@ -140,8 +140,7 @@ struct Vertex {
             case 3:
                 return pos.w;
             default:
-                // TODO maybe throw error?
-                return pos.w;
+                std::range_error("Index was out of range");
         }
     }
 

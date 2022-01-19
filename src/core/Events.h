@@ -30,9 +30,8 @@ struct WindowEvent {
         } mouse_event;
 
         struct {
-            uint32_t width : 16;
-            uint32_t height : 16;
-            uint32_t value : 32; // TODO filler value needs to be filled in later
+            uint32_t width;
+            uint32_t height;
         } expose_event;
 
         struct {

@@ -229,12 +229,8 @@ void remove_shared_memory() {
     shmctl(shm_info.shmid, IPC_RMID, 0);
 }
 
-void render_screen() {
-    Status status = XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_screen.width, x_screen.height, true);
-
-    if (status == 0) {
-        // TODO add error logging
-    }
+bool render_screen() {
+    return XShmPutImage(x_window.display, x_window.win, x_display.gc, x_display.screen_image, 0, 0, 0, 0, x_screen.width, x_screen.height, true);
 }
 
 void set_empty_cursor() {

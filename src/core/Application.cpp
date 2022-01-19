@@ -58,7 +58,6 @@ void Application::run() {
     Renderer renderer;
     RenderPipeline render_pipeline {&renderer};
 
-    // TODO: Values that may belong to a scene?
     Mesh mesh;
     mesh.load_from_obj_file("assets/monkey.obj");
     mesh.texture = &brick_texture;

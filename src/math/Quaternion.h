@@ -9,12 +9,6 @@ namespace Math {
     typedef struct Quat_Type {
         union {
             float m[4];
-            // TODO make this viable later on. If this is uncommented it get_instancea a
-            // constructor not allowed in anonymous aggregate error.
-            // struct {
-            //     V3D_Type qv;
-            //     float q0;
-            // };
             struct {
                 float x, y, z, w;
             };

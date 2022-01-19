@@ -23,7 +23,7 @@ int set_win_fullscreen_mode();
 int set_win_normal_mode();
 int set_win_float_mode();
 
-void render_screen();
+bool render_screen();
 
 void set_empty_cursor();
 void set_cursor_pos(int x_pos, int y_pos);

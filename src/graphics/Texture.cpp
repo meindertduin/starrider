@@ -72,8 +72,6 @@ Texture::~Texture() {
 void Texture::load_from_bmp(std::string path) {
     BmpReader bmp_reader;
 
-    // TODO fix this
-    // fucntion call allocates memory for pixels
     bmp_reader.open_file(path);
 
     size_t s {0};

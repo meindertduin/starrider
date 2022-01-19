@@ -104,5 +104,6 @@ ScreenBitmap* GWindow::get_screen_bitmap() {
 }
 
 void GWindow::render_screen() {
-    XLib::render_screen();
+    if (!XLib::render_screen())
+        throw std::runtime_error("Error while rendering the screen.");
 }
