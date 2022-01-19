@@ -2,10 +2,12 @@
 #include "graphics/Font.h"
 
 #include "math/Core.h"
+#include "io/Logger.h"
 
 int main() {
     try {
         Math::build_lookup_tables();
+        Logger::initialize("log.txt");
 
         if (!ttf_init())
             throw std::runtime_error("TTF could not be initialized");

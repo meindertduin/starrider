@@ -17,6 +17,7 @@ set(SOURCES
     src/io/BmpReader.cpp
     src/graphics/Camera.cpp
     src/io/ObjReader.cpp
+    src/io/Logger.cpp
     src/graphics/RenderPipeline.cpp
     src/entity/Entity.cpp
     src/core/Application.cpp
