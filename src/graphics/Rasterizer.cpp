@@ -23,6 +23,7 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
      vertices.push_back(triangle.p[1]);
      vertices.push_back(triangle.p[2]);
 
+     // Add image space clipping
      if (clip_polygon_axis(vertices, auxilary_list, 0) &&
              clip_polygon_axis(vertices, auxilary_list, 1) &&
              clip_polygon_axis(vertices, auxilary_list, 2))

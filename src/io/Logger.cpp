@@ -30,6 +30,8 @@ void Logger::log(LogLevel level, std::string value, bool log_cout) {
     };
 
     *Logger::log_output << level_string << value << std::endl;
-    std::cout << level_string << value << std::endl;
+
+    if (log_cout)
+        std::cout << level_string << value << std::endl;
 }
 
