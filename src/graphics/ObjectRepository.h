@@ -12,6 +12,7 @@
 class ObjectRepository {
 public:
     ObjectRepository();
+    ~ObjectRepository();
 
     ObjectRepository(const ObjectRepository &other) = delete;
     ObjectRepository(ObjectRepository &&other) = delete;
@@ -20,7 +21,7 @@ public:
     ObjectRepository& operator=(ObjectRepository &&other) = delete;
 
     /* Returns -1 if no object could be created */
-    int create_game_object(std::string obj_file, std::string texture_fil);
+    RenderObject create_game_object(std::string obj_file, std::string texture_fil);
 private:
     std::vector<RenderObject> m_game_objects;
 };

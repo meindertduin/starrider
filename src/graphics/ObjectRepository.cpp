@@ -4,7 +4,18 @@
 
 ObjectRepository::ObjectRepository() {}
 
-int ObjectRepository::create_game_object(std::string obj_file, std::string texture_fil) {
+ObjectRepository::~ObjectRepository() {
+    for (auto object : m_game_objects) {
+        delete[] object.local_points;
+        delete[] object.transformed_points;
+        delete[] object.text_coords;
+        delete[] object.polygons;
+
+        delete object.texture;
+    }
+}
+
+RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
     ObjReader obj_reader;
 
     if (obj_reader.read_file(obj_file)) {
@@ -15,6 +26,9 @@ int ObjectRepository::create_game_object(std::string obj_file, std::string textu
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
     obj_reader.create_render_object(object);
+    object.texture = new Texture();
+    object.texture->load_from_bmp(texture_file);
 
-
+    m_game_objects.push_back(object);
+    return object;
 }
