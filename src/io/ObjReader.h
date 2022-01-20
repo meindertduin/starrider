@@ -4,6 +4,8 @@
 #include <vector>
 
 #include "../graphics/Core.h"
+#include "../graphics/RenderObject.h"
+#include "../math/Vector.h"
 
 using std::string;
 using std::vector;
@@ -19,6 +21,7 @@ public:
     ObjReader();
     bool read_file(string path);
     vector<Triangle> create_vertices();
+    void create_render_object(RenderObject &object);
 private:
     vector<V4D> m_vertices;
     vector<V4D> m_tex_coords;

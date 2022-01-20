@@ -90,6 +90,47 @@ vector<Triangle> ObjReader::create_vertices() {
     return result;
 }
 
+void ObjReader::create_render_object(RenderObject &object) {
+    object.vertex_count = m_vertices.size();
+    object.text_coords_count = m_tex_coords.size();
+
+    object.local_points = new V4D[object.vertex_count];
+    object.text_coords = new V4D[object.text_coords_count];
+
+    for (int i = 0; i < m_vertices.size(); i++) {
+        object.local_points[i] = m_vertices[i];
+    }
+
+    for (int i = 0; i < m_tex_coords.size(); i++) {
+        object.text_coords[i] = m_tex_coords[i];
+    }
+
+    std::vector<Polygon> polygons;
+    for (int i = 0; i < m_indices.size(); i += 3) {
+        Polygon polygon;
+        polygon.points_list = object.local_points;
+        polygon.text_coords = object.text_coords;
+
+        for (int j = 0; j < 3; j++) {
+            auto current_index = m_indices[i + j];
+            polygon.vert[j] = current_index.tex_coord_index;
+
+            if (has_tex_coords) {
+                polygon.text[j] = current_index.tex_coord_index;
+            }
+        }
+
+        polygons.push_back(polygon);
+    }
+
+    object.poly_count = polygons.size();
+    object.polygons = new Polygon[object.poly_count];
+
+    for (int i = 0; i < polygons.size(); i++) {
+        object.polygons[i] = polygons[i];
+    }
+}
+
 ObjIndex ObjReader::parse_object_index(string token) {
     ObjIndex result;
     std::stringstream ss;
