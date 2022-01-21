@@ -18,7 +18,7 @@ ObjectRepository::~ObjectRepository() {
 RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
     ObjReader obj_reader;
 
-    if (obj_reader.read_file(obj_file)) {
+    if (!obj_reader.read_file(obj_file)) {
         return -1;
     }
 

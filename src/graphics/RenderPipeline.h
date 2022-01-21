@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Renderer.h"
 #include "Rasterizer.h"
+#include "RenderObject.h"
 
 struct Renderable {
     Transform *transform;
@@ -16,7 +17,7 @@ class RenderPipeline {
 public:
     RenderPipeline(Renderer *renderer);
 
-    void render_viewport(const Camera &camera, std::vector<Renderable> renderables);
+    void render_objects(const Camera &camera, std::vector<RenderObject> renderables);
 private:
     Rasterizer m_rasterizer;
 

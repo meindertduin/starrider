@@ -6,7 +6,7 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_ras
 
 }
 
-void RenderPipeline::render_viewport(const Camera &camera, std::vector<Renderable> renderables) {
+void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables) {
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
@@ -17,27 +17,55 @@ void RenderPipeline::render_viewport(const Camera &camera, std::vector<Renderabl
     auto v_forward = camera.m_transform.rot.get_back();
 
     for (auto renderable : renderables) {
-        Matrix4x4 transform = renderable.transform->get_matrix_transformation();
-        for (auto triangle : renderable.mesh->triangles) {
-            Triangle translated_tri;
+        Matrix4x4 transform = renderable.transform.get_matrix_transformation();
 
-            translated_tri.p[0] = triangle.p[0].transform(transform);
-            translated_tri.p[1] = triangle.p[1].transform(transform);
-            translated_tri.p[2] = triangle.p[2].transform(transform);
+        for (int i = 0; i < renderable.poly_count; i++) {
+            auto current_poly = renderable.polygons[i];
 
-            auto line1 = translated_tri.p[0].pos - translated_tri.p[1].pos;
-            auto line2 = translated_tri.p[0].pos - translated_tri.p[2].pos;
+            renderable.transformed_points[current_poly.vert[0]] =
+                transform.transform(renderable.local_points[current_poly.vert[0]]);
 
-            auto camera_ray =  camera.m_transform.pos - translated_tri.p[0].pos;
-            auto surface_normal = line1.cross(line2).normalized();
+            renderable.transformed_points[current_poly.vert[1]] =
+                transform.transform(renderable.local_points[current_poly.vert[1]]);
 
-            if (surface_normal.dot(camera_ray) > 0) {
+            renderable.transformed_points[current_poly.vert[2]] =
+                transform.transform(renderable.local_points[current_poly.vert[2]]);
+        }
+
+        for (int i = 0; i < renderable.poly_count; i++) {
+            auto current_poly = renderable.polygons[i];
+
+            auto line1 = renderable.transformed_points[current_poly.vert[0]]
+                - renderable.transformed_points[current_poly.vert[1]];
+
+            auto line2 = renderable.transformed_points[current_poly.vert[0]]
+                - renderable.transformed_points[current_poly.vert[2]];
+
+            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
+            current_poly.normal = line1.cross(line2).normalized();
+
+            if (current_poly.normal.dot(camera_ray) > 0) {
                 Triangle proj_tri;
-                proj_tri.p[0] = translated_tri.p[0].transform(vp, transform);
-                proj_tri.p[1] = translated_tri.p[1].transform(vp, transform);
-                proj_tri.p[2] = translated_tri.p[2].transform(vp, transform);
 
-                m_rasterizer.draw_triangle(proj_tri, *renderable.mesh->texture);
+                proj_tri.p[0] = Vertex {
+                    vp.transform(renderable.transformed_points[current_poly.vert[0]]),
+                    renderable.text_coords[current_poly.text[0]],
+                    current_poly.normal
+                };
+
+                proj_tri.p[1] = Vertex {
+                    vp.transform(renderable.transformed_points[current_poly.vert[1]]),
+                    renderable.text_coords[current_poly.text[1]],
+                    current_poly.normal
+                };
+
+                proj_tri.p[2] = Vertex {
+                    vp.transform(renderable.transformed_points[current_poly.vert[2]]),
+                    renderable.text_coords[current_poly.text[2]],
+                    current_poly.normal
+                };
+
+                m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
             }
         }
     }

@@ -95,25 +95,24 @@ void ObjReader::create_render_object(RenderObject &object) {
     object.text_coords_count = m_tex_coords.size();
 
     object.local_points = new V4D[object.vertex_count];
+    object.transformed_points = new V4D[object.vertex_count];
     object.text_coords = new V4D[object.text_coords_count];
 
-    for (int i = 0; i < m_vertices.size(); i++) {
+    for (int i = 0; i < object.vertex_count; i++) {
         object.local_points[i] = m_vertices[i];
     }
 
-    for (int i = 0; i < m_tex_coords.size(); i++) {
+    for (int i = 0; i < object.text_coords_count; i++) {
         object.text_coords[i] = m_tex_coords[i];
     }
 
     std::vector<Polygon> polygons;
     for (int i = 0; i < m_indices.size(); i += 3) {
         Polygon polygon;
-        polygon.points_list = object.local_points;
-        polygon.text_coords = object.text_coords;
 
         for (int j = 0; j < 3; j++) {
             auto current_index = m_indices[i + j];
-            polygon.vert[j] = current_index.tex_coord_index;
+            polygon.vert[j] = current_index.vertex_index;
 
             if (has_tex_coords) {
                 polygon.text[j] = current_index.tex_coord_index;

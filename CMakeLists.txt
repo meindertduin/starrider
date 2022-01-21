@@ -27,6 +27,8 @@ set(SOURCES
     src/graphics/Texture.cpp
     src/graphics/Font.cpp
     src/graphics/XLib.cpp
+    src/graphics/RenderObject.cpp
+    src/graphics/ObjectRepository.cpp
     src/math/Matrix.cpp
     src/math/Core.cpp
     src/math/Polar.cpp
@@ -37,7 +39,7 @@ set(SOURCES
 
 set(HEADERS include)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -O2 -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
 
 include_directories(
     src
