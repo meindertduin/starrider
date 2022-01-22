@@ -214,7 +214,7 @@ struct Transform {
         set_pos(pos + (dir * amt));
     }
 
-    Matrix4x4 get_matrix_transformation() {
+    Matrix4x4 get_matrix_transformation() const {
         Matrix4x4 translation, rotation, scale, identity;
 
         translation = Math::mat_4x4_translation(pos.x,  pos.y, pos.z);
@@ -222,6 +222,10 @@ struct Transform {
         scale = Math::mat_4x4_scale(this->scale.x, this->scale.y, this->scale.z);
 
         return rotation * translation * scale;
+    }
+
+    Matrix4x4 get_rotation_matrix() const {
+        return rot.conjugated().to_rotation_matrix();
     }
 
     void set_pos(const V4D &pos) {

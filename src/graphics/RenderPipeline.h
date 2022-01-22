@@ -27,5 +27,5 @@ private:
     Rasterizer m_rasterizer;
 
     Renderer* p_renderer = nullptr;
-    void transform_world_pos(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
+    void translation_scale_transform(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
 };

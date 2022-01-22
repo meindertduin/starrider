@@ -17,22 +17,22 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     auto v_forward = camera.m_transform.rot.get_back();
 
     for (auto renderable : renderables) {
-        Matrix4x4 transform = renderable.transform.get_matrix_transformation();
-
-        transform_world_pos(renderable);
+        Matrix4x4 mat_rot = renderable.transform.get_rotation_matrix();
 
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
 
             renderable.transformed_points[current_poly.vert[0]] =
-                transform.transform(renderable.local_points[current_poly.vert[0]]);
+                mat_rot.transform(renderable.local_points[current_poly.vert[0]]);
 
             renderable.transformed_points[current_poly.vert[1]] =
-                transform.transform(renderable.local_points[current_poly.vert[1]]);
+                mat_rot.transform(renderable.local_points[current_poly.vert[1]]);
 
             renderable.transformed_points[current_poly.vert[2]] =
-                transform.transform(renderable.local_points[current_poly.vert[2]]);
+                mat_rot.transform(renderable.local_points[current_poly.vert[2]]);
         }
+
+        translation_scale_transform(renderable, CoordSelect::Trans_Only);
 
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
@@ -73,13 +73,21 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     }
 }
 
-void RenderPipeline::transform_world_pos(RenderObject &object, CoordSelect coord_select) {
+void RenderPipeline::translation_scale_transform(RenderObject &object, CoordSelect coord_select) {
     auto world_pos = object.transform.pos;
     if (coord_select == CoordSelect::Local_To_Trans) {
-        for (int i = 0; i < object.vertex_count; ++i)
+        for (int i = 0; i < object.vertex_count; ++i) {
             object.transformed_points[i] = object.local_points[i] + world_pos;
+            object.transformed_points[i].x *= object.transform.scale.x;
+            object.transformed_points[i].y *= object.transform.scale.y;
+            object.transformed_points[i].z *= object.transform.scale.z;
+        }
     } else { // TransOnly
-        for (int i = 0; i < object.vertex_count; ++i)
+        for (int i = 0; i < object.vertex_count; ++i) {
             object.transformed_points[i] = object.transformed_points[i] + world_pos;
+            object.transformed_points[i].x *= object.transform.scale.x;
+            object.transformed_points[i].y *= object.transform.scale.y;
+            object.transformed_points[i].z *= object.transform.scale.z;
+        }
     }
 }
