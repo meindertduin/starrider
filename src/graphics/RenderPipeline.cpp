@@ -19,6 +19,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     for (auto renderable : renderables) {
         Matrix4x4 transform = renderable.transform.get_matrix_transformation();
 
+        transform_world_pos(renderable);
+
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
 
@@ -68,5 +70,16 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                 m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
             }
         }
+    }
+}
+
+void RenderPipeline::transform_world_pos(RenderObject &object, CoordSelect coord_select) {
+    auto world_pos = object.transform.pos;
+    if (coord_select == CoordSelect::Local_To_Trans) {
+        for (int i = 0; i < object.vertex_count; ++i)
+            object.transformed_points[i] = object.local_points[i] + world_pos;
+    } else { // TransOnly
+        for (int i = 0; i < object.vertex_count; ++i)
+            object.transformed_points[i] = object.transformed_points[i] + world_pos;
     }
 }

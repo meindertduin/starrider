@@ -8,6 +8,11 @@
 #include "Rasterizer.h"
 #include "RenderObject.h"
 
+enum class CoordSelect {
+    Local_To_Trans,
+    Trans_Only,
+};
+
 struct Renderable {
     Transform *transform;
     Mesh *mesh;
@@ -22,4 +27,5 @@ private:
     Rasterizer m_rasterizer;
 
     Renderer* p_renderer = nullptr;
+    void transform_world_pos(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
 };
