@@ -46,7 +46,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
             auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
             current_poly.normal = line1.cross(line2).normalized();
 
-            if (current_poly.normal.dot(camera_ray) > 0) {
+            if (current_poly.normal.dot(camera_ray) >= 0) {
                 Triangle proj_tri;
 
                 proj_tri.p[0] = Vertex {
