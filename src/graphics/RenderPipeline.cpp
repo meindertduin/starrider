@@ -37,36 +37,30 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
 
-            auto line1 = renderable.transformed_points[current_poly.vert[0]]
-                - renderable.transformed_points[current_poly.vert[1]];
+            if (renderable.state & ObjectState::BackfaceCulling) {
+                auto line1 = renderable.transformed_points[current_poly.vert[0]]
+                    - renderable.transformed_points[current_poly.vert[1]];
 
-            auto line2 = renderable.transformed_points[current_poly.vert[0]]
-                - renderable.transformed_points[current_poly.vert[2]];
+                auto line2 = renderable.transformed_points[current_poly.vert[0]]
+                    - renderable.transformed_points[current_poly.vert[2]];
 
-            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
-            current_poly.normal = line1.cross(line2).normalized();
+                auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
+                current_poly.normal = line1.cross(line2).normalized();
 
-            if (current_poly.normal.dot(camera_ray) >= 0) {
-                Triangle proj_tri;
+                if (current_poly.normal.dot(camera_ray) >= 0) {
+                    auto proj_tri = get_proj_tri(renderable, current_poly, vp);
+                    m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
+                }
+            } else {
 
-                proj_tri.p[0] = Vertex {
-                    vp.transform(renderable.transformed_points[current_poly.vert[0]]),
-                    renderable.text_coords[current_poly.text[0]],
-                    current_poly.normal
-                };
+                auto line1 = renderable.transformed_points[current_poly.vert[0]]
+                    - renderable.transformed_points[current_poly.vert[1]];
 
-                proj_tri.p[1] = Vertex {
-                    vp.transform(renderable.transformed_points[current_poly.vert[1]]),
-                    renderable.text_coords[current_poly.text[1]],
-                    current_poly.normal
-                };
+                auto line2 = renderable.transformed_points[current_poly.vert[0]]
+                    - renderable.transformed_points[current_poly.vert[2]];
 
-                proj_tri.p[2] = Vertex {
-                    vp.transform(renderable.transformed_points[current_poly.vert[2]]),
-                    renderable.text_coords[current_poly.text[2]],
-                    current_poly.normal
-                };
-
+                current_poly.normal = line1.cross(line2).normalized();
+                auto proj_tri = get_proj_tri(renderable, current_poly, vp);
                 m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
             }
         }

@@ -28,4 +28,23 @@ private:
 
     Renderer* p_renderer = nullptr;
     void translation_scale_transform(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
+    constexpr Triangle get_proj_tri(const RenderObject &renderable, const Polygon &current_poly, const Matrix4x4 vp) {
+        return Triangle {
+            Vertex {
+                vp.transform(renderable.transformed_points[current_poly.vert[0]]),
+                renderable.text_coords[current_poly.text[0]],
+                current_poly.normal
+            },
+            Vertex {
+                vp.transform(renderable.transformed_points[current_poly.vert[1]]),
+                renderable.text_coords[current_poly.text[1]],
+                current_poly.normal
+            },
+            Vertex {
+                vp.transform(renderable.transformed_points[current_poly.vert[2]]),
+                renderable.text_coords[current_poly.text[2]],
+                current_poly.normal
+            }
+        };
+    }
 };

@@ -91,7 +91,7 @@ struct Vertex {
     V4D text_coords;
     V4D normal;
 
-    Vertex() {}
+    constexpr Vertex() {}
 
     Vertex(float x, float y, float z) {
         pos = V4D(x, y, z);
@@ -101,7 +101,7 @@ struct Vertex {
         pos = V4D(x, y, z, w);
     }
 
-    Vertex(const V4D &in_pos, const V4D &in_text_coords, const V4D &in_normal) {
+    constexpr Vertex(const V4D &in_pos, const V4D &in_text_coords, const V4D &in_normal) {
         pos = in_pos;
         text_coords = in_text_coords;
         normal = in_normal;
@@ -171,8 +171,8 @@ struct Vertex {
 
 struct Triangle {
     Vertex p[3];
-    Triangle() {};
-    Triangle(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
+    constexpr Triangle() {};
+    constexpr Triangle(const Vertex &v1, const Vertex &v2, const Vertex &v3) {
         p[0] = v1;
         p[1] = v2;
         p[2] = v3;
