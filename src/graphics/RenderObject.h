@@ -14,14 +14,14 @@ typedef struct Polygon_Type {
     V4D normal;
 } Polygon;
 
-enum ObjectState {
+enum ObjectState : uint16_t {
     BackfaceCulling = 1,
     SphereCulling = 1 << 1,
 };
 
 typedef struct RenderObject_Type {
     int id;
-    u_int8_t state;
+    uint16_t state;
 
     Transform transform;
 
