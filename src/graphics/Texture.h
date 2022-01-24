@@ -76,6 +76,7 @@ public:
 
         return r;
     }
+
     constexpr Pixel get_pixel(int x_pos, int y_pos) const {
         return {
             .value = get_pixel_value(x_pos, y_pos),
@@ -96,10 +97,10 @@ private:
                     return (val << 24) | (val << 16) | (val << 8) | val;
                 }
             case Format::RGBA:
-                return static_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
+                return reinterpret_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
             case Format::RGB:
                 {
-                    auto rgb =  static_cast<RGB*>(pixels)[width * y_pos + x_pos];
+                    auto rgb =  reinterpret_cast<RGB*>(pixels)[width * y_pos + x_pos];
                     return (0x000000FF << 24) | (rgb.red << 16) | (rgb.green << 8) | (rgb.blue);
                 }
             default:

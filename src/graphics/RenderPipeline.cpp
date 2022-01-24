@@ -37,7 +37,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
 
-            if (renderable.state & ObjectState::BackfaceCulling) {
+            if (renderable.state & PolyAttribute::TwoSided) {
                 auto line1 = renderable.transformed_points[current_poly.vert[0]]
                     - renderable.transformed_points[current_poly.vert[1]];
 
