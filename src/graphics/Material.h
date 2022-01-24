@@ -2,6 +2,13 @@
 
 #include "Texture.h"
 
+struct RGBA {
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
 enum MaterialState : uint16_t {
     TwoSided =  1,
     Transparent = 1 << 1,

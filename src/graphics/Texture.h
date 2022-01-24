@@ -20,21 +20,6 @@ enum class Format {
     RGBA,
 };
 
-struct RGBA {
-    uint32_t blue : 8;
-    uint32_t green : 8;
-    uint32_t red : 8;
-    uint32_t alpha : 8;
-
-    void blend(const RGBA &r) {
-        float u_alpha = (float) alpha / (float) 0xFF;
-
-        blue = blue * u_alpha + r.blue * (1.0f - u_alpha);
-        red =  red * u_alpha + r.red * (1.0f - u_alpha);
-        green = green * u_alpha + r.green * (1.0f - u_alpha);
-        alpha = alpha * u_alpha + r.alpha * (1.0f - u_alpha);
-    }
-};
 
 struct RGB {
     uint32_t blue : 8;
@@ -42,9 +27,22 @@ struct RGB {
     uint32_t red : 8;
 };
 
-
 union Pixel {
-    RGBA rgba;
+    struct RGBA {
+        uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
+        uint32_t alpha : 8;
+
+        void blend(const RGBA &r) {
+            float u_alpha = (float) alpha / (float) 0xFF;
+
+            blue = blue * u_alpha + r.blue * (1.0f - u_alpha);
+            red =  red * u_alpha + r.red * (1.0f - u_alpha);
+            green = green * u_alpha + r.green * (1.0f - u_alpha);
+            alpha = alpha * u_alpha + r.alpha * (1.0f - u_alpha);
+        }
+    } rgba;
     uint32_t value;
 };
 
@@ -64,18 +62,6 @@ public:
 
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
-
-    constexpr Pixel get_pixel(int x_pos, int y_pos, float light_amount) const {
-        Pixel r = {
-            .value = get_pixel_value(x_pos, y_pos),
-        };
-
-        r.rgba.blue *= light_amount;
-        r.rgba.red *= light_amount;
-        r.rgba.green *= light_amount;
-
-        return r;
-    }
 
     constexpr Pixel get_pixel(int x_pos, int y_pos) const {
         return {
