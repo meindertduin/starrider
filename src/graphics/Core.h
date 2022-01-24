@@ -123,12 +123,6 @@ struct Vertex {
         return Vertex(pos.lerp(v.pos, amt), text_coords.lerp(v.text_coords, amt), normal.lerp(v.normal, amt));
     }
 
-    bool inside_view_frustrum() const {
-        return std::abs(pos.x) <= std::abs(pos.w) &&
-            std::abs(pos.y) <= std::abs(pos.w) &&
-            std::abs(pos.z) <= std::abs(pos.w);
-    }
-
     float get(int index) {
         switch(index) {
             case 0:

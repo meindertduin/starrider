@@ -8,14 +8,6 @@ Rasterizer::~Rasterizer() {
 }
 
 void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
-    bool v1_inside = triangle.p[0].inside_view_frustrum();
-    bool v2_inside = triangle.p[1].inside_view_frustrum();
-    bool v3_inside = triangle.p[2].inside_view_frustrum();
-
-    if (v1_inside && v2_inside && v3_inside) {
-        fill_triangle(triangle, texture);
-    }
-
      std::vector<Vertex> vertices;
      std::vector<Vertex> auxilary_list;
 
@@ -112,8 +104,8 @@ inline void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, const Text
 }
 
 inline void Rasterizer::draw_scanline(const Edge &left, const Edge &right, int j, const Texture &texture, const Gradients &gradients) {
-    int x_min = (int)std::ceil(left.x);
-    int x_max = (int)std::ceil(right.x);
+    int x_min = std::ceil(left.x);
+    int x_max = std::ceil(right.x);
     float x_prestep = (float)x_min - left.x;
 
     float x_dist = right.x - left.x;
