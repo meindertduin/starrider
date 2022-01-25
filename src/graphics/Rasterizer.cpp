@@ -8,9 +8,6 @@ Rasterizer::~Rasterizer() {
 }
 
 void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
-    auto screen_space = Math::mat_4x4_screen_space((float)m_width / 2.0f, (float)m_height / 2.0f);
-    auto identity = Math::Mat_4x4_Identity;
-
     Vertex min_y_vert = triangle.p[0];
 	Vertex mid_y_vert = triangle.p[1];
 	Vertex max_y_vert = triangle.p[2];
