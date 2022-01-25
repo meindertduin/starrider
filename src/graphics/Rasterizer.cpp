@@ -11,9 +11,9 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
     auto screen_space = Math::mat_4x4_screen_space((float)m_width / 2.0f, (float)m_height / 2.0f);
     auto identity = Math::Mat_4x4_Identity;
 
-    Vertex min_y_vert = triangle.p[0].transform(screen_space, identity).perspective_divide();
-	Vertex mid_y_vert = triangle.p[1].transform(screen_space, identity).perspective_divide();
-	Vertex max_y_vert = triangle.p[2].transform(screen_space, identity).perspective_divide();
+    Vertex min_y_vert = triangle.p[0];
+	Vertex mid_y_vert = triangle.p[1];
+	Vertex max_y_vert = triangle.p[2];
 
 	if(max_y_vert.pos.y < mid_y_vert.pos.y)
 	{
@@ -44,9 +44,9 @@ void Rasterizer::draw_triangle(Triangle &triangle, const Texture &texture) {
 
     bool handedness =  (x1 * y2 - x2 * y1) >= 0.0f;
 
-    Edge bottom_to_top = Edge(min_y_vert, max_y_vert, 0);
-    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert, 0);
-    Edge middle_to_top = Edge(mid_y_vert, max_y_vert, 1);
+    Edge bottom_to_top = Edge(min_y_vert, max_y_vert);
+    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert);
+    Edge middle_to_top = Edge(mid_y_vert, max_y_vert);
 
     scan_edges(bottom_to_top, bottom_to_middle, handedness, texture);
     scan_edges(bottom_to_top, middle_to_top, handedness, texture);

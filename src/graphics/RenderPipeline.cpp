@@ -37,30 +37,48 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
 
+            auto line1 = renderable.transformed_points[current_poly.vert[0]]
+                - renderable.transformed_points[current_poly.vert[1]];
+
+            auto line2 = renderable.transformed_points[current_poly.vert[0]]
+                - renderable.transformed_points[current_poly.vert[2]];
+
+            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
+            current_poly.normal = line1.cross(line2).normalized();
+
             if (renderable.state & PolyAttribute::TwoSided) {
-                auto line1 = renderable.transformed_points[current_poly.vert[0]]
-                    - renderable.transformed_points[current_poly.vert[1]];
-
-                auto line2 = renderable.transformed_points[current_poly.vert[0]]
-                    - renderable.transformed_points[current_poly.vert[2]];
-
-                auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
-                current_poly.normal = line1.cross(line2).normalized();
-
                 if (current_poly.normal.dot(camera_ray) >= 0) {
                     auto proj_tri = get_proj_tri(renderable, current_poly, vp);
+
+                    float alpha = (0.5f * camera.width - 0.5f);
+                    float beta = (0.5f * camera.height - 0.5f);
+
+                    for (int vertex = 0; vertex < 3; vertex++) {
+                        float z = proj_tri.p[vertex].pos.z;
+                        proj_tri.p[vertex].pos.x = camera.view_dist_h * proj_tri.p[vertex].pos.x / z;
+                        proj_tri.p[vertex].pos.y =  camera.view_dist_v * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
+
+                        proj_tri.p[vertex].pos.x = alpha + proj_tri.p[vertex].pos.x * alpha;
+                        proj_tri.p[vertex].pos.y = beta - proj_tri.p[vertex].pos.y * beta;
+                    }
+
                     m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
                 }
             } else {
-
-                auto line1 = renderable.transformed_points[current_poly.vert[0]]
-                    - renderable.transformed_points[current_poly.vert[1]];
-
-                auto line2 = renderable.transformed_points[current_poly.vert[0]]
-                    - renderable.transformed_points[current_poly.vert[2]];
-
-                current_poly.normal = line1.cross(line2).normalized();
                 auto proj_tri = get_proj_tri(renderable, current_poly, vp);
+
+                float alpha = (0.5f * camera.width - 0.5f);
+                float beta = (0.5f * camera.height - 0.5f);
+
+                for (int vertex = 0; vertex < 3; vertex++) {
+                    float z = proj_tri.p[vertex].pos.z;
+                    proj_tri.p[vertex].pos.x = 200 * proj_tri.p[vertex].pos.x / z;
+                    proj_tri.p[vertex].pos.y = 100 * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
+
+                    proj_tri.p[vertex].pos.x = proj_tri.p[vertex].pos.x + alpha;
+                    proj_tri.p[vertex].pos.y = proj_tri.p[vertex].pos.y + beta;
+                }
+
                 m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
             }
         }

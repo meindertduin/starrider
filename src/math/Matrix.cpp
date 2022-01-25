@@ -509,7 +509,7 @@ Matrix4x4_Type mat_4x4_perspective(float fov, float aspect_ratio, float z_near, 
         fov * aspect_ratio, 0, 0, 0,
         0, 1.0f / fov, 0, 0,
         0, 0, (-z_near - z_far) / z_range, z_far * z_near / z_range,
-        0, 0, 1, 0
+        0, 0, 0, 1
     };
 }
 

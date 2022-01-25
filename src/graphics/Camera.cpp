@@ -7,10 +7,16 @@
 
 Camera::Camera() {
     m_zfar = 1000.0f;
-    m_znear = 0.1f;
+    m_znear = 1.0f;
     m_fov = 90.0f;
+    aspect_ratio = 1.0f;
 
-    m_projection = Math::mat_4x4_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
+    float viewplane_width = 2.0f;
+    float viewplane_height = 2.0f;
+
+    float tan_fov_div2 = std::tan(Math::deg_to_rad(m_fov / 2.0f));
+    view_dist_h = 0.5f * viewplane_width * tan_fov_div2;
+    view_dist_v = 0.5f * viewplane_height * tan_fov_div2 / aspect_ratio;
 
     auto app = Application::get_instance();
     app->listen(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
@@ -65,14 +71,20 @@ void Camera::set_viewport(int width, int height) {
     this->width = width;
     this->height = height;
 
-    float aspect_ratio = (float) width / (float) height;
-    m_projection = Math::mat_4x4_perspective(Math::deg_to_rad(m_fov / 2.0f), 1.0f, m_znear, m_zfar);
+    aspect_ratio = (float) width / (float) height;
+
+    float viewplane_width = 2.0f;
+    float viewplane_height = 2.0f;
+
+    float tan_fov_div2 = std::tan(Math::deg_to_rad(m_fov / 2.0f));
+    view_dist_h = 0.5f * viewplane_width * tan_fov_div2;
+    view_dist_v = 0.5f * viewplane_height * tan_fov_div2; // TODO figure out of aspect ratio needs to be applied here
 }
 
 Matrix4x4 Camera::get_view_projection() const {
     V4D camera_pos = m_transform.pos * -1;
     auto camera_trans = Math::mat_4x4_translation(camera_pos.x, camera_pos.y, camera_pos.z);
 
-    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix() * m_projection;
+    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix();
 }
 

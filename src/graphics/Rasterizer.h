@@ -11,16 +11,15 @@ struct Edge {
     int y_end;
 
     Edge() {}
-    Edge(const Vertex &min_y_vert, const Vertex &max_y_vert, int min_y_vert_index) {
-    	y_start = (int)std::ceil(min_y_vert.pos.y);
-		y_end = (int)std::ceil(max_y_vert.pos.y);
+    Edge(const Vertex &min_y_vert, const Vertex &max_y_vert) {
+    	y_start = min_y_vert.pos.y;
+		y_end = max_y_vert.pos.y;
 
 		float y_dist = max_y_vert.pos.y - min_y_vert.pos.y;
 		float x_dist = max_y_vert.pos.x- min_y_vert.pos.x;
 
-		float y_prestep = (float) y_start - min_y_vert.pos.y;
-		x_step = (float)x_dist/(float)y_dist;
-		x = min_y_vert.pos.x + y_prestep * x_step;
+		x_step = x_dist / y_dist;
+		x = min_y_vert.pos.x;
 
         float x_prestep = x - min_y_vert.pos.x;
     }
@@ -46,9 +45,8 @@ private:
 
     inline void scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture);
     void draw_scanline(const Edge &left, const Edge &right, int y, const Texture &texture) {
-        int x_min = std::ceil(left.x);
-
-        int x_max = std::ceil(right.x);
+        int x_min = left.x;
+        int x_max = right.x;
 
         for(int x = x_min; x < x_max; x++)
         {
