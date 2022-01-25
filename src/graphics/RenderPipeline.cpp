@@ -6,6 +6,21 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_ras
 
 }
 
+void RenderPipeline::perspective_screen_transform(Triangle &proj_tri, const Camera &camera) {
+    float alpha = (0.5f * camera.width - 0.5f);
+    float beta = (0.5f * camera.height - 0.5f);
+
+    for (int vertex = 0; vertex < 3; vertex++) {
+        float z = proj_tri.p[vertex].pos.z;
+        proj_tri.p[vertex].pos.x = camera.view_dist_h * proj_tri.p[vertex].pos.x / z;
+        proj_tri.p[vertex].pos.y =  camera.view_dist_v * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
+
+        proj_tri.p[vertex].pos.x = alpha + proj_tri.p[vertex].pos.x * alpha;
+        proj_tri.p[vertex].pos.y = beta - proj_tri.p[vertex].pos.y * beta;
+    }
+
+}
+
 void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables) {
     m_rasterizer.set_viewport(camera.width, camera.height);
 
@@ -48,36 +63,14 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
             if (renderable.state & PolyAttribute::TwoSided) {
                 if (current_poly.normal.dot(camera_ray) >= 0) {
-                    auto proj_tri = get_proj_tri(renderable, current_poly, vp);
-
-                    float alpha = (0.5f * camera.width - 0.5f);
-                    float beta = (0.5f * camera.height - 0.5f);
-
-                    for (int vertex = 0; vertex < 3; vertex++) {
-                        float z = proj_tri.p[vertex].pos.z;
-                        proj_tri.p[vertex].pos.x = camera.view_dist_h * proj_tri.p[vertex].pos.x / z;
-                        proj_tri.p[vertex].pos.y =  camera.view_dist_v * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
-
-                        proj_tri.p[vertex].pos.x = alpha + proj_tri.p[vertex].pos.x * alpha;
-                        proj_tri.p[vertex].pos.y = beta - proj_tri.p[vertex].pos.y * beta;
-                    }
+                    auto proj_tri = camera_transform(renderable, current_poly, vp);
+                    perspective_screen_transform(proj_tri, camera);
 
                     m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
                 }
             } else {
-                auto proj_tri = get_proj_tri(renderable, current_poly, vp);
-
-                float alpha = (0.5f * camera.width - 0.5f);
-                float beta = (0.5f * camera.height - 0.5f);
-
-                for (int vertex = 0; vertex < 3; vertex++) {
-                    float z = proj_tri.p[vertex].pos.z;
-                    proj_tri.p[vertex].pos.x = 200 * proj_tri.p[vertex].pos.x / z;
-                    proj_tri.p[vertex].pos.y = 100 * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
-
-                    proj_tri.p[vertex].pos.x = proj_tri.p[vertex].pos.x + alpha;
-                    proj_tri.p[vertex].pos.y = proj_tri.p[vertex].pos.y + beta;
-                }
+                auto proj_tri = camera_transform(renderable, current_poly, vp);
+                perspective_screen_transform(proj_tri, camera);
 
                 m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
             }

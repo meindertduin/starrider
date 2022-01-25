@@ -28,7 +28,8 @@ private:
 
     Renderer* p_renderer = nullptr;
     void translation_scale_transform(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
-    constexpr Triangle get_proj_tri(const RenderObject &renderable, const Polygon &current_poly, const Matrix4x4 vp) {
+    void perspective_screen_transform(Triangle &proj_tri, const Camera &camera);
+    constexpr Triangle camera_transform(const RenderObject &renderable, const Polygon &current_poly, const Matrix4x4 vp) {
         return Triangle {
             Vertex {
                 vp.transform(renderable.transformed_points[current_poly.vert[0]]),

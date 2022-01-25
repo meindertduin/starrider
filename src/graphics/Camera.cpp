@@ -16,7 +16,7 @@ Camera::Camera() {
 
     float tan_fov_div2 = std::tan(Math::deg_to_rad(m_fov / 2.0f));
     view_dist_h = 0.5f * viewplane_width * tan_fov_div2;
-    view_dist_v = 0.5f * viewplane_height * tan_fov_div2 / aspect_ratio;
+    view_dist_v = 0.5f * viewplane_height * tan_fov_div2; // TODO figure out of aspect ratio needs to be applied here
 
     auto app = Application::get_instance();
     app->listen(this, WindowEventType::KeyDown | WindowEventType::MouseMotion);
@@ -72,13 +72,6 @@ void Camera::set_viewport(int width, int height) {
     this->height = height;
 
     aspect_ratio = (float) width / (float) height;
-
-    float viewplane_width = 2.0f;
-    float viewplane_height = 2.0f;
-
-    float tan_fov_div2 = std::tan(Math::deg_to_rad(m_fov / 2.0f));
-    view_dist_h = 0.5f * viewplane_width * tan_fov_div2;
-    view_dist_v = 0.5f * viewplane_height * tan_fov_div2; // TODO figure out of aspect ratio needs to be applied here
 }
 
 Matrix4x4 Camera::get_view_projection() const {
