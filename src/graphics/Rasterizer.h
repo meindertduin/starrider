@@ -25,7 +25,7 @@ struct Edge {
         float x_prestep = x - min_y_vert.pos.x;
     }
 
-    Edge(const Math::V2D &min_y_vert, const Math::V2D &max_y_vert) {
+    Edge(const V4D &min_y_vert, const V4D &max_y_vert) {
     	y_start = min_y_vert.y;
 		y_end = max_y_vert.y;
 
@@ -47,7 +47,7 @@ class Rasterizer {
 public:
     Rasterizer(Renderer* renderer);
     ~Rasterizer();
-    void draw_triangle(Math::V2D points[3]);
+    void draw_triangle(V4D points[3]);
     void clear_depth_buffer();
     void set_viewport(int width, int height);
 private:

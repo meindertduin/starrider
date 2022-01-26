@@ -27,24 +27,10 @@ private:
     Rasterizer m_rasterizer;
 
     Renderer* p_renderer = nullptr;
-    void perspective_screen_transform(Triangle &proj_tri, const Camera &camera);
-    constexpr Triangle camera_transform(const RenderObject &renderable, const Polygon &current_poly, const Matrix4x4 vp) {
-        return Triangle {
-            Vertex {
-                vp.transform(renderable.transformed_points[current_poly.vert[0]]),
-                renderable.text_coords[current_poly.text[0]],
-                current_poly.normal
-            },
-            Vertex {
-                vp.transform(renderable.transformed_points[current_poly.vert[1]]),
-                renderable.text_coords[current_poly.text[1]],
-                current_poly.normal
-            },
-            Vertex {
-                vp.transform(renderable.transformed_points[current_poly.vert[2]]),
-                renderable.text_coords[current_poly.text[2]],
-                current_poly.normal
-            }
-        };
+    void perspective_screen_transform(const Camera &camera, V4D *points);
+    constexpr void camera_transform(const RenderObject &renderable, const Matrix4x4 vp, const Polygon &current_poly, V4D *points) {
+        points[0] = vp.transform(renderable.transformed_points[current_poly.vert[0]]);
+        points[1] = vp.transform(renderable.transformed_points[current_poly.vert[1]]);
+        points[2] = vp.transform(renderable.transformed_points[current_poly.vert[2]]);
     }
 };

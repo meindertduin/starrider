@@ -9,43 +9,40 @@ Rasterizer::~Rasterizer() {
     delete[] p_z_buffer;
 }
 
-void Rasterizer::draw_triangle(V2D points[3]) {
-    V2D min_y_vert = points[0];
-	V2D mid_y_vert = points[1];
-	V2D max_y_vert = points[2];
-
-	if(max_y_vert.y < mid_y_vert.y)
+void Rasterizer::draw_triangle(V4D points[3]) {
+    // Points[0] is min_y_vert, points[1] is mid_y_vert, and points[2] max_y_vert
+	if(points[2].y < points[1].y)
 	{
-        V2D temp = max_y_vert;
-		max_y_vert = mid_y_vert;
-		mid_y_vert = temp;
+        V4D temp = points[2];
+		points[2] = points[1];
+		points[1] = temp;
 	}
 
-	if(mid_y_vert.y < min_y_vert.y)
+	if(points[1].y < points[0].y)
 	{
-		V2D temp = mid_y_vert;
-		mid_y_vert = min_y_vert;
-		min_y_vert = temp;
+		V4D temp = points[1];
+		points[1] = points[0];
+		points[0] = temp;
 	}
 
-	if(max_y_vert.y < mid_y_vert.y)
+	if(points[2].y < points[1].y)
 	{
-		V2D temp = max_y_vert;
-		max_y_vert = mid_y_vert;
-		mid_y_vert = temp;
+		V4D temp = points[2];
+		points[2] = points[1];
+		points[1] = temp;
 	}
 
-    float x1 = max_y_vert.x - min_y_vert.x;
-    float y1 = max_y_vert.y - min_y_vert.y;
+    float x1 = points[2].x - points[0].x;
+    float y1 = points[2].y - points[0].y;
 
-    float x2 = mid_y_vert.x - min_y_vert.x;
-    float y2 = mid_y_vert.y - min_y_vert.y;
+    float x2 = points[1].x - points[0].x;
+    float y2 = points[1].y - points[0].y;
 
     bool handedness =  (x1 * y2 - x2 * y1) >= 0.0f;
 
-    Edge bottom_to_top = Edge(min_y_vert, max_y_vert);
-    Edge bottom_to_middle = Edge(min_y_vert, mid_y_vert);
-    Edge middle_to_top = Edge(mid_y_vert, max_y_vert);
+    Edge bottom_to_top = Edge(points[0], points[2]);
+    Edge bottom_to_middle = Edge(points[0], points[1]);
+    Edge middle_to_top = Edge(points[1], points[2]);
 
     scan_edges(bottom_to_top, bottom_to_middle, handedness);
     scan_edges(bottom_to_top, middle_to_top, handedness);

@@ -42,49 +42,34 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
             if (renderable.state & PolyAttribute::TwoSided) {
                 if (current_poly.normal.dot(camera_ray) >= 0) {
-                    auto proj_tri = camera_transform(renderable, current_poly, vp);
-                    perspective_screen_transform(proj_tri, camera);
-
-                    Math::V2D points[3];
-                    points[0].x = proj_tri.p[0].pos.x;
-                    points[0].y = proj_tri.p[0].pos.y;
-                    points[1].x = proj_tri.p[1].pos.x;
-                    points[1].y = proj_tri.p[1].pos.y;
-                    points[2].x = proj_tri.p[2].pos.x;
-                    points[2].y = proj_tri.p[2].pos.y;
+                    V4D points[3];
+                    camera_transform(renderable, vp, current_poly, points);
+                    perspective_screen_transform(camera, points);
 
                     m_rasterizer.draw_triangle(points);
                 }
             } else {
-                auto proj_tri = camera_transform(renderable, current_poly, vp);
-                perspective_screen_transform(proj_tri, camera);
+                    V4D points[3];
+                    camera_transform(renderable, vp, current_poly, points);
+                    perspective_screen_transform(camera, points);
 
-                Math::V2D points[3];
-                points[0].x = proj_tri.p[0].pos.x;
-                points[0].y = proj_tri.p[0].pos.y;
-                points[1].x = proj_tri.p[1].pos.x;
-                points[1].y = proj_tri.p[1].pos.y;
-                points[2].x = proj_tri.p[2].pos.x;
-                points[2].y = proj_tri.p[2].pos.y;
-
-                m_rasterizer.draw_triangle(points);
+                    m_rasterizer.draw_triangle(points);
             }
         }
     }
 }
 
-void RenderPipeline::perspective_screen_transform(Triangle &proj_tri, const Camera &camera) {
+void RenderPipeline::perspective_screen_transform(const Camera &camera, V4D *points) {
     float alpha = (0.5f * camera.width - 0.5f);
     float beta = (0.5f * camera.height - 0.5f);
 
     for (int vertex = 0; vertex < 3; vertex++) {
-        float z = proj_tri.p[vertex].pos.z;
-        proj_tri.p[vertex].pos.x = camera.view_dist_h * proj_tri.p[vertex].pos.x / z;
-        proj_tri.p[vertex].pos.y =  camera.view_dist_v * proj_tri.p[vertex].pos.y * camera.aspect_ratio / z;
+        float z = points[vertex].z;
+        points[vertex].x = camera.view_dist_h * points[vertex].x / z;
+        points[vertex].y =  camera.view_dist_v * points[vertex].y * camera.aspect_ratio / z;
 
-        proj_tri.p[vertex].pos.x = alpha + proj_tri.p[vertex].pos.x * alpha;
-        proj_tri.p[vertex].pos.y = beta - proj_tri.p[vertex].pos.y * beta;
+        points[vertex].x = alpha + points[vertex].x * alpha;
+        points[vertex].y = beta - points[vertex].y * beta;
     }
-
 }
 
