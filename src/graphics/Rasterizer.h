@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Renderer.h"
 #include "Texture.h"
+#include "../math/Vector.h"
 
 struct Edge {
     float x;
@@ -24,6 +25,19 @@ struct Edge {
         float x_prestep = x - min_y_vert.pos.x;
     }
 
+    Edge(const Math::V2D &min_y_vert, const Math::V2D &max_y_vert) {
+    	y_start = min_y_vert.y;
+		y_end = max_y_vert.y;
+
+		float y_dist = max_y_vert.y - min_y_vert.y;
+		float x_dist = max_y_vert.x- min_y_vert.x;
+
+		x_step = x_dist / y_dist;
+		x = min_y_vert.x;
+
+        float x_prestep = x - min_y_vert.x;
+    }
+
     constexpr void step() {
         x += x_step;
     }
@@ -33,7 +47,7 @@ class Rasterizer {
 public:
     Rasterizer(Renderer* renderer);
     ~Rasterizer();
-    void draw_triangle(Triangle &triangle, const Texture &texture);
+    void draw_triangle(Math::V2D points[3]);
     void clear_depth_buffer();
     void set_viewport(int width, int height);
 private:
@@ -43,8 +57,8 @@ private:
 
     Pixel* p_framebuffer;
 
-    inline void scan_edges(Edge &a, Edge &b, bool handedness, const Texture &texture);
-    void draw_scanline(const Edge &left, const Edge &right, int y, const Texture &texture) {
+    inline void scan_edges(Edge &a, Edge &b, bool handedness);
+    void draw_scanline(const Edge &left, const Edge &right, int y) {
         int x_min = left.x;
         int x_max = right.x;
 

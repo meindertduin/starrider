@@ -45,13 +45,29 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                     auto proj_tri = camera_transform(renderable, current_poly, vp);
                     perspective_screen_transform(proj_tri, camera);
 
-                    m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
+                    Math::V2D points[3];
+                    points[0].x = proj_tri.p[0].pos.x;
+                    points[0].y = proj_tri.p[0].pos.y;
+                    points[1].x = proj_tri.p[1].pos.x;
+                    points[1].y = proj_tri.p[1].pos.y;
+                    points[2].x = proj_tri.p[2].pos.x;
+                    points[2].y = proj_tri.p[2].pos.y;
+
+                    m_rasterizer.draw_triangle(points);
                 }
             } else {
                 auto proj_tri = camera_transform(renderable, current_poly, vp);
                 perspective_screen_transform(proj_tri, camera);
 
-                m_rasterizer.draw_triangle(proj_tri, *renderable.texture);
+                Math::V2D points[3];
+                points[0].x = proj_tri.p[0].pos.x;
+                points[0].y = proj_tri.p[0].pos.y;
+                points[1].x = proj_tri.p[1].pos.x;
+                points[1].y = proj_tri.p[1].pos.y;
+                points[2].x = proj_tri.p[2].pos.x;
+                points[2].y = proj_tri.p[2].pos.y;
+
+                m_rasterizer.draw_triangle(points);
             }
         }
     }
