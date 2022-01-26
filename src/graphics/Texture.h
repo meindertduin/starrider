@@ -20,7 +20,6 @@ enum class Format {
     RGBA,
 };
 
-
 struct RGB {
     uint32_t blue : 8;
     uint32_t green : 8;
