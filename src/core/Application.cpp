@@ -46,13 +46,20 @@ bool Application::initialize(const AppSettings &settings) {
 void Application::run() {
     m_running = true;
 
+    Renderer renderer;
+    RenderPipeline render_pipeline {&renderer};
+
+    reset_materials();
+    reset_lights();
+
+    create_base_amb_light(0, RGBA { 50, 50, 50, 255 });
+    create_base_dir_light(1, RGBA { 0xFFFFFFFF }, V4D(0, 0, -1).normalized());
+
+    // Setup camera
     p_camera = std::make_unique<Camera>();
     p_camera->set_viewport(m_window.get_width(), m_window.get_height());
 
     m_cursor.initialize(&m_window);
-
-    Renderer renderer;
-    RenderPipeline render_pipeline {&renderer};
 
     std::vector<RenderObject> objects;
     ObjectRepository object_repository;

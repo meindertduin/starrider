@@ -111,7 +111,7 @@ typedef struct Material_Type {
     Texture *texutre = nullptr;
 } Material;
 
-extern Material_Type materials[MaxMaterials];
+extern Material_Type g_materials[MaxMaterials];
 
 typedef struct Light_Type {
     int id;
@@ -130,7 +130,7 @@ typedef struct Light_Type {
     float pf;
 } Light;
 
-extern Light lights[MaxLights];
+extern Light g_lights[MaxLights];
 
 extern int num_lights;
 
@@ -148,8 +148,8 @@ int init_light(int index,
         float spot_inner, float spot_outer,
         float pf);
 
-int create_base_ambient(int index, RGBA col);
-int create_base_dir_light(int index, RGBA col, V4D pos);
+int create_base_amb_light(int index, RGBA col);
+int create_base_dir_light(int index, RGBA col, V4D dir);
 
 constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return (a << 24) | (r << 16) | (g << 8) | b;
