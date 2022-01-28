@@ -32,14 +32,13 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
             auto current_poly = renderable.polygons[i];
             current_poly.attributes |= ShadeModeFlat;
 
-
             auto line1 = renderable.transformed_points[current_poly.vert[0]]
                 - renderable.transformed_points[current_poly.vert[1]];
 
             auto line2 = renderable.transformed_points[current_poly.vert[0]]
                 - renderable.transformed_points[current_poly.vert[2]];
 
-            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
+            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]].normalized();
             current_poly.normal = line1.cross(line2).normalized();
 
             if (renderable.state & PolyAttributeTwoSided) {
@@ -48,11 +47,11 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                 if (current_poly.normal.dot(camera_ray) >= 0.0f) {
                     auto poly_color = light_polygon(current_poly, camera, g_lights, num_lights);
                     V4D points[3];
+
                     camera_transform(renderable, vp, current_poly, points);
                     perspective_screen_transform(camera, points);
 
                     m_rasterizer.draw_triangle(points, poly_color);
-                    // m_rasterizer.draw_triangle(points, current_poly.color);
                 }
             } else {
                 V4D points[3];
@@ -61,7 +60,6 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                 perspective_screen_transform(camera, points);
 
                 m_rasterizer.draw_triangle(points, poly_color);
-                // m_rasterizer.draw_triangle(points, current_poly.color);
             }
         }
     }
