@@ -2,8 +2,8 @@
 
 #include "Core.h"
 #include "Renderer.h"
-#include "Texture.h"
 #include "../math/Vector.h"
+#include "RenderObject.h"
 
 struct Edge {
     float x;
@@ -47,7 +47,7 @@ class Rasterizer {
 public:
     Rasterizer(Renderer* renderer);
     ~Rasterizer();
-    void draw_triangle(V4D points[3]);
+    void draw_triangle(V4D points[3], RGBA color);
     void clear_depth_buffer();
     void set_viewport(int width, int height);
 private:
@@ -57,15 +57,15 @@ private:
 
     Pixel* p_framebuffer;
 
-    inline void scan_edges(Edge &a, Edge &b, bool handedness);
-    void draw_scanline(const Edge &left, const Edge &right, int y) {
+    inline void scan_edges(Edge &a, Edge &b, bool handedness, RGBA color);
+    void draw_scanline(const Edge &left, const Edge &right, int y, RGBA color) {
         int x_min = left.x;
         int x_max = right.x;
 
         for(int x = x_min; x < x_max; x++)
         {
             if (x > 0 && y > 0 && x < m_width && y < m_height)
-                p_framebuffer[m_width * y + x].value = 0x00ff0000;
+                p_framebuffer[m_width * y + x].value = rgba_bit(color.r, color.g, color.b, color.a);
         }
     }
 };

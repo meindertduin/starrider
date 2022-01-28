@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdio.h>
 #include <memory>
+#include <stdexcept>
 
 #include "../math/Matrix.h"
 #include "../math/Vector.h"

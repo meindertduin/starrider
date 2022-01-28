@@ -97,6 +97,7 @@ void ObjReader::create_render_object(RenderObject &object) {
     object.local_points = new V4D[object.vertex_count];
     object.transformed_points = new V4D[object.vertex_count];
     object.text_coords = new V4D[object.text_coords_count];
+    object.color = RGBA(255, 0, 0, 255);
 
     for (int i = 0; i < object.vertex_count; i++) {
         object.local_points[i] = m_vertices[i];
@@ -119,6 +120,8 @@ void ObjReader::create_render_object(RenderObject &object) {
             }
         }
 
+        // TODO read color out of file
+        polygon.color = object.color;
         polygons.push_back(polygon);
     }
 

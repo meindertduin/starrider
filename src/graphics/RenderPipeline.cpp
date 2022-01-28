@@ -48,14 +48,14 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                     camera_transform(renderable, vp, current_poly, points);
                     perspective_screen_transform(camera, points);
 
-                    m_rasterizer.draw_triangle(points);
+                    m_rasterizer.draw_triangle(points, current_poly.color);
                 }
             } else {
                 V4D points[3];
                 camera_transform(renderable, vp, current_poly, points);
                 perspective_screen_transform(camera, points);
 
-                m_rasterizer.draw_triangle(points);
+                m_rasterizer.draw_triangle(points, current_poly.color);
             }
         }
     }

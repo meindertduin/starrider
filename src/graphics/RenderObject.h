@@ -55,38 +55,6 @@ const u_int16_t LightStateOff = 0;
 static constexpr int MaxLights = 8;
 static constexpr int MaxMaterials = 256;
 
-typedef struct Polygon_Type {
-    uint16_t state;
-    uint16_t attributes;
-    V4D *points_list;
-    V4D *text_coords;
-    int vert[3];
-    int text[3];
-    V4D normal;
-} Polygon;
-
-typedef struct RenderObject_Type {
-    int id;
-    uint16_t state;
-
-    Transform transform;
-
-    Texture *texture;
-
-
-    int vertex_count;
-    V4D *local_points;
-    V4D *transformed_points;
-
-    int text_coords_count;
-    V4D *text_coords;
-
-    int poly_count;
-    Polygon *polygons;
-
-    RenderObject_Type(int id) : id(id) {}
-} RenderObject;
-
 typedef struct RGBA_Type {
     union {
         uint32_t rgba;
@@ -101,9 +69,38 @@ typedef struct RGBA_Type {
     RGBA_Type(uint8_t r, uint8_t g, u_int8_t b, u_int8_t a) : r(r), g(g), b(b), a(a) {}
 } RGBA;
 
-constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
-    return (a << 24) | (r << 16) | (g << 8) | b;
-}
+typedef struct Polygon_Type {
+    uint16_t state;
+    uint16_t attributes;
+    V4D *points_list;
+    V4D *text_coords;
+    int vert[3];
+    int text[3];
+    V4D normal;
+    RGBA color;
+} Polygon;
+
+typedef struct RenderObject_Type {
+    int id;
+    uint16_t state;
+
+    Transform transform;
+
+    Texture *texture;
+    RGBA color;
+
+    int vertex_count;
+    V4D *local_points;
+    V4D *transformed_points;
+
+    int text_coords_count;
+    V4D *text_coords;
+
+    int poly_count;
+    Polygon *polygons;
+
+    RenderObject_Type(int id) : id(id) {}
+} RenderObject;
 
 typedef struct Material_Type {
     int id;
@@ -153,3 +150,8 @@ int init_light(int index,
 
 int create_base_ambient(int index, RGBA col);
 int create_base_dir_light(int index, RGBA col, V4D pos);
+
+constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
+    return (a << 24) | (r << 16) | (g << 8) | b;
+}
+

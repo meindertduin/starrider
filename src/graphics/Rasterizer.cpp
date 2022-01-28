@@ -9,7 +9,7 @@ Rasterizer::~Rasterizer() {
     delete[] p_z_buffer;
 }
 
-void Rasterizer::draw_triangle(V4D points[3]) {
+void Rasterizer::draw_triangle(V4D points[3], RGBA color) {
     // Points[0] is min_y_vert, points[1] is mid_y_vert, and points[2] max_y_vert
 	if(points[2].y < points[1].y)
 	{
@@ -44,23 +44,23 @@ void Rasterizer::draw_triangle(V4D points[3]) {
     Edge bottom_to_middle = Edge(points[0], points[1]);
     Edge middle_to_top = Edge(points[1], points[2]);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness);
-    scan_edges(bottom_to_top, middle_to_top, handedness);
+    scan_edges(bottom_to_top, bottom_to_middle, handedness, color);
+    scan_edges(bottom_to_top, middle_to_top, handedness, color);
 }
 
 void Rasterizer::clear_depth_buffer() {
     std::fill(p_z_buffer, p_z_buffer + m_width * m_height, INFINITY);
 }
 
-inline void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness) {
+inline void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, RGBA color) {
     int y_start = b.y_start;
     int y_end = b.y_end;
 
-    for(int j = y_start; j < y_end; j++) {
+    for(int y = y_start; y < y_end; y++) {
         if (handedness) {
-            draw_scanline(b, a, j);
+            draw_scanline(b, a, y, color);
         } else {
-            draw_scanline(a, b, j);
+            draw_scanline(a, b, y, color);
         }
         a.step();
         b.step();
