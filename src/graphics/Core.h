@@ -7,13 +7,9 @@
 #include <stdio.h>
 #include <memory>
 
-#include "../io/BmpReader.h"
-#include "Texture.h"
 #include "../math/Matrix.h"
 #include "../math/Vector.h"
 #include "../math/Quaternion.h"
-
-class Texture;
 
 float saturate(float val);
 
@@ -175,14 +171,6 @@ struct Triangle {
         p[1] = v2;
         p[2] = v3;
     }
-};
-
-struct Mesh {
-    std::vector<Triangle> triangles;
-    Texture *texture;
-
-    Mesh() {}
-    bool load_from_obj_file(std::string path);
 };
 
 struct Transform {

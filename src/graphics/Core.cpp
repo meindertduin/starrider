@@ -28,12 +28,3 @@ Vertex Vertex::transform(const Matrix4x4 &transform, const Matrix4x4 &normal) {
     V4D n = (normal * this->normal).normalized();
     return Vertex(v, text_coords, n);
 }
-
-bool Mesh::load_from_obj_file(std::string path) {
-    ObjReader obj_reader;
-    if (!obj_reader.read_file(path))
-        return false;
-
-    triangles = obj_reader.create_vertices();
-    return true;
-}

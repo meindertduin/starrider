@@ -40,8 +40,10 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
             auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]];
             current_poly.normal = line1.cross(line2).normalized();
 
-            if (renderable.state & PolyAttribute::TwoSided) {
-                if (current_poly.normal.dot(camera_ray) >= 0) {
+            if (renderable.state & PolyAttributeTwoSided) {
+                // TODO: fix minor glitches in object polygons not being rendered
+                // Probably has to do with the camera_ray not being entiterly accurate
+                if (current_poly.normal.dot(camera_ray) >= 0.0f) {
                     V4D points[3];
                     camera_transform(renderable, vp, current_poly, points);
                     perspective_screen_transform(camera, points);

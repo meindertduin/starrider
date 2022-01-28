@@ -13,11 +13,6 @@ enum class CoordSelect {
     Trans_Only,
 };
 
-struct Renderable {
-    Transform *transform;
-    Mesh *mesh;
-};
-
 class RenderPipeline {
 public:
     RenderPipeline(Renderer *renderer);

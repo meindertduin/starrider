@@ -29,7 +29,6 @@ set(SOURCES
     src/graphics/XLib.cpp
     src/graphics/RenderObject.cpp
     src/graphics/ObjectRepository.cpp
-    src/graphics/Material.cpp
     src/math/Matrix.cpp
     src/math/Core.cpp
     src/math/Polar.cpp
