@@ -172,63 +172,30 @@ struct RenderPolygon {
         }
 };
 
+constexpr bool render_polygon_avg_sort(const RenderPolygon &a, const RenderPolygon &b) {
+    return 0.3333f * (a.points[0].z * a.points[1].z * a.points[2].z) > 0.3333f * (b.points[0].z * b.points[1].z * b.points[2].z);
+}
 
-struct RenderListNode {
-    RenderPolygon *data = nullptr;
-    RenderListNode* next = nullptr;
-};
+constexpr bool render_polygon_farz_sort(const RenderPolygon &a, const RenderPolygon &b) {
+    float a_farz = a.points[0].z > a.points[1].z ? a.points[0].z : a.points[1].z;
+    if (a_farz < a.points[2].z)
+        a_farz = a.points[2].z;
 
-struct RenderList {
-    RenderListNode *head;
+    float b_farz = b.points[0].z > b.points[1].z ? b.points[0].z : b.points[1].z;
+    if (b_farz < b.points[2].z)
+        b_farz = b.points[2].z;
 
-    int length;
-    RenderList() : length(0), head(nullptr) {}
-    ~RenderList() {
-        while(head->next != nullptr) {
-            auto next = head->next;
-            delete head;
-            head = next;
-        }
-    }
+    return a_farz > b_farz;
+}
 
-    void add_polygon(const Polygon &poly, RGBA color) {
-        auto new_poly = new RenderPolygon { poly, color };
-        auto node = new RenderListNode();
+constexpr bool render_polygon_nearz_sort(const RenderPolygon &a, const RenderPolygon &b) {
+    float a_farz = a.points[0].z < a.points[1].z ? a.points[0].z : a.points[1].z;
+    if (a_farz > a.points[2].z)
+        a_farz = a.points[2].z;
 
-        node->data = new_poly;
+    float b_farz = b.points[0].z < b.points[1].z ? b.points[0].z : b.points[1].z;
+    if (b_farz > b.points[2].z)
+        b_farz = b.points[2].z;
 
-        if (head == nullptr) {
-            head = node;
-        } else {
-            RenderListNode *temp = head;
-            while (temp->next != nullptr) {
-                temp = temp->next;
-            }
-
-            temp->next = node;
-        }
-
-        length++;
-    }
-
-    void insertionSort() {
-        RenderListNode* i = head->next;
-
-        while (i != nullptr) {
-            RenderListNode* key=i;
-            RenderListNode* j=head;
-
-            while (j!=i) {
-                if (key->data->points[0].z > j->data->points[0].z) {
-                    auto temp = key->data;
-                    key->data = j->data;
-                    j->data = temp;
-                }
-                j = j->next;
-
-            }
-            i = i->next;
-        }
-    }
-};
-
+    return a_farz > b_farz;
+}

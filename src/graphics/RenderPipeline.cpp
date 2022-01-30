@@ -17,6 +17,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     auto v_forward = camera.m_transform.rot.get_back();
 
     for (auto renderable : renderables) {
+        std::vector<RenderPolygon> render_list;
         Matrix4x4 mat_rot = renderable.transform.get_rotation_matrix();
 
         for (int i = 0; i < renderable.vertex_count; i++) {
@@ -46,21 +47,23 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
                 // Probably has to do with the camera_ray not being entiterly accurate
                 if (current_poly.normal.dot(camera_ray) >= 0.0f) {
                     auto poly_color = light_polygon(current_poly, camera, g_lights, num_lights);
-                    V4D points[3];
-
-                    camera_transform(renderable, vp, current_poly, points);
-                    perspective_screen_transform(camera, points);
-
-                    m_rasterizer.draw_triangle(points, poly_color);
+                    auto render_poly = RenderPolygon(current_poly, poly_color);
+                    camera_transform(renderable, vp, current_poly, render_poly.points);
+                    render_list.push_back(render_poly);
                 }
             } else {
-                V4D points[3];
                 auto poly_color = light_polygon(current_poly, camera, g_lights, num_lights);
-                camera_transform(renderable, vp, current_poly, points);
-                perspective_screen_transform(camera, points);
-
-                m_rasterizer.draw_triangle(points, poly_color);
+                auto render_poly = RenderPolygon(current_poly, poly_color);
+                camera_transform(renderable, vp, current_poly, render_poly.points);
+                render_list.push_back(render_poly);
             }
+        }
+
+        std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
+
+        for (auto render_poly : render_list) {
+            perspective_screen_transform(camera, render_poly.points);
+            m_rasterizer.draw_triangle(render_poly.points, render_poly.color);
         }
     }
 }
