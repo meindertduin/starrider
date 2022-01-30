@@ -155,3 +155,80 @@ constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
+
+struct RenderPolygon {
+    uint16_t state;
+    uint16_t attributes;
+    V4D points[3];
+    RGBA color;
+    V4D *text_coords;
+    int text[3];
+
+    RenderPolygon(const Polygon &poly, RGBA color)
+        : state(poly.state), attributes(poly.attributes), color(color), text_coords(poly.text_coords) {
+            text[0] = poly.text[0];
+            text[1] = poly.text[1];
+            text[2] = poly.text[2];
+        }
+};
+
+
+struct RenderListNode {
+    RenderPolygon *data = nullptr;
+    RenderListNode* next = nullptr;
+};
+
+struct RenderList {
+    RenderListNode *head;
+
+    int length;
+    RenderList() : length(0), head(nullptr) {}
+    ~RenderList() {
+        while(head->next != nullptr) {
+            auto next = head->next;
+            delete head;
+            head = next;
+        }
+    }
+
+    void add_polygon(const Polygon &poly, RGBA color) {
+        auto new_poly = new RenderPolygon { poly, color };
+        auto node = new RenderListNode();
+
+        node->data = new_poly;
+
+        if (head == nullptr) {
+            head = node;
+        } else {
+            RenderListNode *temp = head;
+            while (temp->next != nullptr) {
+                temp = temp->next;
+            }
+
+            temp->next = node;
+        }
+
+        length++;
+    }
+
+    void insertionSort() {
+        RenderListNode* i = head->next;
+
+        while (i != nullptr) {
+            RenderListNode* key=i;
+            RenderListNode* j=head;
+
+            while (j!=i) {
+                if (key->data->points[0].z > j->data->points[0].z) {
+                    auto temp = key->data;
+                    key->data = j->data;
+                    j->data = temp;
+                }
+                j = j->next;
+
+            }
+            i = i->next;
+        }
+    }
+};
+
