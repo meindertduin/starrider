@@ -20,8 +20,7 @@ class ObjReader {
 public:
     ObjReader();
     bool read_file(string path);
-    vector<Triangle> create_vertices();
-    void create_render_object(RenderObject &object);
+    void create_render_object(RenderObject &object, Texture *texture);
 private:
     vector<V4D> m_vertices;
     vector<Math::V2D> m_tex_coords;

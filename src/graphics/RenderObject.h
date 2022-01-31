@@ -144,7 +144,6 @@ typedef struct RenderObject_Type {
     RGBA color;
 
     int vertex_count;
-    int text_coords_count;
     int frames_count;
     int curr_frame;
 
@@ -153,6 +152,9 @@ typedef struct RenderObject_Type {
 
     Vertex4D *head_local_vertices;
     Vertex4D *head_transformed_vertices;
+
+    // TODO: check if these are still needed when we have
+    // them stored in the vertex
     Point2D *texture_coords;
 
     int poly_count;

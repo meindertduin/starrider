@@ -25,9 +25,9 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    obj_reader.create_render_object(object);
     object.texture = new Texture();
     object.texture->load_from_bmp(texture_file);
+    obj_reader.create_render_object(object, object.texture);
 
     m_game_objects.push_back(object);
     return object;

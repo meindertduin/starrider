@@ -65,35 +65,66 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-void ObjReader::create_render_object(RenderObject &object) {
+void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
+    object.state |= ObjectStateActive | ObjectStateVisible;
+
+    // TODO: read if object has multiple frames out of the file
+    object.frames_count = 1;
+    object.curr_frame = 0;
+    object.attributes |= ObjectAttributeSingleFrame;
+
     object.vertex_count = m_vertices.size();
-    object.text_coords_count = m_tex_coords.size();
 
     object.local_vertices = new Vertex4D[object.vertex_count];
     object.transformed_vertices = new Vertex4D[object.vertex_count];
-    object.texture_coords = new Point2D[object.text_coords_count];
+    object.texture_coords = new Point2D[object.vertex_count];
+
+    object.head_local_vertices = &object.local_vertices[0];
+    object.head_transformed_vertices = &object.transformed_vertices[0];
+
     object.color = RGBA(255, 0, 0, 255);
 
     for (int i = 0; i < object.vertex_count; i++) {
         object.local_vertices[i].v = m_vertices[i];
-    }
-
-    for (int i = 0; i < object.text_coords_count; i++) {
-        object.texture_coords[i] = m_tex_coords[i];
+        object.local_vertices[i].attributes = VertexAttributePoint;
     }
 
     std::vector<Polygon> polygons;
     for (int i = 0; i < m_indices.size(); i += 3) {
         Polygon polygon;
+        polygon.texture = texture;
+        polygon.vertices = object.local_vertices;
+        polygon.text_coords = object.texture_coords;
+
+        // TODO: get these values from obj file
+        polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 | PolyAttributeShadeModeGouraud;
+        polygon.color = 0xFFFFFFFF;
 
         for (int j = 0; j < 3; j++) {
             auto current_index = m_indices[i + j];
             polygon.vert[j] = current_index.vertex_index;
 
             if (has_tex_coords) {
-                polygon.text[j] = current_index.tex_coord_index;
+                polygon.vertices[current_index.vertex_index].t = m_tex_coords[current_index.tex_coord_index];
+                polygon.text_coords[current_index.vertex_index] = m_tex_coords[current_index.tex_coord_index];
+
+                polygon.text[j] = current_index.vertex_index;
+                polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeTexture;
+            }
+
+            if (has_normal_indices) {
+                polygon.vertices[current_index.vertex_index].n = m_normals[current_index.normal_index];
+                polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeNormal;
             }
         }
+
+        auto line1 = object.transformed_vertices[polygon.vert[0]].v
+            - object.transformed_vertices[polygon.vert[1]].v;
+
+        auto line2 = object.transformed_vertices[polygon.vert[0]].v
+            - object.transformed_vertices[polygon.vert[2]].v;
+
+        polygon.n_length = line1.cross(line2).length();
 
         // TODO read color out of file
         polygon.color = object.color;
