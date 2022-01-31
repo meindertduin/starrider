@@ -37,7 +37,7 @@ bool ObjReader::read_file(string path) {
             float x, y;
             ss >> x >> y;
 
-            m_tex_coords.push_back(V4D(x, y, 0));
+            m_tex_coords.push_back(Math::V2D(x, y));
         }
 
         if (first_token == "vn") {
@@ -65,46 +65,21 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-vector<Triangle> ObjReader::create_vertices() {
-    std::vector<Triangle> result;
-
-    for (int i = 0; i < m_indices.size(); i += 3) {
-        Vertex vertecis[3];
-
-        for (int j = 0; j < 3; j++) {
-            auto current_index = m_indices[i + j];
-            vertecis[j].pos = m_vertices[current_index.vertex_index];
-
-            if (has_tex_coords) {
-                vertecis[j].text_coords = m_tex_coords[current_index.tex_coord_index];
-            }
-
-            if (has_normal_indices) {
-                vertecis[j].normal = m_normals[current_index.normal_index];
-            }
-        }
-
-        result.push_back(Triangle(vertecis[0], vertecis[1], vertecis[2]));
-    }
-
-    return result;
-}
-
 void ObjReader::create_render_object(RenderObject &object) {
     object.vertex_count = m_vertices.size();
     object.text_coords_count = m_tex_coords.size();
 
-    object.local_points = new V4D[object.vertex_count];
-    object.transformed_points = new V4D[object.vertex_count];
-    object.text_coords = new V4D[object.text_coords_count];
+    object.local_vertices = new Vertex4D[object.vertex_count];
+    object.transformed_vertices = new Vertex4D[object.vertex_count];
+    object.texture_coords = new Point2D[object.text_coords_count];
     object.color = RGBA(255, 0, 0, 255);
 
     for (int i = 0; i < object.vertex_count; i++) {
-        object.local_points[i] = m_vertices[i];
+        object.local_vertices[i].v = m_vertices[i];
     }
 
     for (int i = 0; i < object.text_coords_count; i++) {
-        object.text_coords[i] = m_tex_coords[i];
+        object.texture_coords[i] = m_tex_coords[i];
     }
 
     std::vector<Polygon> polygons;

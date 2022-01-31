@@ -24,7 +24,7 @@ public:
     void create_render_object(RenderObject &object);
 private:
     vector<V4D> m_vertices;
-    vector<V4D> m_tex_coords;
+    vector<Math::V2D> m_tex_coords;
     vector<ObjIndex> m_indices;
     vector<V4D> m_normals;
 

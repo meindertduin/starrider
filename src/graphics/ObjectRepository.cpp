@@ -6,9 +6,9 @@ ObjectRepository::ObjectRepository() {}
 
 ObjectRepository::~ObjectRepository() {
     for (auto object : m_game_objects) {
-        delete[] object.local_points;
-        delete[] object.transformed_points;
-        delete[] object.text_coords;
+        delete[] object.local_vertices;
+        delete[] object.transformed_vertices;
+        delete[] object.texture_coords;
         delete[] object.polygons;
 
         delete object.texture;

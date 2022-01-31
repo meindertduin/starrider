@@ -21,25 +21,26 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         Matrix4x4 mat_rot = renderable.transform.get_rotation_matrix();
 
         for (int i = 0; i < renderable.vertex_count; i++) {
-            renderable.transformed_points[i] = mat_rot.transform(renderable.local_points[i]);
+            renderable.transformed_vertices[i].v = mat_rot.transform(renderable.local_vertices[i].v);
 
-            renderable.transformed_points[i] = renderable.transformed_points[i] + renderable.transform.pos;
-            renderable.transformed_points[i].x *= renderable.transform.scale.x;
-            renderable.transformed_points[i].y *= renderable.transform.scale.y;
-            renderable.transformed_points[i].z *= renderable.transform.scale.z;
+            renderable.transformed_vertices[i].v = renderable.transformed_vertices[i].v + renderable.transform.pos;
+
+            renderable.transformed_vertices[i].v.x *= renderable.transform.scale.x;
+            renderable.transformed_vertices[i].v.y *= renderable.transform.scale.y;
+            renderable.transformed_vertices[i].v.z *= renderable.transform.scale.z;
         }
 
         for (int i = 0; i < renderable.poly_count; i++) {
             auto current_poly = renderable.polygons[i];
             current_poly.attributes |= ShadeModeFlat;
 
-            auto line1 = renderable.transformed_points[current_poly.vert[0]]
-                - renderable.transformed_points[current_poly.vert[1]];
+            auto line1 = renderable.transformed_vertices[current_poly.vert[0]].v
+                - renderable.transformed_vertices[current_poly.vert[1]].v;
 
-            auto line2 = renderable.transformed_points[current_poly.vert[0]]
-                - renderable.transformed_points[current_poly.vert[2]];
+            auto line2 = renderable.transformed_vertices[current_poly.vert[0]].v
+                - renderable.transformed_vertices[current_poly.vert[2]].v;
 
-            auto camera_ray =  camera.m_transform.pos - renderable.transformed_points[current_poly.vert[0]].normalized();
+            auto camera_ray =  camera.m_transform.pos - renderable.transformed_vertices[current_poly.vert[0]].v.normalized();
             current_poly.normal = line1.cross(line2).normalized();
 
             if (renderable.state & PolyAttributeTwoSided) {
@@ -113,7 +114,7 @@ RGBA RenderPipeline::light_polygon(const Polygon &polygon, const Camera &camera,
                     b_sum += ((lights[curr_light].c_diffuse.b * polygon.color.b * i) / (256 * 128));
                 }
             } else if (lights[curr_light].attributes * LightAttributePoint) {
-                auto l = V4D(polygon.points_list[polygon.vert[0]], lights[curr_light].pos);
+                auto l = V4D(polygon.vertices[polygon.vert[0]].v, lights[curr_light].pos);
 
                 dist = l.length();
                 dp = polygon.normal.dot(l);

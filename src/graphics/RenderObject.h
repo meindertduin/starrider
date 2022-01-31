@@ -90,28 +90,18 @@ typedef struct RGBA_Type {
 } RGBA;
 
 typedef struct Vertext4D_Type {
-    union {
-        float m[12];
-        struct {
-            float x, y, z, w;
-            float nx, ny, nz, nw;
-            float u0, v0;
-            float i;
-            int attributes;
-        };
-        struct {
-            Point4D v;
-            V4D n;
-            Point2D t;
-        };
-    };
+    Point4D v;
+    V4D n;
+    Point2D t;
+    float i;
+    uint16_t attributes;
 } Vertex4D;
 
 typedef struct Polygon_Type {
     uint16_t state;
     uint16_t attributes;
-    uint32_t color;
-    uint32_t lit_color[3];
+    RGBA color;
+    RGBA lit_color[3];
 
     int mati;
     Texture *texture;
@@ -122,12 +112,14 @@ typedef struct Polygon_Type {
     int vert[3];
     int text[3];
     float n_length;
+    // TODO can be deleted when using the RenderListPoly at this stage
+    V4D normal;
 } Polygon;
 
 typedef struct RenderListPoly_Type {
     uint16_t state;
     uint16_t attributes;
-    uint32_t color;
+    RGBA color;
     uint32_t lit_color[3];
     Texture *texture;
     int mati;
@@ -152,6 +144,7 @@ typedef struct RenderObject_Type {
     RGBA color;
 
     int vertex_count;
+    int text_coords_count;
     int frames_count;
     int curr_frame;
 
@@ -229,7 +222,7 @@ struct RenderPolygon {
     uint16_t attributes;
     V4D points[3];
     RGBA color;
-    V4D *text_coords;
+    Math::V2D *text_coords;
     int text[3];
 
     RenderPolygon(const Polygon &poly, RGBA color)
