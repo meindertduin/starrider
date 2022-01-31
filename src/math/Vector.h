@@ -207,7 +207,6 @@ typedef struct V4D_Type {
         r.x = x + rhs.x;
         r.y = y + rhs.y;
         r.z = z + rhs.z;
-        r.w = w + rhs.w;
 
         return r;
     }
@@ -217,7 +216,6 @@ typedef struct V4D_Type {
         r.x = x - rhs.x;
         r.y = y - rhs.y;
         r.z = z - rhs.z;
-        r.w = w - rhs.w;
 
         return r;
     }
@@ -227,7 +225,6 @@ typedef struct V4D_Type {
         r.x = x * f;
         r.y = y * f;
         r.z = z * f;
-        r.w = w * f;
 
         return r;
     }
@@ -237,7 +234,6 @@ typedef struct V4D_Type {
         r.x = x / f;
         r.y = y / f;
         r.z = z / f;
-        r.w = w / f;
 
         return r;
     }
@@ -246,7 +242,6 @@ typedef struct V4D_Type {
         x += rhs.x;
         y += rhs.y;
         z += rhs.z;
-        w += rhs.w;
 
         return *this;
     }
@@ -255,7 +250,6 @@ typedef struct V4D_Type {
         x -= rhs.x;
         y -= rhs.y;
         z -= rhs.z;
-        w -= rhs.w;
 
         return *this;
     }
@@ -264,7 +258,6 @@ typedef struct V4D_Type {
         x *=  f;
         y *= f;
         z *= f;
-        w *= f;
 
         return *this;
     }
@@ -273,7 +266,6 @@ typedef struct V4D_Type {
         x /= f;
         y /= f;
         z /= f;
-        w /= f;
 
         return *this;
     }

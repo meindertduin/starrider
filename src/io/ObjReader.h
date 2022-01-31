@@ -31,4 +31,5 @@ private:
     bool has_normal_indices = false;
 
     ObjIndex parse_object_index(string token);
+    int compute_vertex_normals(RenderObject &object);
 };

@@ -118,13 +118,19 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
             }
         }
 
-        auto line1 = object.transformed_vertices[polygon.vert[0]].v
-            - object.transformed_vertices[polygon.vert[1]].v;
+        if (polygon.attributes & ShadeModeGouraud || polygon.attributes & ShadeModeFastPhong) {
+            if (has_normal_indices) {
+                auto line1 = object.transformed_vertices[polygon.vert[0]].v
+                    - object.transformed_vertices[polygon.vert[1]].v;
 
-        auto line2 = object.transformed_vertices[polygon.vert[0]].v
-            - object.transformed_vertices[polygon.vert[2]].v;
+                auto line2 = object.transformed_vertices[polygon.vert[0]].v
+                    - object.transformed_vertices[polygon.vert[2]].v;
 
-        polygon.n_length = line1.cross(line2).length();
+                polygon.n_length = line1.cross(line2).length();
+            } else {
+                compute_vertex_normals(object);
+            }
+        }
 
         // TODO read color out of file
         polygon.color = object.color;
@@ -137,6 +143,46 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
     for (int i = 0; i < polygons.size(); i++) {
         object.polygons[i] = polygons[i];
     }
+}
+
+int ObjReader::compute_vertex_normals(RenderObject &object) {
+    int polys_touch_vertices[ObjectMaxVertices];
+    memset((void*)polys_touch_vertices, 0, sizeof(int) * ObjectMaxVertices);
+
+    for (int poly = 0; poly < object.poly_count; poly++) {
+        if (object.polygons[poly].attributes & PolyAttributeShadeModeGouraud) {
+            int vi0 = object.polygons[poly].vert[0];
+            int vi1 = object.polygons[poly].vert[1];
+            int vi2 = object.polygons[poly].vert[2];
+
+            auto line1 = object.transformed_vertices[object.polygons[poly].vert[0]].v
+                - object.transformed_vertices[object.polygons[poly].vert[1]].v;
+
+            auto line2 = object.transformed_vertices[object.polygons[poly].vert[0]].v
+                - object.transformed_vertices[object.polygons[poly].vert[2]].v;
+
+            auto n = line1.cross(line2);
+
+            object.polygons[poly].n_length = n.length();
+
+            polys_touch_vertices[vi0]++;
+            polys_touch_vertices[vi1]++;
+            polys_touch_vertices[vi2]++;
+
+            object.local_vertices[vi0].n += n;
+            object.local_vertices[vi1].n += n;
+            object.local_vertices[vi2].n += n;
+        }
+    }
+
+    for (int vertex = 0; vertex < object.vertex_count; vertex++) {
+        if (polys_touch_vertices[vertex] >= 1) {
+            object.local_vertices[vertex].n /= polys_touch_vertices[vertex];
+            object.local_vertices[vertex].n.normalise();
+        }
+    }
+
+    return 1;
 }
 
 ObjIndex ObjReader::parse_object_index(string token) {
@@ -168,3 +214,4 @@ ObjIndex ObjReader::parse_object_index(string token) {
 
     return result;
 }
+

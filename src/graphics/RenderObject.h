@@ -72,6 +72,10 @@ const uint16_t VertexAttributePoint = 1 << 1;
 const uint16_t VertexAttributeNormal = 1 << 2;
 const uint16_t VertexAttributeTexture = 1 << 3;
 
+const int ObjectMaxVertices = 4096;
+const int ObjectMaxPolys = 8192;
+const int RenderListMaxPolys = 32768;
+
 static constexpr int MaxLights = 8;
 static constexpr int MaxMaterials = 256;
 
