@@ -7,9 +7,21 @@
 using Math::Point4D;
 using Math::V4D;
 
+const uint16_t ObjectStateNull = 0;
+const uint16_t ObjectStateActive = 1;
+const uint16_t ObjectStateVisible = 1 << 1;
+const uint16_t ObjectStateCulled = 1 << 2;
+const uint16_t ObjectStateLit = 1 << 3;
+
+const uint16_t ObjectAttributeSingleFrame = 1;
+const uint16_t ObjectAttributeMultiFrame = 1 << 1;
+const uint16_t ObjectAttributeTextures = 1 << 2;
+
+const uint16_t PolyStateNull = 0;
 const uint16_t PolyStateActive = 1;
 const uint16_t PolyStateClipped = 1 << 1;
 const uint16_t PolyStateBackface = 1 << 2;
+const uint16_t PolyStateLit = 1 << 3;
 
 const uint16_t PolyAttributeTwoSided = 1;
 const uint16_t PolyAttributeTransparent = 1 << 1;
@@ -20,8 +32,10 @@ const uint16_t PolyAttributeShadeModePure = 1 << 5;
 const uint16_t PolyAttributeShadeModeConstant = 1 << 6;
 const uint16_t PolyAttributeShadeModeFlat = 1 << 7;
 const uint16_t PolyAttributeShadeModeGouraud = 1 << 8;
-const uint16_t PolyAttributeShadeModeSimplePhong = 1 << 9;
+const uint16_t PolyAttributeShadeModeFastPhong = 1 << 9;
 const uint16_t PolyAttributeShadeModeTexture = 1 << 10;
+const uint16_t PolyAttributeEnableMaterial = 1 << 11;
+const uint16_t PolyAttributeDisableMaterial = 1 << 12;
 
 const uint16_t MaterialStateTransparent = 1 << 1;
 const uint16_t MaterialStateEightBitColor = 1 << 2;
@@ -51,6 +65,11 @@ const uint16_t ShadeModeFastPhong = 0x6000;
 
 const u_int16_t LightStateOn = 1;
 const u_int16_t LightStateOff = 0;
+
+const uint16_t VertexAttributeNull = 0;
+const uint16_t VertexAttributePoint = 1 << 1;
+const uint16_t VertexAttributeNormal = 1 << 2;
+const uint16_t VertexAttributeTexture = 1 << 3;
 
 static constexpr int MaxLights = 8;
 static constexpr int MaxMaterials = 256;
