@@ -18,6 +18,7 @@ static constexpr int FixP16_DP_MASK = 0x0000FFFF;
 static constexpr int FixP16_WP_MASK = 0xFFFF0000;
 static constexpr int FixP16_ROUND_UP = 0x00008000;
 
+static constexpr float EPSILON_E3 = 1E-3f;
 static constexpr float EPSILON_E4 = 1E-4f;
 static constexpr float EPSILON_E5 = 1E-5f;
 static constexpr float EPSILON_E6 = 1E-6f;
@@ -37,6 +38,14 @@ static constexpr T& max(const T &lhs, const T &rhs) {
 
 static constexpr float deg_to_rad(const float ang) {
     return ang * PI / 180.0f;
+}
+
+static constexpr float fabs(float f) {
+    return f > 0 ? f : -f;
+}
+
+static constexpr bool f_cmp(float f1, float f2) {
+    return fabs(f1 - f2) < EPSILON_E4 ? true : false;
 }
 
 static constexpr float rad_to_deg(const float rads) {

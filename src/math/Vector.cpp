@@ -70,6 +70,36 @@ namespace Math {
         return std::sqrt(x * x + y * y + z * z);
     }
 
+    float V4D_Type::length_fast() const {
+        int temp;
+        int xi, yi, zi;
+
+        xi = Math::fabs(this->x) * 1024;
+        yi = Math::fabs(this->y) * 1024;
+        zi = Math::fabs(this->z) * 1024;
+
+        if (yi < xi) {
+            temp = xi;
+            xi = yi;
+            yi = temp;
+        }
+
+        if (zi < yi) {
+            temp = zi;
+            zi = yi;
+            yi = temp;
+        }
+
+        if (yi < xi) {
+            temp = xi;
+            xi = yi;
+            yi = temp;
+        }
+
+        int dist = (zi + 11 * (yi >> 5) + (xi >> 2));
+        return (float)(dist >> 10);
+    }
+
     V4D_Type& V4D_Type::normalise() {
         float l = length();
         x /= l; y /= l; z /= l;

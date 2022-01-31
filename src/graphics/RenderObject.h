@@ -5,6 +5,7 @@
 #include "Texture.h"
 
 using Math::Point4D;
+using Math::Point2D;
 using Math::V4D;
 
 const uint16_t ObjectStateNull = 0;
@@ -88,37 +89,85 @@ typedef struct RGBA_Type {
     RGBA_Type(uint8_t r, uint8_t g, u_int8_t b, u_int8_t a) : r(r), g(g), b(b), a(a) {}
 } RGBA;
 
+typedef struct Vertext4D_Type {
+    union {
+        float m[12];
+        struct {
+            float x, y, z, w;
+            float nx, ny, nz, nw;
+            float u0, v0;
+            float i;
+            int attributes;
+        };
+        struct {
+            Point4D v;
+            V4D n;
+            Point2D t;
+        };
+    };
+} Vertex4D;
+
 typedef struct Polygon_Type {
     uint16_t state;
     uint16_t attributes;
-    V4D *points_list;
-    V4D *text_coords;
+    uint32_t color;
+    uint32_t lit_color[3];
+
+    int mati;
+    Texture *texture;
+
+    Vertex4D *vertices;
+    Point2D *text_coords;
+
     int vert[3];
     int text[3];
-    V4D normal;
-    RGBA color;
+    float n_length;
 } Polygon;
+
+typedef struct RenderListPoly_Type {
+    uint16_t state;
+    uint16_t attributes;
+    uint32_t color;
+    uint32_t lit_color[3];
+    Texture *texture;
+    int mati;
+
+    float n_length;
+    V4D normal;
+
+    float avg_z;
+    Vertex4D verts[3];
+    Vertex4D trans_verts[3];
+} RenderListPoly;
 
 typedef struct RenderObject_Type {
     int id;
     uint16_t state;
+    uint16_t attributes;
+
+    int mati;
 
     Transform transform;
-
     Texture *texture;
     RGBA color;
 
     int vertex_count;
-    V4D *local_points;
-    V4D *transformed_points;
+    int frames_count;
+    int curr_frame;
 
-    int text_coords_count;
-    V4D *text_coords;
+    Vertex4D *local_vertices;
+    Vertex4D *transformed_vertices;
+
+    Vertex4D *head_local_vertices;
+    Vertex4D *head_transformed_vertices;
+    Point2D *texture_coords;
 
     int poly_count;
     Polygon *polygons;
 
     RenderObject_Type(int id) : id(id) {}
+
+    int set_frame(int frame);
 } RenderObject;
 
 typedef struct Material_Type {

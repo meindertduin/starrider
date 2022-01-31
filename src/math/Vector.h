@@ -292,6 +292,9 @@ typedef struct V4D_Type {
 
     V4D_Type cross(const V4D_Type &other) const;
     float length() const;
+
+    /* Really fast but has high error percentage */
+    float length_fast() const;
     V4D_Type& normalise();
     V4D_Type normalized() const;
     float cos_th(const V4D_Type &other) const;
@@ -299,4 +302,31 @@ typedef struct V4D_Type {
 
 } V4D, Point4D, *V4D_Ptr, *Point4D_Ptr;
 
+typedef struct V2DI_Type {
+    union {
+        int m[2];
+        struct {
+            int x, y;
+        };
+    };
+} V2DI, Point2DI;
+
+typedef struct V3DI_Type {
+    union {
+        int m[3];
+        struct {
+            int x, y, z;
+        };
+    };
+} V3DI, Point3DI;
+
+typedef struct V4DI_Type {
+    union {
+        int m[4];
+        struct {
+            int x, y, z, w;
+        };
+    };
+} V4DI, Point4DI;
 }
+

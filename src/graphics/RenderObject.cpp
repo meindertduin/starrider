@@ -73,3 +73,24 @@ int create_base_dir_light(int index, RGBA col, V4D dir) {
             0, 1, 0,
             0, 0, 0);
 }
+
+int RenderObject_Type::set_frame(int frame) {
+    if (!(this->attributes & ObjectAttributeMultiFrame))
+        return 0;
+
+    if (frame < 0) {
+        frame = 0;
+    } else {
+        frame = this->frames_count - 1;
+    }
+
+    this->curr_frame = frame;
+
+    this->local_vertices = &(this->head_local_vertices[frame * this->vertex_count]);
+    this->transformed_vertices = &(this->head_transformed_vertices[frame * this->vertex_count]);
+
+    return 1;
+}
+
+
+
