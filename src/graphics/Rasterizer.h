@@ -14,8 +14,8 @@ struct Edge {
     Edge() {}
     Edge(const Vertex &min_y_vert, const Vertex &max_y_vert) {
         // fill convention is to ceil up
-    	y_start = min_y_vert.pos.y + 1.0f;
-		y_end = max_y_vert.pos.y + 1.0f;
+    	y_start = std::ceil(min_y_vert.pos.y);
+		y_end = std::ceil(max_y_vert.pos.y) - 1;
 
 		float y_dist = max_y_vert.pos.y - min_y_vert.pos.y;
 		float x_dist = max_y_vert.pos.x- min_y_vert.pos.x;
@@ -39,6 +39,19 @@ struct Edge {
         float x_prestep = x - min_y_vert.x;
     }
 
+    Edge(float min_y_x, float min_y_y, float max_y_x, float max_y_y) {
+    	y_start = min_y_y;
+		y_end = max_y_y;
+
+		float y_dist = max_y_y - min_y_y;
+		float x_dist = max_y_x- min_y_x;
+
+		x_step = x_dist / y_dist;
+		x = min_y_x;
+
+        float x_prestep = x - min_y_x;
+    }
+
     constexpr void step() {
         x += x_step;
     }
@@ -49,25 +62,15 @@ public:
     Rasterizer(Renderer* renderer);
     ~Rasterizer();
     void draw_triangle(V4D points[3], RGBA color);
-    void clear_depth_buffer();
+    void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color);
     void set_viewport(int width, int height);
 private:
+    int min_clip_y {0};
+    int min_clip_x {0};
     int m_width, m_height;
-    Renderer* p_renderer = nullptr;
-    float *p_z_buffer = nullptr;
 
+    Renderer* p_renderer = nullptr;
     Pixel* p_framebuffer;
 
-    inline void scan_edges(Edge &a, Edge &b, bool handedness, RGBA color);
-    void draw_scanline(const Edge &left, const Edge &right, int y, RGBA color) {
-        // fill convention ceils up
-        int x_min = left.x + 1.0f;
-        int x_max = right.x + 1.0f;
-
-        for(int x = x_min; x < x_max; x++)
-        {
-            if (x > 0 && y > 0 && x < m_width && y < m_height)
-                p_framebuffer[m_width * y + x].value = rgba_bit(color.r, color.g, color.b, color.a);
-        }
-    }
+    inline void scan_edges(Edge &a, Edge &b, bool handedness, uint32_t color);
 };

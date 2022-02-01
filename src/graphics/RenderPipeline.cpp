@@ -10,7 +10,6 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
-    m_rasterizer.clear_depth_buffer();
 
     auto vp = camera.get_view_projection();
 
@@ -64,7 +63,10 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         for (auto render_poly : render_list) {
             perspective_screen_transform(camera, render_poly.points);
-            m_rasterizer.draw_triangle(render_poly.points, render_poly.color);
+            m_rasterizer.draw_triangle(render_poly.points[0].x, render_poly.points[0].y,
+                render_poly.points[1].x, render_poly.points[1].y,
+                render_poly.points[2].x, render_poly.points[2].y,
+                rgba_bit(render_poly.color.r, render_poly.color.g, render_poly.color.b, render_poly.color.a));
         }
     }
 }
