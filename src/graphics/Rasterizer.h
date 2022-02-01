@@ -13,8 +13,9 @@ struct Edge {
 
     Edge() {}
     Edge(const Vertex &min_y_vert, const Vertex &max_y_vert) {
-    	y_start = min_y_vert.pos.y;
-		y_end = max_y_vert.pos.y;
+        // fill convention is to ceil up
+    	y_start = min_y_vert.pos.y + 1.0f;
+		y_end = max_y_vert.pos.y + 1.0f;
 
 		float y_dist = max_y_vert.pos.y - min_y_vert.pos.y;
 		float x_dist = max_y_vert.pos.x- min_y_vert.pos.x;
@@ -59,8 +60,9 @@ private:
 
     inline void scan_edges(Edge &a, Edge &b, bool handedness, RGBA color);
     void draw_scanline(const Edge &left, const Edge &right, int y, RGBA color) {
-        int x_min = left.x;
-        int x_max = right.x;
+        // fill convention ceils up
+        int x_min = left.x + 1.0f;
+        int x_max = right.x + 1.0f;
 
         for(int x = x_min; x < x_max; x++)
         {
