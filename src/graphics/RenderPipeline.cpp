@@ -40,8 +40,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
             auto line2 = renderable.transformed_vertices[current_poly.vert[0]].v
                 - renderable.transformed_vertices[current_poly.vert[2]].v;
 
-            auto camera_ray =  camera.m_transform.pos - renderable.transformed_vertices[current_poly.vert[0]].v.normalized();
-            current_poly.normal = line1.cross(line2).normalized();
+            auto camera_ray =  camera.m_transform.pos - renderable.transformed_vertices[current_poly.vert[0]].v;
+            current_poly.normal = line1.cross(line2);
 
             if (renderable.state & PolyAttributeTwoSided) {
                 // TODO: fix minor glitches in object polygons not being rendered
