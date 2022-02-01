@@ -45,6 +45,13 @@ void Rasterizer::draw_triangle(float x1, float y1, float x2, float y2, float x3,
         y3 = y_temp;
     }
 
+    if (y3 < min_clip_y || y1 > m_height ||
+        (x1 < min_clip_x && x2 < min_clip_x && x3 < min_clip_x) ||
+        (x1 > m_width && x2 > m_width && x3 > m_width))
+    {
+        return;
+    }
+
     float dx1 = x3 - x1;
     float dy1 = y3 - y1;
 
@@ -53,12 +60,25 @@ void Rasterizer::draw_triangle(float x1, float y1, float x2, float y2, float x3,
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    Edge bottom_to_top = Edge(x1, y1, x3, y3);
-    Edge bottom_to_middle = Edge(x1, y1, x2, y2);
-    Edge middle_to_top = Edge(x2, y2, x3, y3);
+    if (Math::f_cmp(y1, y2)) {
+        Edge bottom_to_top = Edge(x1, y1, x3, y3);
+        Edge bottom_to_middle = Edge(x1, y1, x2, y2);
 
-    scan_edges(bottom_to_top, bottom_to_middle, handedness, color);
-    scan_edges(bottom_to_top, middle_to_top, handedness, color);
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, color);
+    }
+    else if (Math::f_cmp(y2, y3)) {
+        Edge bottom_to_top = Edge(x1, y1, x3, y3);
+        Edge middle_to_top = Edge(x2, y2, x3, y3);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, color);
+    } else {
+        Edge bottom_to_top = Edge(x1, y1, x3, y3);
+        Edge bottom_to_middle = Edge(x1, y1, x2, y2);
+        Edge middle_to_top = Edge(x2, y2, x3, y3);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, color);
+        scan_edges(bottom_to_top, middle_to_top, handedness, color);
+    }
 }
 
 void Rasterizer::scan_edges(Edge &a, Edge &b, bool handedness, uint32_t color) {
