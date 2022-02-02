@@ -15,19 +15,19 @@ enum class CoordSelect {
     Trans_Only,
 };
 
-constexpr void camera_transform(const RenderObject &renderable, const Matrix4x4 &vp, const Polygon &current_poly, V4D *points) {
-    points[0] = vp.transform(renderable.transformed_vertices[current_poly.vert[0]].v);
-    points[1] = vp.transform(renderable.transformed_vertices[current_poly.vert[1]].v);
-    points[2] = vp.transform(renderable.transformed_vertices[current_poly.vert[2]].v);
+constexpr void camera_transform(const RenderObject &renderable, const Matrix4x4 &vp, const Polygon &current_poly, RenderListPoly &list_poly) {
+    list_poly.trans_verts[0].v = vp.transform(renderable.transformed_vertices[current_poly.vert[0]].v);
+    list_poly.trans_verts[1].v = vp.transform(renderable.transformed_vertices[current_poly.vert[1]].v);
+    list_poly.trans_verts[2].v = vp.transform(renderable.transformed_vertices[current_poly.vert[2]].v);
 }
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
 
-void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderPolygon> &render_list);
+void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list);
 
 void backface_removal_object(RenderObject& object, const Camera &camera);
 
-void perspective_screen_transform(const Camera &camera, V4D *points);
+void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
 RGBA light_polygon(const Polygon &polygon, Light *lights, int max_lights);
 

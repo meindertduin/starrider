@@ -222,47 +222,8 @@ constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return (a << 24) | (r << 16) | (g << 8) | b;
 }
 
-
-struct RenderPolygon {
-    uint16_t state;
-    uint16_t attributes;
-    V4D points[3];
-    RGBA color;
-    Math::V2D *text_coords;
-    int text[3];
-
-    RenderPolygon(const Polygon &poly, RGBA color)
-        : state(poly.state), attributes(poly.attributes), color(color), text_coords(poly.text_coords) {
-            text[0] = poly.text[0];
-            text[1] = poly.text[1];
-            text[2] = poly.text[2];
-        }
-};
-
-constexpr bool render_polygon_avg_sort(const RenderPolygon &a, const RenderPolygon &b) {
-    return 0.3333f * (a.points[0].z * a.points[1].z * a.points[2].z) > 0.3333f * (b.points[0].z * b.points[1].z * b.points[2].z);
+constexpr bool render_polygon_avg_sort(const RenderListPoly &a, const RenderListPoly &b) {
+    return 0.3333f * (a.trans_verts[0].v.z * a.trans_verts[1].v.z * a.trans_verts[2].v.z) >
+        0.3333f * (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
 }
 
-constexpr bool render_polygon_farz_sort(const RenderPolygon &a, const RenderPolygon &b) {
-    float a_farz = a.points[0].z > a.points[1].z ? a.points[0].z : a.points[1].z;
-    if (a_farz < a.points[2].z)
-        a_farz = a.points[2].z;
-
-    float b_farz = b.points[0].z > b.points[1].z ? b.points[0].z : b.points[1].z;
-    if (b_farz < b.points[2].z)
-        b_farz = b.points[2].z;
-
-    return a_farz > b_farz;
-}
-
-constexpr bool render_polygon_nearz_sort(const RenderPolygon &a, const RenderPolygon &b) {
-    float a_farz = a.points[0].z < a.points[1].z ? a.points[0].z : a.points[1].z;
-    if (a_farz > a.points[2].z)
-        a_farz = a.points[2].z;
-
-    float b_farz = b.points[0].z < b.points[1].z ? b.points[0].z : b.points[1].z;
-    if (b_farz > b.points[2].z)
-        b_farz = b.points[2].z;
-
-    return a_farz > b_farz;
-}

@@ -17,7 +17,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     auto v_forward = camera.m_transform.rot.get_back();
 
     for (auto object : renderables) {
-        std::vector<RenderPolygon> render_list;
+        std::vector<RenderListPoly> render_list;
 
         world_transform_object(object);
 
@@ -28,10 +28,10 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
 
         for (auto render_poly : render_list) {
-            perspective_screen_transform(camera, render_poly.points);
-            draw_triangle(render_poly.points[0].x, render_poly.points[0].y,
-                render_poly.points[1].x, render_poly.points[1].y,
-                render_poly.points[2].x, render_poly.points[2].y,
+            perspective_screen_transform(camera, render_poly);
+            draw_triangle(render_poly.trans_verts[0].v.x, render_poly.trans_verts[0].v.y,
+                render_poly.trans_verts[1].v.x, render_poly.trans_verts[1].v.y,
+                render_poly.trans_verts[2].v.x, render_poly.trans_verts[2].v.y,
                 rgba_bit(render_poly.color.r, render_poly.color.g, render_poly.color.b, render_poly.color.a));
         }
     }
@@ -87,33 +87,51 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
     }
 }
 
-void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderPolygon> &render_list) {
+void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
     for (int j = 0; j < object.poly_count; j++) {
         auto current_poly = object.polygons[j];
 
         if (!(object.polygons[j].state & PolyStateBackface)) {
             auto poly_color = light_polygon(current_poly, g_lights, num_lights);
 
-            auto render_poly = RenderPolygon(current_poly, poly_color);
-            camera_transform(object, vp, current_poly, render_poly.points);
+            RenderListPoly render_poly = {
+                .state = current_poly.state,
+                .attributes = current_poly.attributes,
+                .color = poly_color,
+                .texture = current_poly.texture,
+                .mati = current_poly.mati,
+                .n_length = current_poly.n_length,
+                .normal = current_poly.normal,
+                .verts = {
+                    current_poly.vertices[current_poly.vert[0]],
+                    current_poly.vertices[current_poly.vert[1]],
+                    current_poly.vertices[current_poly.vert[2]],
+                },
+                .trans_verts = {
+                    object.transformed_vertices[current_poly.vert[0]],
+                    object.transformed_vertices[current_poly.vert[1]],
+                    object.transformed_vertices[current_poly.vert[2]],
+                },
+            };
 
+            camera_transform(object, vp, current_poly, render_poly);
             render_list.push_back(render_poly);
         }
     }
 }
 
 
-void perspective_screen_transform(const Camera &camera, V4D *points) {
+void perspective_screen_transform(const Camera &camera, RenderListPoly &poly) {
     float alpha = (0.5f * camera.width - 0.5f);
     float beta = (0.5f * camera.height - 0.5f);
 
     for (int vertex = 0; vertex < 3; vertex++) {
-        float z = points[vertex].z;
-        points[vertex].x = camera.view_dist_h * points[vertex].x / z;
-        points[vertex].y =  camera.view_dist_v * points[vertex].y * camera.aspect_ratio / z;
+        float z = poly.trans_verts[vertex].v.z;
+        poly.trans_verts[vertex].v.x = camera.view_dist_h * poly.trans_verts[vertex].v.x / z;
+        poly.trans_verts[vertex].v.y =  camera.view_dist_v * poly.trans_verts[vertex].v.y * camera.aspect_ratio / z;
 
-        points[vertex].x = alpha + points[vertex].x * alpha;
-        points[vertex].y = beta - points[vertex].y * beta;
+        poly.trans_verts[vertex].v.x = alpha + poly.trans_verts[vertex].v.x * alpha;
+        poly.trans_verts[vertex].v.y = beta - poly.trans_verts[vertex].v.y * beta;
     }
 }
 
