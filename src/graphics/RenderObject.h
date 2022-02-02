@@ -95,6 +95,10 @@ typedef struct RGBA_Type {
     constexpr uint32_t to_argb_bit() const {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
+
+    constexpr uint32_t to_argb_bit(float i) {
+        return ((uint32_t)(a * i) << 24) | ((uint32_t)(r * i) << 16) | ((uint32_t)(g * i) << 16) | ((uint32_t) (b * i));
+    }
 } RGBA;
 
 typedef struct Vertext4D_Type {

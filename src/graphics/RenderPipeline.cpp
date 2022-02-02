@@ -111,6 +111,11 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
                 },
             };
 
+            // TODO: calculate from gourad shading
+            render_poly.trans_verts[0].i = 1.0f;
+            render_poly.trans_verts[1].i = 1.0f;
+            render_poly.trans_verts[2].i = 1.0f;
+
             camera_transform(object, vp, current_poly, render_poly);
             render_list.push_back(render_poly);
         }

@@ -55,20 +55,20 @@ void draw_gouraud_triangle(RenderListPoly &poly) {
         Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
         Edge bottom_to_middle = Edge(poly.trans_verts[v0], poly.trans_verts[v1]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color.to_argb_bit());
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
         Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
         Edge middle_to_top = Edge(poly.trans_verts[v1], poly.trans_verts[v2]);
 
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color.to_argb_bit());
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color);
     } else {
         Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
         Edge bottom_to_middle = Edge(poly.trans_verts[v0], poly.trans_verts[v1]);
         Edge middle_to_top = Edge(poly.trans_verts[v1], poly.trans_verts[v2]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color.to_argb_bit());
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color.to_argb_bit());
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color);
     }
 }
 
@@ -144,7 +144,7 @@ void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, u
     }
 }
 
-void scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, uint32_t color) {
+void scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, RGBA color) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -152,12 +152,19 @@ void scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, uint32_t col
     Edge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
+        float dix = (right.i - left.i) / (right.x - left.x);
+        float i = left.i;
         for(int x = left.x; x < right.x; x++) {
             if (x > 0 && y > 0 && x < m_width && y < m_height)
-                p_frame_buffer[m_width * y + x].value = color;
+                p_frame_buffer[m_width * y + x].value = color.to_argb_bit(i);
+            i += dix;
         }
-        long_edge.x += long_edge.x_step;
-        short_edge.x += short_edge.x_step;
+
+        left.x += left.x_step;
+        right.x += right.x_step;
+
+        left.i += left.di_dy;
+        right.i += right.di_dy;
     }
 }
 
