@@ -47,7 +47,7 @@ void Application::run() {
     m_running = true;
 
     Renderer renderer;
-    RenderPipeline render_pipeline {&renderer};
+    Graphics::RenderPipeline render_pipeline {&renderer};
 
     reset_materials();
     reset_lights();

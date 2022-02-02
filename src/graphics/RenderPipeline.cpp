@@ -2,6 +2,8 @@
 
 #include "RenderPipeline.h"
 
+namespace Graphics {
+
 RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_rasterizer(renderer) {
 
 }
@@ -10,54 +12,18 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     m_rasterizer.set_viewport(camera.width, camera.height);
 
     p_renderer->clear_screen();
-
     auto vp = camera.get_view_projection();
 
     auto v_forward = camera.m_transform.rot.get_back();
 
-    for (auto renderable : renderables) {
+    for (auto object : renderables) {
         std::vector<RenderPolygon> render_list;
-        Matrix4x4 mat_rot = renderable.transform.get_rotation_matrix();
 
-        for (int i = 0; i < renderable.vertex_count; i++) {
-            renderable.transformed_vertices[i].v = mat_rot.transform(renderable.local_vertices[i].v);
+        world_transform_object(object);
 
-            renderable.transformed_vertices[i].v = renderable.transformed_vertices[i].v + renderable.transform.pos;
+        backface_removal_object(object, camera);
 
-            renderable.transformed_vertices[i].v.x *= renderable.transform.scale.x;
-            renderable.transformed_vertices[i].v.y *= renderable.transform.scale.y;
-            renderable.transformed_vertices[i].v.z *= renderable.transform.scale.z;
-        }
-
-        for (int i = 0; i < renderable.poly_count; i++) {
-            auto current_poly = renderable.polygons[i];
-            current_poly.attributes |= ShadeModeFlat;
-
-            auto line1 = renderable.transformed_vertices[current_poly.vert[0]].v
-                - renderable.transformed_vertices[current_poly.vert[1]].v;
-
-            auto line2 = renderable.transformed_vertices[current_poly.vert[0]].v
-                - renderable.transformed_vertices[current_poly.vert[2]].v;
-
-            auto camera_ray =  camera.m_transform.pos - renderable.transformed_vertices[current_poly.vert[0]].v;
-            current_poly.normal = line1.cross(line2);
-
-            if (renderable.state & PolyAttributeTwoSided) {
-                // TODO: fix minor glitches in object polygons not being rendered
-                // Probably has to do with the camera_ray not being entiterly accurate
-                if (current_poly.normal.dot(camera_ray) >= 0.0f) {
-                    auto poly_color = light_polygon(current_poly, camera, g_lights, num_lights);
-                    auto render_poly = RenderPolygon(current_poly, poly_color);
-                    camera_transform(renderable, vp, current_poly, render_poly.points);
-                    render_list.push_back(render_poly);
-                }
-            } else {
-                auto poly_color = light_polygon(current_poly, camera, g_lights, num_lights);
-                auto render_poly = RenderPolygon(current_poly, poly_color);
-                camera_transform(renderable, vp, current_poly, render_poly.points);
-                render_list.push_back(render_poly);
-            }
-        }
+        light_camera_transform_object(object, vp, render_list);
 
         std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
 
@@ -71,7 +37,72 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
     }
 }
 
-void RenderPipeline::perspective_screen_transform(const Camera &camera, V4D *points) {
+void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderPolygon> &render_list) {
+    for (int j = 0; j < object.poly_count; j++) {
+        auto current_poly = object.polygons[j];
+
+        if (!(object.polygons[j].state & PolyStateBackface)) {
+            auto poly_color = light_polygon(current_poly, g_lights, num_lights);
+
+            auto render_poly = RenderPolygon(current_poly, poly_color);
+            camera_transform(object, vp, current_poly, render_poly.points);
+
+            render_list.push_back(render_poly);
+        }
+    }
+}
+
+void world_transform_object(RenderObject &object, CoordSelect coord_select) {
+    if (!(object.state & ObjectStateActive) || !(object.state & ObjectStateVisible))
+        return;
+
+    Matrix4x4 mat_rot = object.transform.get_rotation_matrix();
+
+    if (coord_select == CoordSelect::Local_To_Trans) {
+        for (int i = 0; i < object.vertex_count; i++) {
+            object.transformed_vertices[i].v = mat_rot.transform(object.local_vertices[i].v);
+
+            object.transformed_vertices[i].v = object.transformed_vertices[i].v + object.transform.pos;
+
+            object.transformed_vertices[i].v.x *= object.transform.scale.x;
+            object.transformed_vertices[i].v.y *= object.transform.scale.y;
+            object.transformed_vertices[i].v.z *= object.transform.scale.z;
+        }
+    } else if (coord_select == CoordSelect::Trans_Only) {
+        for (int i = 0; i < object.vertex_count; i++) {
+            object.transformed_vertices[i].v = mat_rot.transform(object.transformed_vertices[i].v);
+
+            object.transformed_vertices[i].v = object.transformed_vertices[i].v + object.transform.pos;
+
+            object.transformed_vertices[i].v.x *= object.transform.scale.x;
+            object.transformed_vertices[i].v.y *= object.transform.scale.y;
+            object.transformed_vertices[i].v.z *= object.transform.scale.z;
+        }
+    }
+}
+
+void backface_removal_object(RenderObject& object, const Camera &camera) {
+    for (int i = 0; i < object.poly_count; i++) {
+        auto line1 = object.transformed_vertices[object.polygons[i].vert[0]].v
+            - object.transformed_vertices[object.polygons[i].vert[1]].v;
+
+        auto line2 = object.transformed_vertices[object.polygons[i].vert[0]].v
+            - object.transformed_vertices[object.polygons[i].vert[2]].v;
+
+        auto camera_ray =  camera.m_transform.pos - object.transformed_vertices[object.polygons[i].vert[0]].v;
+        object.polygons[i].normal = line1.cross(line2);
+
+        if (object.state & PolyAttributeTwoSided) {
+            if (object.polygons[i].normal.dot(camera_ray) < 0.0f) {
+                object.polygons[i].state |= PolyStateBackface;
+            } else {
+                object.polygons[i].state = PolyStateNull;
+            }
+        }
+    }
+}
+
+void perspective_screen_transform(const Camera &camera, V4D *points) {
     float alpha = (0.5f * camera.width - 0.5f);
     float beta = (0.5f * camera.height - 0.5f);
 
@@ -85,14 +116,14 @@ void RenderPipeline::perspective_screen_transform(const Camera &camera, V4D *poi
     }
 }
 
-RGBA RenderPipeline::light_polygon(const Polygon &polygon, const Camera &camera, Light *lights, int max_lights) {
+RGBA light_polygon(const Polygon &polygon, Light *lights, int max_lights) {
     uint32_t r_base, g_base, b_base,
              r_sum, g_sum, b_sum,
              shaded_color;
 
     float dp, dist, i, n1, atten;
 
-    if (polygon.attributes & ShadeModeFlat || polygon.attributes & ShadeModeGouraud) {
+    if (polygon.attributes & PolyAttributeShadeModeFlat || polygon.attributes & PolyAttributeShadeModeGouraud) {
         r_sum = g_sum = b_sum = 0;
 
         for (int curr_light = 0; curr_light < max_lights; curr_light++) {
@@ -142,3 +173,4 @@ RGBA RenderPipeline::light_polygon(const Polygon &polygon, const Camera &camera,
     return polygon.color;
 }
 
+}

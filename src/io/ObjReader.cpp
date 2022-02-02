@@ -97,6 +97,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         polygon.text_coords = object.texture_coords;
 
         // TODO: get these values from obj file
+        polygon.state = PolyStateNull;
         polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 | PolyAttributeShadeModeGouraud;
         polygon.color = 0xFFFFFFFF;
 
