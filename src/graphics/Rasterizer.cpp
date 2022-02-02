@@ -14,8 +14,66 @@ int m_width {0};
 int m_height {0};
 
 
+void draw_gouraud_triangle(RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y) {
+        temp = v0;
+        v0 = v1;
+        v1 = temp;
+    }
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y) {
+        temp = v0;
+        v0 = v2;
+        v2 = temp;
+    }
+
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y) {
+        temp = v1;
+        v1 = v2;
+        v2 = temp;
+    }
+
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
+
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
+
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
+        Edge bottom_to_middle = Edge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color.to_argb_bit());
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
+        Edge middle_to_top = Edge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color.to_argb_bit());
+    } else {
+        Edge bottom_to_top = Edge(poly.trans_verts[v0], poly.trans_verts[v2]);
+        Edge bottom_to_middle = Edge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        Edge middle_to_top = Edge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color.to_argb_bit());
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color.to_argb_bit());
+    }
+}
+
 void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color) {
-    if (Math::f_cmp(x1, x2) && Math::f_cmp(x2, x3) || Math::f_cmp(y1, y2) && Math::f_cmp(y2, y3))
+    if ((Math::f_cmp(x1, x2) && Math::f_cmp(x2, x3)) || (Math::f_cmp(y1, y2) && Math::f_cmp(y2, y3)))
         return;
 
     float x_temp, y_temp;

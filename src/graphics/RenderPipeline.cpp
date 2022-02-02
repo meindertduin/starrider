@@ -29,10 +29,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         for (auto render_poly : render_list) {
             perspective_screen_transform(camera, render_poly);
-            draw_triangle(render_poly.trans_verts[0].v.x, render_poly.trans_verts[0].v.y,
-                render_poly.trans_verts[1].v.x, render_poly.trans_verts[1].v.y,
-                render_poly.trans_verts[2].v.x, render_poly.trans_verts[2].v.y,
-                rgba_bit(render_poly.color.r, render_poly.color.g, render_poly.color.b, render_poly.color.a));
+            draw_gouraud_triangle(render_poly);
         }
     }
 }

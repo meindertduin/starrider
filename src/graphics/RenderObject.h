@@ -91,6 +91,10 @@ typedef struct RGBA_Type {
     RGBA_Type() = default;
     RGBA_Type(uint32_t rgba) : rgba(rgba) {  }
     RGBA_Type(uint8_t r, uint8_t g, u_int8_t b, u_int8_t a) : r(r), g(g), b(b), a(a) {}
+
+    constexpr uint32_t to_argb_bit() const {
+        return (a << 24) | (r << 16) | (g << 8) | b;
+    }
 } RGBA;
 
 typedef struct Vertext4D_Type {
