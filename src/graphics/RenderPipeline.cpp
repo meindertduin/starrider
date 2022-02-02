@@ -4,12 +4,12 @@
 
 namespace Graphics {
 
-RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer), m_rasterizer(renderer) {
+RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 }
 
 void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables) {
-    m_rasterizer.set_viewport(camera.width, camera.height);
+    rast_set_frame_buffer(camera.width, camera.height, p_renderer->get_framebuffer());
 
     p_renderer->clear_screen();
     auto vp = camera.get_view_projection();
@@ -29,25 +29,10 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         for (auto render_poly : render_list) {
             perspective_screen_transform(camera, render_poly.points);
-            m_rasterizer.draw_triangle(render_poly.points[0].x, render_poly.points[0].y,
+            draw_triangle(render_poly.points[0].x, render_poly.points[0].y,
                 render_poly.points[1].x, render_poly.points[1].y,
                 render_poly.points[2].x, render_poly.points[2].y,
                 rgba_bit(render_poly.color.r, render_poly.color.g, render_poly.color.b, render_poly.color.a));
-        }
-    }
-}
-
-void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderPolygon> &render_list) {
-    for (int j = 0; j < object.poly_count; j++) {
-        auto current_poly = object.polygons[j];
-
-        if (!(object.polygons[j].state & PolyStateBackface)) {
-            auto poly_color = light_polygon(current_poly, g_lights, num_lights);
-
-            auto render_poly = RenderPolygon(current_poly, poly_color);
-            camera_transform(object, vp, current_poly, render_poly.points);
-
-            render_list.push_back(render_poly);
         }
     }
 }
@@ -101,6 +86,22 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
         }
     }
 }
+
+void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderPolygon> &render_list) {
+    for (int j = 0; j < object.poly_count; j++) {
+        auto current_poly = object.polygons[j];
+
+        if (!(object.polygons[j].state & PolyStateBackface)) {
+            auto poly_color = light_polygon(current_poly, g_lights, num_lights);
+
+            auto render_poly = RenderPolygon(current_poly, poly_color);
+            camera_transform(object, vp, current_poly, render_poly.points);
+
+            render_list.push_back(render_poly);
+        }
+    }
+}
+
 
 void perspective_screen_transform(const Camera &camera, V4D *points) {
     float alpha = (0.5f * camera.width - 0.5f);

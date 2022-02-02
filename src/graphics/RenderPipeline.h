@@ -37,7 +37,6 @@ public:
     RenderPipeline(Renderer *renderer);
     void render_objects(const Camera &camera, std::vector<RenderObject> renderables);
 private:
-    Rasterizer m_rasterizer;
     Renderer* p_renderer = nullptr;
 };
 

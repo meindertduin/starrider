@@ -3,13 +3,18 @@
 
 using Math::V2D;
 
-Rasterizer::Rasterizer(Renderer* renderer) : p_renderer(renderer) {
-}
+namespace Graphics {
 
-Rasterizer::~Rasterizer() {
-}
+Pixel* p_frame_buffer;
 
-void Rasterizer::draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color) {
+int min_clip_y {0};
+int min_clip_x {0};
+
+int m_width {0};
+int m_height {0};
+
+
+void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color) {
     if (Math::f_cmp(x1, x2) && Math::f_cmp(x2, x3) || Math::f_cmp(y1, y2) && Math::f_cmp(y2, y3))
         return;
 
@@ -81,7 +86,7 @@ void Rasterizer::draw_triangle(float x1, float y1, float x2, float y2, float x3,
     }
 }
 
-void Rasterizer::scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, uint32_t color) {
+void scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, uint32_t color) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -91,18 +96,21 @@ void Rasterizer::scan_edges(Edge &long_edge, Edge &short_edge, bool handedness, 
     for(int y = y_start; y < y_end; y++) {
         for(int x = left.x; x < right.x; x++) {
             if (x > 0 && y > 0 && x < m_width && y < m_height)
-                p_framebuffer[m_width * y + x].value = color;
+                p_frame_buffer[m_width * y + x].value = color;
         }
         long_edge.x += long_edge.x_step;
         short_edge.x += short_edge.x_step;
     }
 }
 
-void Rasterizer::set_viewport(int width, int height) {
+void rast_set_frame_buffer(int width, int height, Pixel *frame_buffer) {
     if (m_width != width || height != m_height) {
         m_width = width;
         m_height = height;
 
-        p_framebuffer = p_renderer->get_framebuffer();
+        p_frame_buffer = frame_buffer;
     }
 }
+
+}
+
