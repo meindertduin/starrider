@@ -91,6 +91,7 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
         auto current_poly = object.polygons[j];
 
         if (!(object.polygons[j].state & PolyStateBackface)) {
+            current_poly.vertices = object.transformed_vertices;
             gourad_light_polygon(current_poly, g_lights, num_lights);
 
             RenderListPoly render_poly = {
@@ -102,9 +103,9 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
                 .n_length = current_poly.n_length,
                 .normal = current_poly.normal,
                 .verts = {
-                    current_poly.vertices[current_poly.vert[0]],
-                    current_poly.vertices[current_poly.vert[1]],
-                    current_poly.vertices[current_poly.vert[2]],
+                    object.local_vertices[current_poly.vert[0]],
+                    object.local_vertices[current_poly.vert[1]],
+                    object.local_vertices[current_poly.vert[2]],
                 },
                 .trans_verts = {
                     object.transformed_vertices[current_poly.vert[0]],
@@ -144,11 +145,12 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
              r0_sum, g0_sum, b0_sum,
              r1_sum, g1_sum, b1_sum,
              r2_sum, g2_sum, b2_sum,
+             ri, gi, bi,
              shaded_color;
 
     float dp, dist, i, n1, atten;
 
-    if (polygon.attributes & PolyAttributeShadeModeFlat || polygon.attributes & PolyAttributeShadeModeGouraud) {
+    if (polygon.attributes & PolyAttributeShadeModeGouraud) {
         r0_sum = g0_sum = b0_sum = 0;
         r1_sum = g1_sum = b1_sum = 0;
         r2_sum = g2_sum = b2_sum = 0;
@@ -159,16 +161,27 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
             }
 
             if (lights[curr_light].attributes & LightAttributeAmbient) {
-                r0_sum += ((lights[curr_light].c_ambient.r * polygon.color.r) >> 8);
-                g0_sum += ((lights[curr_light].c_ambient.g * polygon.color.g) >> 8);
-                b0_sum += ((lights[curr_light].c_ambient.b * polygon.color.b) >> 8);
+                ri = ((lights[curr_light].c_ambient.r * polygon.color.r) >> 8);
+                gi = ((lights[curr_light].c_ambient.g * polygon.color.g) >> 8);
+                bi = ((lights[curr_light].c_ambient.b * polygon.color.b) >> 8);
+
+                r0_sum += ri;
+                g0_sum += gi;
+                b0_sum += bi;
+
+                r1_sum += ri;
+                g1_sum += gi;
+                b1_sum += bi;
+
+                r2_sum += ri;
+                g2_sum += gi;
+                b2_sum += bi;
             }
             else if (lights[curr_light].attributes & LightAttributeInfinite) {
                 auto dp = polygon.vertices[polygon.vert[0]].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
-                    // i = 128 * dp;
-                    i = 128 * dp / polygon.vertices[polygon.vert[0]].n.length();
+                    i = 128 * dp;
 
                     r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                     g0_sum += ((lights[curr_light].c_diffuse.g * polygon.color.g * i) / (256 * 128));
@@ -178,8 +191,7 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
                 dp = polygon.vertices[polygon.vert[1]].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
-                    //i = 128 * dp;
-                    i = 128 * dp / polygon.vertices[polygon.vert[1]].n.length();
+                    i = 128 * dp;
 
                     r1_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                     g1_sum += ((lights[curr_light].c_diffuse.g * polygon.color.g * i) / (256 * 128));
@@ -189,8 +201,7 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
                 dp = polygon.vertices[polygon.vert[2]].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
-                    //i = 128 * dp;
-                    i = 128 * dp / polygon.vertices[polygon.vert[2]].n.length();
+                    i = 128 * dp;
 
                     r2_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                     g2_sum += ((lights[curr_light].c_diffuse.g * polygon.color.g * i) / (256 * 128));

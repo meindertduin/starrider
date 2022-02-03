@@ -52,8 +52,8 @@ void Application::run() {
     reset_materials();
     reset_lights();
 
-    create_base_amb_light(0, RGBA { 50, 50, 50, 255 });
-    create_base_dir_light(1, RGBA { 0xFFFFFFFF }, V4D(0, 0, -1).normalized());
+    create_base_amb_light(0, RGBA { 20, 20, 20, 255 });
+    create_base_dir_light(1, RGBA { 125, 125, 125, 255 }, V4D(0, 0, -1).normalized());
 
     // Setup camera
     p_camera = std::make_unique<Camera>();

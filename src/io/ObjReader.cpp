@@ -99,7 +99,6 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         // TODO: get these values from obj file
         polygon.state = PolyStateNull;
         polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 | PolyAttributeShadeModeGouraud;
-        polygon.color = 0xFFFFFFFF;
 
         for (int j = 0; j < 3; j++) {
             auto current_index = m_indices[i + j];
@@ -113,10 +112,10 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
                 polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeTexture;
             }
 
-            if (has_normal_indices) {
-                polygon.vertices[current_index.vertex_index].n = m_normals[current_index.normal_index];
-                polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeNormal;
-            }
+            // if (has_normal_indices) {
+            //     polygon.vertices[current_index.vertex_index].n = m_normals[current_index.normal_index];
+            //     polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeNormal;
+            // }
         }
 
         if (polygon.attributes & ShadeModeGouraud || polygon.attributes & ShadeModeFastPhong) {
@@ -142,7 +141,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         object.polygons[i] = polygons[i];
     }
 
-    if (!has_normal_indices) {
+    if (has_normal_indices) {
         compute_vertex_normals(object);
     }
 }
