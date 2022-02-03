@@ -93,6 +93,7 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
         if (!(object.polygons[j].state & PolyStateBackface)) {
             current_poly.vertices = object.transformed_vertices;
             gourad_light_polygon(current_poly, g_lights, num_lights);
+            // flat_light_polygon(current_poly, g_lights, num_lights);
 
             RenderListPoly render_poly = {
                 .state = current_poly.state,
@@ -148,7 +149,7 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
              ri, gi, bi,
              shaded_color;
 
-    float dp, dist, i, n1, atten;
+    float dp, dist, n1, atten, i;
 
     if (polygon.attributes & PolyAttributeShadeModeGouraud) {
         r0_sum = g0_sum = b0_sum = 0;
@@ -227,25 +228,16 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
         if (r0_sum > 255) r0_sum = 255;
         if (g0_sum > 255) g0_sum = 255;
         if (b0_sum > 255) b0_sum = 255;
+        if (r1_sum > 255) r1_sum = 255;
+        if (g1_sum > 255) g1_sum = 255;
+        if (b1_sum > 255) b1_sum = 255;
+        if (r2_sum > 255) r2_sum = 255;
+        if (g2_sum > 255) g2_sum = 255;
+        if (b2_sum > 255) b2_sum = 255;
 
-        if (r1_sum > 0) {
-            if (r1_sum > 255) r1_sum = 255;
-            if (g1_sum > 255) g1_sum = 255;
-            if (b1_sum > 255) b1_sum = 255;
-            if (r2_sum > 255) r2_sum = 255;
-            if (g2_sum > 255) g2_sum = 255;
-            if (b2_sum > 255) b2_sum = 255;
-
-            polygon.lit_color[0] = RGBA(r0_sum, g0_sum, b0_sum, 0xFF);
-            polygon.lit_color[1] = RGBA(r1_sum, g1_sum, b1_sum, 0xFF);
-            polygon.lit_color[2] = RGBA(r2_sum, g2_sum, b2_sum, 0xFF);
-
-        } else {
-            auto verts_color = RGBA(r0_sum, g0_sum, b0_sum, 0xFF);
-            polygon.lit_color[0] = verts_color;
-            polygon.lit_color[1] = verts_color;
-            polygon.lit_color[2] = verts_color;
-        }
+        polygon.lit_color[0] = RGBA(r0_sum, g0_sum, b0_sum, 0xFF);
+        polygon.lit_color[1] = RGBA(r1_sum, g1_sum, b1_sum, 0xFF);
+        polygon.lit_color[2] = RGBA(r2_sum, g2_sum, b2_sum, 0xFF);
     }
 }
 
