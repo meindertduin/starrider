@@ -120,17 +120,13 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         }
 
         if (polygon.attributes & ShadeModeGouraud || polygon.attributes & ShadeModeFastPhong) {
-            if (has_normal_indices) {
-                auto line1 = object.transformed_vertices[polygon.vert[0]].v
-                    - object.transformed_vertices[polygon.vert[1]].v;
+            auto line1 = object.transformed_vertices[polygon.vert[0]].v
+                - object.transformed_vertices[polygon.vert[1]].v;
 
-                auto line2 = object.transformed_vertices[polygon.vert[0]].v
-                    - object.transformed_vertices[polygon.vert[2]].v;
+            auto line2 = object.transformed_vertices[polygon.vert[0]].v
+                - object.transformed_vertices[polygon.vert[2]].v;
 
-                polygon.n_length = line1.cross(line2).length();
-            } else {
-                compute_vertex_normals(object);
-            }
+            polygon.n_length = line1.cross(line2).length();
         }
 
         // TODO read color out of file
@@ -138,11 +134,16 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         polygons.push_back(polygon);
     }
 
+
     object.poly_count = polygons.size();
     object.polygons = new Polygon[object.poly_count];
 
     for (int i = 0; i < polygons.size(); i++) {
         object.polygons[i] = polygons[i];
+    }
+
+    if (!has_normal_indices) {
+        compute_vertex_normals(object);
     }
 }
 
@@ -156,11 +157,11 @@ int ObjReader::compute_vertex_normals(RenderObject &object) {
             int vi1 = object.polygons[poly].vert[1];
             int vi2 = object.polygons[poly].vert[2];
 
-            auto line1 = object.transformed_vertices[object.polygons[poly].vert[0]].v
-                - object.transformed_vertices[object.polygons[poly].vert[1]].v;
+            auto line1 = object.local_vertices[vi0].v
+                - object.local_vertices[vi1].v;
 
-            auto line2 = object.transformed_vertices[object.polygons[poly].vert[0]].v
-                - object.transformed_vertices[object.polygons[poly].vert[2]].v;
+            auto line2 = object.local_vertices[vi0].v
+                - object.local_vertices[vi2].v;
 
             auto n = line1.cross(line2);
 
