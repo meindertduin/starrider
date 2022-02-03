@@ -132,7 +132,7 @@ typedef struct RenderListPoly_Type {
     uint16_t state;
     uint16_t attributes;
     RGBA color;
-    uint32_t lit_color[3];
+    RGBA lit_color[3];
     Texture *texture;
     int mati;
 

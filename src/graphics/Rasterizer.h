@@ -7,7 +7,7 @@
 
 namespace Graphics {
 
-struct Edge {
+struct IGouradEdge {
     float x;
     float x_step;
     int y_start;
@@ -17,9 +17,9 @@ struct Edge {
     float di_dy;
     float i;
 
-    Edge() = default;
+    IGouradEdge() = default;
 
-    Edge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
+    IGouradEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
         y_start = min_y_vert.v.y;
         y_end = max_y_vert.v.y;
 
@@ -32,30 +32,56 @@ struct Edge {
         di_dy = (max_y_vert.i - min_y_vert.i) / (max_y_vert.v.y - min_y_vert.v.y);
         i = min_y_vert.i;
     }
+};
 
-    Edge(float min_y_x, float min_y_y, float max_y_x, float max_y_y) {
-        y_start = min_y_y;
-        y_end = max_y_y;
+struct CGouradEdge {
+    float x;
+    float x_step;
+    int y_start;
+    int y_end;
 
-        float y_dist = max_y_y - min_y_y;
-        float x_dist = max_y_x- min_y_x;
+    // lighting
+    float dr_dy;
+    float dg_dy;
+    float db_dy;
+    float r;
+    float g;
+    float b;
+
+    CGouradEdge() = default;
+
+    CGouradEdge(const Vertex4D &min_y_vert, RGBA min_y_vert_col, const Vertex4D &max_y_vert, RGBA max_y_vert_col) {
+        y_start = min_y_vert.v.y;
+        y_end = max_y_vert.v.y;
+
+        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
+        float x_dist = max_y_vert.v.x- min_y_vert.v.x;
 
         x_step = x_dist / y_dist;
-        x = min_y_x;
+        x = min_y_vert.v.x;
 
-        float x_prestep = x - min_y_x;
+        dr_dy = (max_y_vert_col.r - min_y_vert_col.r) / (max_y_vert.v.y - min_y_vert.v.y);
+        dg_dy = (max_y_vert_col.g - min_y_vert_col.g) / (max_y_vert.v.y - min_y_vert.v.y);
+        db_dy = (max_y_vert_col.b - min_y_vert_col.b) / (max_y_vert.v.y - min_y_vert.v.y);
+
+        r = min_y_vert_col.r;
+        g = min_y_vert_col.g;
+        b = min_y_vert_col.b;
     }
 };
 
 void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color);
 
-void draw_gouraud_triangle(RenderListPoly &poly);
+void draw_colored_gouraud_triangle(RenderListPoly &poly);
+
+void draw_intensity_gouraud_triangle(RenderListPoly &poly);
 
 void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 
 void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color);
 
-void scan_edges(Edge &left, Edge &right, bool handedness, RGBA color);
+void scan_edges(IGouradEdge &left, IGouradEdge &right, bool handedness, RGBA color);
+void scan_edges(CGouradEdge &left, CGouradEdge &right, bool handedness, RGBA color);
 
 }
 

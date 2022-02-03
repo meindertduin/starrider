@@ -19,6 +19,10 @@ constexpr void camera_transform(const RenderObject &renderable, const Matrix4x4 
     list_poly.trans_verts[0].v = vp.transform(renderable.transformed_vertices[current_poly.vert[0]].v);
     list_poly.trans_verts[1].v = vp.transform(renderable.transformed_vertices[current_poly.vert[1]].v);
     list_poly.trans_verts[2].v = vp.transform(renderable.transformed_vertices[current_poly.vert[2]].v);
+
+    list_poly.trans_verts[0].n = vp.transform(renderable.transformed_vertices[current_poly.vert[0]].n);
+    list_poly.trans_verts[1].n = vp.transform(renderable.transformed_vertices[current_poly.vert[1]].n);
+    list_poly.trans_verts[2].n = vp.transform(renderable.transformed_vertices[current_poly.vert[2]].n);
 }
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
@@ -29,7 +33,9 @@ void backface_removal_object(RenderObject& object, const Camera &camera);
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
-RGBA light_polygon(const Polygon &polygon, Light *lights, int max_lights);
+void light_polygon(Polygon &polygon, Light *lights, int max_lights);
+
+void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights);
 
 
 class RenderPipeline {
