@@ -54,20 +54,20 @@ void draw_colored_gouraud_triangle(RenderListPoly &poly) {
         CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
         CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1], poly.lit_color[v1]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color);
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
         CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
         CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2], poly.lit_color[v2]);
 
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
     } else {
         CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
         CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1], poly.lit_color[v1]);
         CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2], poly.lit_color[v2]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color);
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color);
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
     }
 }
 
@@ -153,7 +153,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     }
 }
 
-void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color) {
+void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -170,12 +170,23 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
         float dbx = (right.b - left.b) / (right.x - left.x);
         float b = left.b;
 
+        float du = (right.u - left.u) / (right.x - left.x);
+        float dv = (right.v - left.v) / (right.x - left.x);
+
+        float u = left.u;
+        float v = left.v;
+
         for(int x = left.x; x < right.x; x++) {
-            if (x > 0 && y > 0 && x < m_width && y < m_height)
-                p_frame_buffer[m_width * y + x].value = rgba_bit(r, g, b, 0xFF);
+            if (x > 0 && y > 0 && x < m_width && y < m_height) {
+                auto pixel = poly.texture->get_pixel(u * poly.texture->width, v * poly.texture->height);
+                p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red, pixel.rgba.green, pixel.rgba.green, 0xFF);
+            }
             r += drx;
             g += dgx;
             b += dbx;
+
+            u += du;
+            v += dv;
         }
 
         left.x += left.x_step;
@@ -188,6 +199,12 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
         right.r += right.dr_dy;
         right.g += right.dg_dy;
         right.b += right.db_dy;
+
+        left.u += left.du_dy;
+        left.v += left.dv_dy;
+
+        right.u += left.du_dy;
+        right.v += left.dv_dy;
     }
 }
 

@@ -106,7 +106,6 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
 
             if (has_tex_coords) {
                 polygon.vertices[current_index.vertex_index].t = m_tex_coords[current_index.tex_coord_index];
-                object.texture_coords[polygon.vert[j]] = m_tex_coords[current_index.tex_coord_index];
                 polygon.text_coords[current_index.vertex_index] = m_tex_coords[current_index.tex_coord_index];
 
                 polygon.text[j] = current_index.vertex_index;

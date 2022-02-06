@@ -45,6 +45,7 @@ void world_transform_object(RenderObject &object, CoordSelect coord_select) {
         for (int i = 0; i < object.vertex_count; i++) {
             object.transformed_vertices[i].v = mat_rot.transform(object.local_vertices[i].v);
             object.transformed_vertices[i].n = mat_rot.transform(object.local_vertices[i].n);
+            object.transformed_vertices[i].t = object.local_vertices[i].t;
 
             object.transformed_vertices[i].v = object.transformed_vertices[i].v + object.transform.pos;
 
