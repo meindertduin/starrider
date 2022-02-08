@@ -84,7 +84,7 @@ void Application::run() {
         poll_window_events();
 
         render_pipeline.render_objects(*p_camera, objects);
-        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+        // objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         string time_text = std::to_string(dt) + "MS";
         renderer.render_text(time_text, ttf_font, {20, 52});

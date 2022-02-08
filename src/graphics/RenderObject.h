@@ -157,6 +157,7 @@ typedef struct RenderObject_Type {
 
     int vertex_count;
     int frames_count;
+    int text_count;
     int curr_frame;
 
     Vertex4D *local_vertices;

@@ -120,6 +120,11 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
             render_poly.lit_color[1] = current_poly.lit_color[1];
             render_poly.lit_color[2] = current_poly.lit_color[2];
 
+            // TODO optimize
+            render_poly.trans_verts[0].t = current_poly.text_coords[current_poly.text[0]];
+            render_poly.trans_verts[1].t = current_poly.text_coords[current_poly.text[1]];
+            render_poly.trans_verts[2].t = current_poly.text_coords[current_poly.text[2]];
+
             camera_transform(object, vp, current_poly, render_poly);
 
             render_list.push_back(render_poly);

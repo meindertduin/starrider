@@ -19,7 +19,7 @@ struct ObjIndex {
 class ObjReader {
 public:
     ObjReader();
-    bool read_file(string path);
+    bool read_file(string path, int text_width, int text_height);
     void create_render_object(RenderObject &object, Texture *texture);
 private:
     vector<V4D> m_vertices;

@@ -75,8 +75,9 @@ struct CGouradEdge {
         g = min_y_vert_col.g;
         b = min_y_vert_col.b;
 
-        du_dy = (max_y_vert.t.x - min_y_vert.t.x) / (max_y_vert.v.y - min_y_vert.v.y);
-        dv_dy = (max_y_vert.t.y - min_y_vert.t.y) / (max_y_vert.v.y - min_y_vert.v.y);
+        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / (max_y_vert.v.y - min_y_vert.v.y));
+        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / (max_y_vert.v.y - min_y_vert.v.y));
+
         u = min_y_vert.t.x;
         v = min_y_vert.t.y;
     }

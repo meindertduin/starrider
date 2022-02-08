@@ -8,7 +8,7 @@ ObjReader::ObjReader() {
 
 }
 
-bool ObjReader::read_file(string path) {
+bool ObjReader::read_file(string path, int text_width, int text_height) {
     std::ifstream fs(path);
 
     if (!fs.is_open())
@@ -37,7 +37,7 @@ bool ObjReader::read_file(string path) {
             float x, y;
             ss >> x >> y;
 
-            m_tex_coords.push_back(Math::V2D(x, y));
+            m_tex_coords.push_back(Math::V2D(std::floor(x * text_width), std::floor(y * text_height)));
         }
 
         if (first_token == "vn") {
@@ -74,10 +74,11 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
     object.attributes |= ObjectAttributeSingleFrame;
 
     object.vertex_count = m_vertices.size();
+    object.text_count = m_tex_coords.size();
 
     object.local_vertices = new Vertex4D[object.vertex_count];
     object.transformed_vertices = new Vertex4D[object.vertex_count];
-    object.texture_coords = new Point2D[object.vertex_count];
+    object.texture_coords = new Point2D[m_tex_coords.size()];
 
     object.head_local_vertices = &object.local_vertices[0];
     object.head_transformed_vertices = &object.transformed_vertices[0];
@@ -87,6 +88,10 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
     for (int i = 0; i < object.vertex_count; i++) {
         object.local_vertices[i].v = m_vertices[i];
         object.local_vertices[i].attributes = VertexAttributePoint;
+    }
+
+    for (int i = 0; i < object.text_count; i++) {
+        object.texture_coords[i] = m_tex_coords[i];
     }
 
     std::vector<Polygon> polygons;
@@ -105,11 +110,9 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
             polygon.vert[j] = current_index.vertex_index;
 
             if (has_tex_coords) {
-                polygon.vertices[current_index.vertex_index].t = m_tex_coords[current_index.tex_coord_index];
-                object.texture_coords[polygon.vert[j]] = m_tex_coords[current_index.tex_coord_index];
-                polygon.text_coords[current_index.vertex_index] = m_tex_coords[current_index.tex_coord_index];
+                polygon.vertices[current_index.vertex_index].t = object.texture_coords[current_index.tex_coord_index];
+                polygon.text[j] = current_index.tex_coord_index;
 
-                polygon.text[j] = current_index.vertex_index;
                 polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeTexture;
             }
 
@@ -127,6 +130,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
                 - object.transformed_vertices[polygon.vert[2]].v;
 
             polygon.n_length = line1.cross(line2).length();
+            polygon.text_coords = object.texture_coords;
         }
 
         // TODO read color out of file
