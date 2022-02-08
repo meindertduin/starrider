@@ -37,7 +37,7 @@ bool ObjReader::read_file(string path, int text_width, int text_height) {
             float x, y;
             ss >> x >> y;
 
-            m_tex_coords.push_back(Math::V2D(std::floor(x * text_width), std::floor(y * text_height)));
+            m_tex_coords.push_back(Math::V2D(x, y));
         }
 
         if (first_token == "vn") {

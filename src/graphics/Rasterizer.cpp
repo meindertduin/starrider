@@ -50,24 +50,33 @@ void draw_colored_gouraud_triangle(RenderListPoly &poly) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
-        CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1], poly.lit_color[v1]);
+    auto gradients = Gradients(poly.trans_verts[v0], poly.trans_verts[v1], poly.trans_verts[v2]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2],
+                poly.lit_color[v2], gradients, v0);
+        CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1],
+                poly.lit_color[v1], gradients, v0);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, gradients);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
-        CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2], poly.lit_color[v2]);
+        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2],
+                poly.lit_color[v2], gradients, v0);
+        CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2],
+                poly.lit_color[v2], gradients, v1);
 
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, gradients);
     } else {
-        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2], poly.lit_color[v2]);
-        CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1], poly.lit_color[v1]);
-        CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2], poly.lit_color[v2]);
+        CGouradEdge bottom_to_top = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v2],
+                poly.lit_color[v2], gradients, v0);
+        CGouradEdge bottom_to_middle = CGouradEdge(poly.trans_verts[v0], poly.lit_color[v0], poly.trans_verts[v1],
+                poly.lit_color[v1], gradients, v0);
+        CGouradEdge middle_to_top = CGouradEdge(poly.trans_verts[v1], poly.lit_color[v1], poly.trans_verts[v2],
+                poly.lit_color[v2], gradients, v1);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, gradients);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, gradients);
     }
 }
 
@@ -153,7 +162,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     }
 }
 
-void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
+void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly, Gradients &gradients) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -176,17 +185,20 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
         float u = left.u;
         float v = left.v;
 
+        float text_coord_x_xstep = gradients.text_coord_x_xstep;
+        float text_coord_y_xstep = gradients.text_coord_y_xstep;
+
         for(int x = left.x; x < right.x; x++) {
             if (x > 0 && y > 0 && x < m_width && y < m_height) {
-                auto pixel = poly.texture->get_pixel(u, v);
+                auto pixel = poly.texture->get_pixel(u * 16 -1, v * 16 -1);
                 p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red, pixel.rgba.green, pixel.rgba.green, 0xFF);
             }
             r += drx;
             g += dgx;
             b += dbx;
 
-            u += du;
-            v += dv;
+            u += text_coord_x_xstep;
+            v += text_coord_y_xstep;
         }
 
         left.x += left.x_step;
