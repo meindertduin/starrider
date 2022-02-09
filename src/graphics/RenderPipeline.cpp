@@ -29,8 +29,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         for (auto render_poly : render_list) {
             perspective_screen_transform(camera, render_poly);
-            // draw_intensity_gouraud_triangle(render_poly);
-            draw_colored_gouraud_triangle(render_poly);
+            draw_intensity_gouraud_triangle(render_poly);
+            // draw_colored_gouraud_triangle(render_poly);
         }
     }
 }
@@ -92,7 +92,8 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
 
         if (!(object.polygons[j].state & PolyStateBackface)) {
             current_poly.vertices = object.transformed_vertices;
-            gourad_light_polygon(current_poly, g_lights, num_lights);
+            gourad_intensity_light_polygon(current_poly, g_lights, num_lights);
+            // gourad_light_polygon(current_poly, g_lights, num_lights);
             // flat_light_polygon(current_poly, g_lights, num_lights);
 
             RenderListPoly render_poly = {
@@ -118,6 +119,10 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
             render_poly.lit_color[0] = current_poly.lit_color[0];
             render_poly.lit_color[1] = current_poly.lit_color[1];
             render_poly.lit_color[2] = current_poly.lit_color[2];
+
+            render_poly.trans_verts[0].i = current_poly.vertices[0].i;
+            render_poly.trans_verts[1].i = current_poly.vertices[1].i;
+            render_poly.trans_verts[2].i = current_poly.vertices[2].i;
 
             // TODO optimize
             render_poly.trans_verts[0].t = current_poly.text_coords[current_poly.text[0]];
@@ -243,6 +248,82 @@ void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
         polygon.lit_color[0] = RGBA(r0_sum, g0_sum, b0_sum, 0xFF);
         polygon.lit_color[1] = RGBA(r1_sum, g1_sum, b1_sum, 0xFF);
         polygon.lit_color[2] = RGBA(r2_sum, g2_sum, b2_sum, 0xFF);
+    }
+}
+
+void gourad_intensity_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
+    uint32_t r_base, g_base, b_base,
+             r0_sum,
+             r1_sum,
+             r2_sum,
+             ri,
+             shaded_color;
+
+    float dp, dist, n1, atten, i;
+
+    if (polygon.attributes & PolyAttributeShadeModeGouraud) {
+        r0_sum = 0;
+        r1_sum = 0;
+        r2_sum = 0;
+
+        for (int curr_light = 0; curr_light < max_lights; curr_light++) {
+            if (!lights[curr_light].state) {
+                continue;
+            }
+
+            if (lights[curr_light].attributes & LightAttributeAmbient) {
+                ri = ((lights[curr_light].c_ambient.r * polygon.color.r) >> 8);
+
+                r0_sum += ri;
+                r1_sum += ri;
+                r2_sum += ri;
+            }
+            else if (lights[curr_light].attributes & LightAttributeInfinite) {
+                auto dp = polygon.vertices[polygon.vert[0]].n.dot(lights[curr_light].dir);
+
+                if (dp > 0.0f) {
+                    i = 128 * dp;
+
+                    r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+
+                dp = polygon.vertices[polygon.vert[1]].n.dot(lights[curr_light].dir);
+
+                if (dp > 0.0f) {
+                    i = 128 * dp;
+
+                    r1_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+
+                dp = polygon.vertices[polygon.vert[2]].n.dot(lights[curr_light].dir);
+
+                if (dp > 0.0f) {
+                    i = 128 * dp;
+
+                    r2_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+            } else if (lights[curr_light].attributes * LightAttributePoint) {
+                auto l = V4D(polygon.vertices[polygon.vert[0]].v, lights[curr_light].pos);
+
+                dist = l.length();
+                dp = polygon.normal.dot(l);
+
+                if (dp > 0) {
+                    atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
+                    i = 128 * dp / (polygon.normal.length() * dist * atten);
+
+                    r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+            }
+        }
+
+        if (r0_sum > 255) r0_sum = 255;
+        if (r1_sum > 255) r1_sum = 255;
+        if (r2_sum > 255) r2_sum = 255;
+
+        polygon.vertices[0].i = r0_sum / 255.0f;
+        polygon.vertices[1].i = r1_sum / 255.0f;
+        polygon.vertices[2].i = r2_sum / 255.0f;
     }
 }
 

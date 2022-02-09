@@ -17,6 +17,12 @@ struct IGouradEdge {
     float di_dy;
     float i;
 
+    // texturing
+    float du_dy;
+    float dv_dy;
+    float u;
+    float v;
+
     IGouradEdge() = default;
 
     IGouradEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
@@ -31,6 +37,12 @@ struct IGouradEdge {
 
         di_dy = (max_y_vert.i - min_y_vert.i) / (max_y_vert.v.y - min_y_vert.v.y);
         i = min_y_vert.i;
+
+        u = min_y_vert.t.x;
+        v = min_y_vert.t.y;
+
+        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / (max_y_vert.v.y - min_y_vert.v.y));
+        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / (max_y_vert.v.y - min_y_vert.v.y));
     }
 };
 
@@ -93,7 +105,7 @@ void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 
 void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color);
 
-void scan_edges(IGouradEdge &left, IGouradEdge &right, bool handedness, RGBA color);
+void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly);
 void scan_edges(CGouradEdge &left, CGouradEdge &right, bool handedness, RGBA color, const RenderListPoly &poly);
 
 }
