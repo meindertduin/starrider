@@ -52,7 +52,7 @@ void Application::run() {
     reset_materials();
     reset_lights();
 
-    create_base_amb_light(0, RGBA { 20, 20, 20, 255 });
+    create_base_amb_light(0, RGBA { 10, 10, 10, 255 });
     create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(0, 0, -1).normalized());
 
     // Setup camera
@@ -76,6 +76,8 @@ void Application::run() {
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
 
+    objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+
     while (m_running) {
         m_cursor.reset_pos_middle();
 
@@ -84,7 +86,6 @@ void Application::run() {
         poll_window_events();
 
         render_pipeline.render_objects(*p_camera, objects);
-        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         string time_text = std::to_string(dt) + "MS";
         renderer.render_text(time_text, ttf_font, {20, 52});
