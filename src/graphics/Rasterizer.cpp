@@ -115,24 +115,46 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    // Rasterization
+    uint8_t point_bytes[3];
+    for (int i = 0; i < 3; i++) {
+        point_bytes[i] = 0;
+        if (poly.trans_verts[i].v.y > m_height)
+            point_bytes[i] |= 1 << 3;
+        if (poly.trans_verts[i].v.y < min_clip_y)
+            point_bytes[i] |= 1 << 2;
+        if (poly.trans_verts[i].v.x > m_width)
+            point_bytes[i] |= 1 << 1;
+        if (poly.trans_verts[i].v.x < min_clip_x) {
+            point_bytes[i] |= 1;
+        }
     }
-    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
 
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-    } else {
-        IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+    if (point_bytes[0] == 0 && point_bytes[1] == 0 && point_bytes[2] == 0) {
+        if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
 
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        }
+        else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+        } else {
+            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+        }
+    } else if ((point_bytes[0] & point_bytes[1]) == 0
+            || (point_bytes[1] & point_bytes[2]) == 0
+            || (point_bytes[2] & point_bytes[0]) == 0)
+    {
+
     }
 }
 
@@ -155,10 +177,8 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         float v = left.v;
 
         for(int x = left.x; x < right.x; x++) {
-            if (x > 0 && y > 0 && x < m_width && y < m_height) {
-                auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-                p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red * i, pixel.rgba.green * i, pixel.rgba.blue * i, 0xFF);;
-            }
+            auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+            p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red * i, pixel.rgba.green * i, pixel.rgba.blue * i, 0xFF);;
 
             i += dix;
 
@@ -188,17 +208,18 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
     CGouradEdge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
-        float drx = (right.r - left.r) / (right.x - left.x);
+        float x_dist = right.x - left.x;
+        float drx = (right.r - left.r) / x_dist;
         float r = left.r;
 
-        float dgx = (right.g - left.g) / (right.x - left.x);
+        float dgx = (right.g - left.g) / x_dist;
         float g = left.g;
 
-        float dbx = (right.b - left.b) / (right.x - left.x);
+        float dbx = (right.b - left.b) / x_dist;
         float b = left.b;
 
-        float du = (right.u - left.u) / (right.x - left.x);
-        float dv = (right.v - left.v) / (right.x - left.x);
+        float du = (right.u - left.u) / x_dist;
+        float dv = (right.v - left.v) / x_dist;
 
         float u = left.u;
         float v = left.v;
