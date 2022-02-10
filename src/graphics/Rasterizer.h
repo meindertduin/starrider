@@ -35,14 +35,14 @@ struct IGouradEdge {
         x_step = x_dist / y_dist;
         x = min_y_vert.v.x;
 
-        di_dy = (max_y_vert.i - min_y_vert.i) / (max_y_vert.v.y - min_y_vert.v.y);
+        di_dy = (max_y_vert.i - min_y_vert.i) / y_dist;
         i = min_y_vert.i;
 
         u = min_y_vert.t.x;
         v = min_y_vert.t.y;
 
-        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / (max_y_vert.v.y - min_y_vert.v.y));
-        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / (max_y_vert.v.y - min_y_vert.v.y));
+        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
+        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
     }
 };
 
@@ -78,10 +78,9 @@ struct CGouradEdge {
         x_step = x_dist / y_dist;
         x = min_y_vert.v.x;
 
-        // TODO: optiize (max_y_vert.v.y - min_y_vert.v.y)
-        dr_dy = (max_y_vert_col.r - min_y_vert_col.r) / (max_y_vert.v.y - min_y_vert.v.y);
-        dg_dy = (max_y_vert_col.g - min_y_vert_col.g) / (max_y_vert.v.y - min_y_vert.v.y);
-        db_dy = (max_y_vert_col.b - min_y_vert_col.b) / (max_y_vert.v.y - min_y_vert.v.y);
+        dr_dy = (max_y_vert_col.r - min_y_vert_col.r) / y_dist;
+        dg_dy = (max_y_vert_col.g - min_y_vert_col.g) / y_dist;
+        db_dy = (max_y_vert_col.b - min_y_vert_col.b) / y_dist;
 
         r = min_y_vert_col.r;
         g = min_y_vert_col.g;
@@ -90,8 +89,8 @@ struct CGouradEdge {
         u = min_y_vert.t.x;
         v = min_y_vert.t.y;
 
-        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / (max_y_vert.v.y - min_y_vert.v.y));
-        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / (max_y_vert.v.y - min_y_vert.v.y));
+        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
+        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
     }
 };
 

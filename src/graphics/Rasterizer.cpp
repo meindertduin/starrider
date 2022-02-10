@@ -144,11 +144,12 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     IGouradEdge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
-        float dix = (right.i - left.i) / (right.x - left.x);
+        float x_dist = right.x - left.x;
+        float dix = (right.i - left.i) / x_dist;
         float i = left.i;
 
-        float du = (right.u - left.u) / (right.x - left.x);
-        float dv = (right.v - left.v) / (right.x - left.x);
+        float du = (right.u - left.u) / x_dist;
+        float dv = (right.v - left.v) / x_dist;
 
         float u = left.u;
         float v = left.v;
