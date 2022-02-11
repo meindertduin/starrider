@@ -236,3 +236,5 @@ constexpr bool render_polygon_avg_sort(const RenderListPoly &a, const RenderList
         0.3333f * (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
 }
 
+void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly> &render_list);
+

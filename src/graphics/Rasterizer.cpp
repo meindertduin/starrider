@@ -135,63 +135,6 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
     }
 }
 
-void draw_clipped_intensitiy_gourad_triangle(const RenderListPoly &poly) {
-    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
-        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
-        return;
-
-    int v0 = 0;
-    int v1 = 1;
-    int v2 = 2;
-    int temp = 0;
-
-    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y) {
-        temp = v0;
-        v0 = v1;
-        v1 = temp;
-    }
-
-    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y) {
-        temp = v0;
-        v0 = v2;
-        v2 = temp;
-    }
-
-
-    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y) {
-        temp = v1;
-        v1 = v2;
-        v2 = temp;
-    }
-
-    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
-    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
-
-    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
-    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
-
-    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
-
-    IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-
-    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-    }
-    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-    } else {
-        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-    }
-}
-
 void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;

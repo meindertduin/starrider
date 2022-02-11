@@ -66,7 +66,7 @@ bool ObjReader::read_file(string path, int text_width, int text_height) {
 }
 
 void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
-    object.state |= ObjectStateActive | ObjectStateVisible;
+    object.state = ObjectStateActive | ObjectStateVisible;
 
     // TODO: read if object has multiple frames out of the file
     object.frames_count = 1;
@@ -102,7 +102,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         polygon.text_coords = object.texture_coords;
 
         // TODO: get these values from obj file
-        polygon.state = PolyStateNull;
+        polygon.state = PolyStateActive;
         polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 | PolyAttributeShadeModeGouraud;
 
         for (int j = 0; j < 3; j++) {
@@ -146,7 +146,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         object.polygons[i] = polygons[i];
     }
 
-    if (!has_normal_indices) {
+    if (has_normal_indices) {
         compute_vertex_normals(object);
     }
 }

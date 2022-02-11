@@ -100,8 +100,6 @@ void draw_colored_gouraud_triangle(RenderListPoly &poly);
 
 void draw_intensity_gouraud_triangle(RenderListPoly &poly);
 
-void draw_clipped_intensitiy_gourad_triangle(const RenderListPoly &poly);
-
 void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 
 void draw_triangle(float x1, float y1, float x2, float y2, float x3, float y3, uint32_t color);
