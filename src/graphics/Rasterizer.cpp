@@ -169,53 +169,60 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
                 }
             }
 
+            int p[3];
             if (v0 == inside_index) {
-                printf("inside!\n");
-                float p[4] = {
-                    -dx1, dx1, dy1, -dy1
-                };
+                p[0] = v0;
+                p[1] = v1;
+                p[2] = v2;
+            } else if (v1 == inside_index) {
+                p[0] = v1;
+                p[1] = v0;
+                p[2] = v2;
+            } else {
+                p[0] = v2;
+                p[1] = v1;
+                p[2] = v0;
+            }
 
-                float n0 = (-min_clip_x + poly.verts[v0].v.x) / p[0];
-                float n1 = (m_width - poly.verts[v0].v.x) / p[1];
-                float n2 = (m_height - poly.verts[v0].v.y) / p[2];
-                float n3 = (-min_clip_y + poly.verts[v0].v.y) / p[3];
+            for (int i = 1; i < 3; i++) {
+                float new_x;
+                float new_y;
+                // value does exceed both xmin or xmax and ymin or ymax
+                if (point_bytes[p[i]] ^ 1 << 3 && point_bytes[p[i]] ^ 1 << 2 && point_bytes[p[i]] ^ 1 << 1 && point_bytes[p[i]] ^ 1) {
+                } else { // value only exceeds xmin or xmax or ymin or ymax
+                    float t;
+                    // exceeds ymin or ymax
+                    if (point_bytes[p[i]] & (1 << 3) || point_bytes[p[i]] & (1 << 2)) {
+                        if (point_bytes[p[i]] & 1 << 3) {
+                            new_y = m_height;
+                        } else {
+                            new_y = min_clip_y;
+                        }
 
-                float pt1[2];
-                int pti1 = 0;
+                        t = (new_y - poly.trans_verts[p[0]].v.y) / (poly.trans_verts[p[i]].v.y - poly.trans_verts[p[0]].v.y);
+                        new_x = poly.trans_verts[p[0]].v.x + (poly.trans_verts[p[i]].v.x - poly.trans_verts[p[0]].v.x) * t;
+                    } else { // exceeds xmin or xmax
+                        if (point_bytes[p[i]] & 1 << 1) {
+                            new_x = m_width;
+                        } else {
+                            new_x = min_clip_x;
+                        }
 
-                float pt2[2];
-                int pti2 = 0;
-
-                for (int i = 0; i < 4; i++) {
-                    if (p[i] < 0)
-                        pt1[pti1++] = p[i];
-                    else
-                        pt2[pti2++] = p[i];
+                        t = (new_x - poly.trans_verts[p[0]].v.x) / (poly.trans_verts[p[i]].v.x - poly.trans_verts[p[0]].v.x);
+                        new_y = poly.trans_verts[p[0]].v.y + (poly.trans_verts[p[i]].v.y - poly.trans_verts[p[0]].v.y) * t;
+                    }
                 }
 
-                float t1 = Math::max(0.0f, pt1[0], pt1[1]);
-                float t2 = Math::min(1.0f, pt2[0], pt2[1]);
-
-                float x1 = poly.trans_verts[v0].v.x + dx1 * t1;
-                float y1 = poly.trans_verts[v0].v.y + dy1 * t1;
-
-                float x2 = poly.trans_verts[v0].v.x + dx1 * t2;
-                float y2 = poly.trans_verts[v0].v.y + dy1 * t2;
-
-                poly.trans_verts[v0].v.x = x1;
-                poly.trans_verts[v0].v.y = y1;
-
-                poly.trans_verts[v2].v.x = x2;
-                poly.trans_verts[v2].v.y = y2;
-
-
-                IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-                IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-                IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-                scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-                scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+                poly.trans_verts[p[i]].v.x = new_x;
+                poly.trans_verts[p[i]].v.y = new_y;
             }
+
+            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
 
             // calculate and lerp to the
 
@@ -224,16 +231,6 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
 
         } else {
 
-        }
-
-        if (point_bytes[v0] & point_bytes[v2]) {
-            bool min_is_left = true;
-            if (poly.verts[v0].v.x > point_bytes[v2]) {
-                min_is_left = false;
-            }
-
-            float left = -dx1 / (-min_clip_x + (min_is_left ? poly.trans_verts[v0].v.x : poly.trans_verts[v2].v.x));
-            float right = dx1 / (m_width - (min_is_left ? poly.trans_verts[v0].v.x : poly.trans_verts[v2].v.x));
         }
     }
 }
