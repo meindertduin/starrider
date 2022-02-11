@@ -115,123 +115,80 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    // Rasterization
-    uint8_t point_bytes[3];
-    for (int i = 0; i < 3; i++) {
-        point_bytes[i] = 0;
-        if (poly.trans_verts[i].v.y > m_height)
-            point_bytes[i] |= 1 << 3;
-        if (poly.trans_verts[i].v.y < min_clip_y)
-            point_bytes[i] |= 1 << 2;
-        if (poly.trans_verts[i].v.x > m_width)
-            point_bytes[i] |= 1 << 1;
-        if (poly.trans_verts[i].v.x < min_clip_x) {
-            point_bytes[i] |= 1;
-        }
+    IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    }
+}
+
+void draw_clipped_intensitiy_gourad_triangle(const RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y) {
+        temp = v0;
+        v0 = v1;
+        v1 = temp;
     }
 
-    if (point_bytes[0] == 0 && point_bytes[1] == 0 && point_bytes[2] == 0) {
-        IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-
-        if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-
-            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-        }
-        else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-        } else {
-            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-        }
-    } else if ((point_bytes[0] & point_bytes[1]) == 0
-            || (point_bytes[1] & point_bytes[2]) == 0
-            || (point_bytes[2] & point_bytes[0]) == 0)
-    {
-        int points_inside = 0;
-        for (int i = 0; i < 3; i++)
-            if (point_bytes[i] == 0)
-                points_inside++;
-
-        if (points_inside == 1) {
-            // get the inside point index
-
-            int inside_index;
-            for (int i = 0; i < 3; i++) {
-                if (point_bytes[i] == 0) {
-                    inside_index = i;
-                    break;
-                }
-            }
-
-            int p[3];
-            if (v0 == inside_index) {
-                p[0] = v0;
-                p[1] = v1;
-                p[2] = v2;
-            } else if (v1 == inside_index) {
-                p[0] = v1;
-                p[1] = v0;
-                p[2] = v2;
-            } else {
-                p[0] = v2;
-                p[1] = v1;
-                p[2] = v0;
-            }
-
-            for (int i = 1; i < 3; i++) {
-                float new_x;
-                float new_y;
-                // value does exceed both xmin or xmax and ymin or ymax
-                if (point_bytes[p[i]] ^ 1 << 3 && point_bytes[p[i]] ^ 1 << 2 && point_bytes[p[i]] ^ 1 << 1 && point_bytes[p[i]] ^ 1) {
-                } else { // value only exceeds xmin or xmax or ymin or ymax
-                    float t;
-                    // exceeds ymin or ymax
-                    if (point_bytes[p[i]] & (1 << 3) || point_bytes[p[i]] & (1 << 2)) {
-                        if (point_bytes[p[i]] & 1 << 3) {
-                            new_y = m_height;
-                        } else {
-                            new_y = min_clip_y;
-                        }
-
-                        t = (new_y - poly.trans_verts[p[0]].v.y) / (poly.trans_verts[p[i]].v.y - poly.trans_verts[p[0]].v.y);
-                        new_x = poly.trans_verts[p[0]].v.x + (poly.trans_verts[p[i]].v.x - poly.trans_verts[p[0]].v.x) * t;
-                    } else { // exceeds xmin or xmax
-                        if (point_bytes[p[i]] & 1 << 1) {
-                            new_x = m_width;
-                        } else {
-                            new_x = min_clip_x;
-                        }
-
-                        t = (new_x - poly.trans_verts[p[0]].v.x) / (poly.trans_verts[p[i]].v.x - poly.trans_verts[p[0]].v.x);
-                        new_y = poly.trans_verts[p[0]].v.y + (poly.trans_verts[p[i]].v.y - poly.trans_verts[p[0]].v.y) * t;
-                    }
-                }
-
-                poly.trans_verts[p[i]].v.x = new_x;
-                poly.trans_verts[p[i]].v.y = new_y;
-            }
-
-            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
-            IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
-            IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
-
-            scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
-            scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
-
-            // calculate and lerp to the
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y) {
+        temp = v0;
+        v0 = v2;
+        v2 = temp;
+    }
 
 
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y) {
+        temp = v1;
+        v1 = v2;
+        v2 = temp;
+    }
 
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
 
-        } else {
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
 
-        }
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
     }
 }
 
@@ -239,8 +196,32 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    if (y_start > m_height || y_end < 0)
+        return;
+
     IGouradEdge &left = handedness ? short_edge : long_edge;
     IGouradEdge &right = handedness ? long_edge : short_edge;
+
+    if (y_start < min_clip_y) {
+        left.x += left.x_step * -y_start;
+        right.x += right.x_step * -y_start;
+
+        left.i += left.di_dy * -y_start;
+        right.i += right.di_dy * -y_start;
+
+        left.u += left.du_dy * -y_start;
+        left.v += left.dv_dy * -y_start;
+
+        right.u += right.du_dy * -y_start;
+        right.v += right.dv_dy * -y_start;
+
+        y_start = min_clip_y;
+    }
+
+    if (y_end > m_height) {
+        y_end = m_height;
+    }
+
 
     for(int y = y_start; y < y_end; y++) {
         float x_dist = right.x - left.x;
@@ -253,7 +234,22 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         float u = left.u;
         float v = left.v;
 
-        for(int x = left.x; x < right.x; x++) {
+        float x_start = left.x;
+        float x_end = right.x;
+
+        if (x_start < min_clip_x) {
+            i += dix * -x_start;
+
+            u += du * -x_start;
+            v += dv * -x_start;
+
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
             p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red * i, pixel.rgba.green * i, pixel.rgba.blue * i, 0xFF);;
 
