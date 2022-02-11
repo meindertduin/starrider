@@ -32,8 +32,26 @@ static constexpr T& min(const T &lhs, const T &rhs) {
 }
 
 template<typename T>
+static constexpr T min(const T &v1, const T &v2, const T &v3) {
+    if (v1 < v2 && v1 < v3) {
+        return v1;
+    }
+
+    return v2 < v3 ? v2 : v3;
+}
+
+template<typename T>
 static constexpr T& max(const T &lhs, const T &rhs) {
     return lhs < rhs ? rhs : lhs;
+}
+
+template<typename T>
+static constexpr T max(const T &v1, const T &v2, const T &v3) {
+    if (v1 > v2 && v1 > v3) {
+        return v1;
+    }
+
+    return v2 > v3 ? v2 : v3;
 }
 
 static constexpr float deg_to_rad(const float ang) {

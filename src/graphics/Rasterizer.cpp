@@ -131,19 +131,18 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
     }
 
     if (point_bytes[0] == 0 && point_bytes[1] == 0 && point_bytes[2] == 0) {
+        IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
         if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
             IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
 
             scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
         }
         else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
             IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
 
             scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
         } else {
-            IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
             IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
             IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
 
@@ -154,7 +153,88 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
             || (point_bytes[1] & point_bytes[2]) == 0
             || (point_bytes[2] & point_bytes[0]) == 0)
     {
+        int points_inside = 0;
+        for (int i = 0; i < 3; i++)
+            if (point_bytes[i] == 0)
+                points_inside++;
 
+        if (points_inside == 1) {
+            // get the inside point index
+
+            int inside_index;
+            for (int i = 0; i < 3; i++) {
+                if (point_bytes[i] == 0) {
+                    inside_index = i;
+                    break;
+                }
+            }
+
+            if (v0 == inside_index) {
+                printf("inside!\n");
+                float p[4] = {
+                    -dx1, dx1, dy1, -dy1
+                };
+
+                float n0 = (-min_clip_x + poly.verts[v0].v.x) / p[0];
+                float n1 = (m_width - poly.verts[v0].v.x) / p[1];
+                float n2 = (m_height - poly.verts[v0].v.y) / p[2];
+                float n3 = (-min_clip_y + poly.verts[v0].v.y) / p[3];
+
+                float pt1[2];
+                int pti1 = 0;
+
+                float pt2[2];
+                int pti2 = 0;
+
+                for (int i = 0; i < 4; i++) {
+                    if (p[i] < 0)
+                        pt1[pti1++] = p[i];
+                    else
+                        pt2[pti2++] = p[i];
+                }
+
+                float t1 = Math::max(0.0f, pt1[0], pt1[1]);
+                float t2 = Math::min(1.0f, pt2[0], pt2[1]);
+
+                float x1 = poly.trans_verts[v0].v.x + dx1 * t1;
+                float y1 = poly.trans_verts[v0].v.y + dy1 * t1;
+
+                float x2 = poly.trans_verts[v0].v.x + dx1 * t2;
+                float y2 = poly.trans_verts[v0].v.y + dy1 * t2;
+
+                poly.trans_verts[v0].v.x = x1;
+                poly.trans_verts[v0].v.y = y1;
+
+                poly.trans_verts[v2].v.x = x2;
+                poly.trans_verts[v2].v.y = y2;
+
+
+                IGouradEdge bottom_to_top = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+                IGouradEdge bottom_to_middle = IGouradEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+                IGouradEdge middle_to_top = IGouradEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+                scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+                scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+            }
+
+            // calculate and lerp to the
+
+
+
+
+        } else {
+
+        }
+
+        if (point_bytes[v0] & point_bytes[v2]) {
+            bool min_is_left = true;
+            if (poly.verts[v0].v.x > point_bytes[v2]) {
+                min_is_left = false;
+            }
+
+            float left = -dx1 / (-min_clip_x + (min_is_left ? poly.trans_verts[v0].v.x : poly.trans_verts[v2].v.x));
+            float right = dx1 / (m_width - (min_is_left ? poly.trans_verts[v0].v.x : poly.trans_verts[v2].v.x));
+        }
     }
 }
 

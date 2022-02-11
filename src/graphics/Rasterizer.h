@@ -30,7 +30,7 @@ struct IGouradEdge {
         y_end = max_y_vert.v.y + 0.5f;
 
         float y_dist = max_y_vert.v.y - min_y_vert.v.y;
-        float x_dist = max_y_vert.v.x- min_y_vert.v.x;
+        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
 
         x_step = x_dist / y_dist;
         x = min_y_vert.v.x;
