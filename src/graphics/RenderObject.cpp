@@ -102,14 +102,10 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
    for (int poly = 0; poly < object.poly_count; poly++) {
         auto current_poly = object.polygons[poly];
 
-        if (current_poly.state & PolyStateBackface) {
+        if (!(current_poly.state & PolyStateActive) ||
+                current_poly.state & PolyStateBackface) {
             continue;
         }
-
-        // if (!(current_poly.state & PolyStateActive) ||
-        //         current_poly.state & PolyStateBackface) {
-        //     continue;
-        // }
 
         RenderListPoly render_poly = {
             .state = current_poly.state,
