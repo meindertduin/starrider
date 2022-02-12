@@ -29,7 +29,7 @@ void backface_removal_object(RenderObject& object, const Camera &camera);
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
-void gourad_light_polygon(Polygon &polygon, Light *lights, int max_lights);
+void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
 
 void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
 

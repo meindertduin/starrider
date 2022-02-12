@@ -220,8 +220,36 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    if (y_start > m_height || y_end < 0)
+        return;
+
     CGouradEdge &left = handedness ? short_edge : long_edge;
     CGouradEdge &right = handedness ? long_edge : short_edge;
+
+    if (y_start < min_clip_y) {
+        left.x += left.x_step * -y_start;
+        right.x += right.x_step * -y_start;
+
+        left.r += left.dr_dy * -y_start;
+        left.g += left.dg_dy * -y_start;
+        left.b += left.db_dy * -y_start;
+
+        right.r += right.dr_dy * -y_start;
+        right.g += right.dg_dy * -y_start;
+        right.b += right.db_dy * -y_start;
+
+        left.u += left.du_dy * -y_start;
+        left.v += left.dv_dy * -y_start;
+
+        right.u += right.du_dy * -y_start;
+        right.v += right.dv_dy * -y_start;
+
+        y_start = min_clip_y;
+    }
+
+    if (y_end > m_height) {
+        y_end = m_height;
+    }
 
     for(int y = y_start; y < y_end; y++) {
         float x_dist = right.x - left.x;
@@ -240,15 +268,31 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
         float u = left.u;
         float v = left.v;
 
-        for(int x = left.x; x < right.x; x++) {
-            if (x > 0 && y > 0 && x < m_width && y < m_height) {
-                auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-                uint32_t r_col = pixel.rgba.red * (r / 255);
-                uint32_t g_col = pixel.rgba.green * (g / 255);
-                uint32_t b_col = pixel.rgba.blue * (b / 255);
+        float x_start = left.x;
+        float x_end = right.x;
 
-                p_frame_buffer[m_width * y + x].value = rgba_bit(r_col, g_col, b_col, 0xFF);
-            }
+        if (x_start < min_clip_x) {
+            r += drx * -x_start;
+            g += dgx * -x_start;
+            b += dbx * -x_start;
+
+            u += du * -x_start;
+            v += dv * -x_start;
+
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        for(int x = left.x; x < right.x; x++) {
+            auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+            uint32_t r_col = pixel.rgba.red * (r / 255);
+            uint32_t g_col = pixel.rgba.green * (g / 255);
+            uint32_t b_col = pixel.rgba.blue * (b / 255);
+
+            p_frame_buffer[m_width * y + x].value = rgba_bit(r_col, g_col, b_col, 0xFF);
+
             r += drx;
             g += dgx;
             b += dbx;
