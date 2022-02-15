@@ -23,11 +23,13 @@ constexpr void camera_transform(const Matrix4x4 &vp, RenderListPoly &list_poly) 
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
 
-void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list);
+void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list);
+
+void light_renderlist(std::vector<RenderListPoly> &render_list);
 
 void backface_removal_object(RenderObject& object, const Camera &camera);
 
-void view_frustrum_clip(const Camera &camera, std::vector<RenderListPoly> &render_list);
+void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list);
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 

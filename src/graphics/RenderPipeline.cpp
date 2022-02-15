@@ -26,9 +26,11 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         insert_object_render_list(object, render_list);
 
-        light_camera_transform_object(object, vp, render_list);
+        camera_transform_renderlist(vp, render_list);
 
-        view_frustrum_clip(camera, render_list);
+        frustrum_clip_renderlist(camera, render_list);
+
+        light_renderlist(render_list);
 
         std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
 
@@ -95,7 +97,7 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
     }
 }
 
-void view_frustrum_clip(const Camera &camera, std::vector<RenderListPoly> &render_list) {
+void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
         int outside_vert_count = 0;
 
@@ -113,12 +115,20 @@ void view_frustrum_clip(const Camera &camera, std::vector<RenderListPoly> &rende
     }
 }
 
-void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
+void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
+        camera_transform(vp, poly);
+    }
+}
+
+void light_renderlist(std::vector<RenderListPoly> &render_list) {
+    for (auto &poly : render_list) {
+        if (poly.state & PolyStateClipped) {
+            continue;
+        }
+
         gourad_intensity_light_polygon(poly, g_lights, num_lights);
         // gourad_light_polygon(poly, g_lights, num_lights);
-
-        camera_transform(vp, poly);
     }
 }
 
