@@ -1,6 +1,7 @@
 #include <list>
 
 #include "RenderPipeline.h"
+#include "../math/Core.h"
 
 namespace Graphics {
 
@@ -27,12 +28,18 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         light_camera_transform_object(object, vp, render_list);
 
+        view_frustrum_clip(camera, render_list);
+
         std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
 
         for (auto render_poly : render_list) {
+            if (render_poly.state & PolyStateClipped) {
+                continue;
+            }
+
             perspective_screen_transform(camera, render_poly);
-            // draw_intensity_gouraud_triangle(render_poly);
-            draw_colored_gouraud_triangle(render_poly);
+            draw_intensity_gouraud_triangle(render_poly);
+            // draw_colored_gouraud_triangle(render_poly);
         }
     }
 }
@@ -88,10 +95,28 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
     }
 }
 
+void view_frustrum_clip(const Camera &camera, std::vector<RenderListPoly> &render_list) {
+    for (auto &poly : render_list) {
+        int outside_vert_count = 0;
+
+        for (int i = 0; i < 3; i++) {
+            auto max_x = poly.trans_verts[i].v.z * camera.tan_fov_div2;
+            if (Math::fabs(poly.trans_verts[i].v.x) > max_x) {
+                outside_vert_count++;
+            }
+        }
+
+        if (outside_vert_count == 3) {
+            poly.state |= PolyStateClipped;
+            continue;
+        }
+    }
+}
+
 void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
-        // gourad_intensity_light_polygon(poly, g_lights, num_lights);
-        gourad_light_polygon(poly, g_lights, num_lights);
+        gourad_intensity_light_polygon(poly, g_lights, num_lights);
+        // gourad_light_polygon(poly, g_lights, num_lights);
 
         camera_transform(vp, poly);
     }

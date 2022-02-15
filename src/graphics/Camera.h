@@ -18,6 +18,7 @@ public:
     float aspect_ratio;
     float view_dist_v;
     float view_dist_h;
+    float tan_fov_div2;
 
     void on_event(const WindowEvent &event) override;
     Transform m_transform;

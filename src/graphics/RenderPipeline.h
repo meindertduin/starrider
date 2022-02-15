@@ -27,6 +27,8 @@ void light_camera_transform_object(RenderObject &object, const Matrix4x4 &vp, st
 
 void backface_removal_object(RenderObject& object, const Camera &camera);
 
+void view_frustrum_clip(const Camera &camera, std::vector<RenderListPoly> &render_list);
+
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
 void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
@@ -34,7 +36,6 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
 void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
 
 void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights);
-
 
 class RenderPipeline {
 public:

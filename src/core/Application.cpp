@@ -52,7 +52,7 @@ void Application::run() {
     reset_materials();
     reset_lights();
 
-    create_base_amb_light(0, RGBA { 10, 10, 10, 255 });
+    create_base_amb_light(0, RGBA { 25, 25, 25, 255 });
     create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(1, 0, 0).normalized());
 
     // Setup camera
