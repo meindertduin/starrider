@@ -7,6 +7,12 @@
 
 namespace Graphics {
 
+extern int min_clip_y;
+extern int min_clip_x;
+
+extern int m_width;
+extern int m_height;
+
 struct IGouradEdge {
     float x;
     float x_step;
@@ -43,6 +49,21 @@ struct IGouradEdge {
 
         du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
         dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
+
+        if (y_start < min_clip_y) {
+            x += x_step * -y_start;
+            i += di_dy * -y_start;
+
+            u += du_dy * -y_start;
+            v += dv_dy * -y_start;
+
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
+
     }
 };
 
@@ -91,6 +112,23 @@ struct CGouradEdge {
 
         du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
         dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
+
+        if (y_start < min_clip_y) {
+            x += x_step * -y_start;
+
+            r += dr_dy * -y_start;
+            g += dg_dy * -y_start;
+            b += db_dy * -y_start;
+
+            u += du_dy * -y_start;
+            v += dv_dy * -y_start;
+
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
     }
 };
 
