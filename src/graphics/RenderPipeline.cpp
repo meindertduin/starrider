@@ -105,22 +105,22 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
 
 void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
-        uint16_t vertex_coords[3];
+        uint16_t vertex_clip_code[3];
 
         for (int i = 0; i < 3; i++) {
             auto max_x = poly.trans_verts[i].v.z * camera.tan_fov_div2;
             if (poly.trans_verts[i].v.x > max_x)
-                vertex_coords[i] = ClipCodes::G;
+                vertex_clip_code[i] = ClipCodes::G;
             else if (poly.trans_verts[i].v.x < - max_x) {
-                vertex_coords[i] = ClipCodes::L;
+                vertex_clip_code[i] = ClipCodes::L;
             } else {
-                vertex_coords[i] = ClipCodes::I;
+                vertex_clip_code[i] = ClipCodes::I;
             }
 
         }
 
-        if ((vertex_coords[0] == ClipCodes::G && vertex_coords[1] == ClipCodes::G && vertex_coords[2] == ClipCodes::G) ||
-            (vertex_coords[0] == ClipCodes::L && vertex_coords[1] == ClipCodes::L && vertex_coords[2] == ClipCodes::L)) {
+        if ((vertex_clip_code[0] == ClipCodes::G && vertex_clip_code[1] == ClipCodes::G && vertex_clip_code[2] == ClipCodes::G) ||
+            (vertex_clip_code[0] == ClipCodes::L && vertex_clip_code[1] == ClipCodes::L && vertex_clip_code[2] == ClipCodes::L)) {
             poly.state |= PolyStateClipped;
             continue;
         }
@@ -128,21 +128,89 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
         for (int i = 0; i < 3; i++) {
             auto max_y = poly.trans_verts[i].v.z * (camera.tan_fov_div2 / camera.aspect_ratio);
             if (poly.trans_verts[i].v.y > max_y)
-                vertex_coords[i] = ClipCodes::G;
+                vertex_clip_code[i] = ClipCodes::G;
             else if (poly.trans_verts[i].v.y < - max_y) {
-                vertex_coords[i] = ClipCodes::L;
+                vertex_clip_code[i] = ClipCodes::L;
             } else {
-                vertex_coords[i] = ClipCodes::I;
+                vertex_clip_code[i] = ClipCodes::I;
             }
         }
 
-        if ((vertex_coords[0] == ClipCodes::G && vertex_coords[1] == ClipCodes::G && vertex_coords[2] == ClipCodes::G) ||
-            (vertex_coords[0] == ClipCodes::L && vertex_coords[1] == ClipCodes::L && vertex_coords[2] == ClipCodes::L)) {
+        if ((vertex_clip_code[0] == ClipCodes::G && vertex_clip_code[1] == ClipCodes::G && vertex_clip_code[2] == ClipCodes::G) ||
+            (vertex_clip_code[0] == ClipCodes::L && vertex_clip_code[1] == ClipCodes::L && vertex_clip_code[2] == ClipCodes::L)) {
             poly.state |= PolyStateClipped;
-            printf("clip\n");
             continue;
         }
 
+        int num_inside = 0;
+
+        for (int i = 0; i < 3; i++) {
+            if (poly.trans_verts[i].v.z > camera.m_zfar)
+                vertex_clip_code[i] = ClipCodes::G;
+            else if (poly.trans_verts[i].v.z < camera.m_znear) {
+                vertex_clip_code[i] = ClipCodes::L;
+            } else {
+                vertex_clip_code[i] = ClipCodes::I;
+                num_inside++;
+            }
+        }
+
+        if ((vertex_clip_code[0] == ClipCodes::G && vertex_clip_code[1] == ClipCodes::G && vertex_clip_code[2] == ClipCodes::G) ||
+            (vertex_clip_code[0] == ClipCodes::L && vertex_clip_code[1] == ClipCodes::L && vertex_clip_code[2] == ClipCodes::L)) {
+            poly.state |= PolyStateClipped;
+            continue;
+        }
+
+        int v0, v1, v2;
+        V4D v;
+        float t1, t2, xi, yi, ui, vi;
+
+        // clip for one point inside
+        if ((vertex_clip_code[0] | vertex_clip_code[1] | vertex_clip_code[2]) & ClipCodes::L) {
+            // get the inside index
+            if (num_inside == 1) {
+                if (vertex_clip_code[0] == ClipCodes::I) {
+                    v0 = 0; v1 = 1; v2 = 2;
+                } else if (vertex_clip_code[1] == ClipCodes::I) {
+                    v0 = 1; v1 = 2; v2 = 0;
+                } else {
+                    v0 = 2; v1 = 0; v2 = 1;
+                }
+
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v1].v);
+
+                t1 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
+                xi = poly.trans_verts[v0].v.x + v.x * t1;
+                yi = poly.trans_verts[v0].v.y + v.x * t1;
+
+                poly.trans_verts[v1].v.x = xi;
+                poly.trans_verts[v1].v.y = yi;
+                poly.trans_verts[v1].v.z = camera.m_znear;
+
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v2].v);
+
+                t2 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
+                xi = poly.trans_verts[v0].v.x + v.x * t2;
+                yi = poly.trans_verts[v0].v.y + v.x * t2;
+
+                poly.trans_verts[v2].v.x = xi;
+                poly.trans_verts[v2].v.y = yi;
+                poly.trans_verts[v2].v.z = camera.m_znear;
+
+                // TODO check if the poly is textured, for now we assume that every poly is textured
+                ui = poly.trans_verts[v0].t.x + (poly.trans_verts[v1].t.x - poly.trans_verts[v0].t.x) * t1;
+                vi = poly.trans_verts[v0].t.y + (poly.trans_verts[v1].t.y - poly.trans_verts[v0].t.y) * t1;
+                poly.trans_verts[v1].t.x = ui;
+                poly.trans_verts[v1].t.y = vi;
+
+                ui = poly.trans_verts[v0].t.x + (poly.trans_verts[v2].t.x - poly.trans_verts[v0].t.x) * t2;
+                vi = poly.trans_verts[v0].t.y + (poly.trans_verts[v2].t.y - poly.trans_verts[v0].t.y) * t2;
+                poly.trans_verts[v1].t.x = ui;
+                poly.trans_verts[v1].t.y = vi;
+            } else {
+
+            }
+        }
     }
 }
 
