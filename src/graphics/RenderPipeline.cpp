@@ -476,15 +476,16 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
                 }
             } else if (lights[curr_light].attributes * LightAttributePoint) {
                 auto l = V4D(polygon.trans_verts[0].v, lights[curr_light].pos);
-
                 dist = l.length();
                 dp = polygon.normal.dot(l);
 
-                if (dp > 0) {
+                if (dp > 0.0f) {
                     atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
                     i = 128 * dp / (polygon.normal.length() * dist * atten);
 
                     r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                    r1_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                    r2_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                 }
             }
         }

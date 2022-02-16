@@ -74,6 +74,15 @@ int create_base_dir_light(int index, RGBA col, V4D dir) {
             0, 0, 0);
 }
 
+
+int create_base_point_light(int index, RGBA col, V4D pos, float kc, float kl, float kq) {
+    return init_light(index, LightAttributePoint, LightStateOn,
+            RGBA { 0 }, col, RGBA { 0 },
+            pos, V4D(),
+            kc, kl, kq,
+            0, 0, 0);
+}
+
 int RenderObject_Type::set_frame(int frame) {
     if (!(this->attributes & ObjectAttributeMultiFrame))
         return 0;

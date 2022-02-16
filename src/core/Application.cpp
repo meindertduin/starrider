@@ -53,7 +53,9 @@ void Application::run() {
     reset_lights();
 
     create_base_amb_light(0, RGBA { 25, 25, 25, 255 });
-    create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(1, 0, 0).normalized());
+    // create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(1, 0, 0).normalized());
+
+    create_base_point_light(1, RGBA { 225, 225, 225, 255 }, V4D(-1, 0, 0), 0, 0, 0.1f);
 
     // Setup camera
     p_camera = std::make_unique<Camera>();
@@ -76,8 +78,6 @@ void Application::run() {
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
 
-    objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
-
     while (m_running) {
         m_cursor.reset_pos_middle();
 
@@ -91,7 +91,7 @@ void Application::run() {
         renderer.render_text(time_text, ttf_font, {20, 52});
 
         renderer.render_framebuffer();
-    // objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
