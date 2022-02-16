@@ -5,6 +5,12 @@
 
 namespace Graphics {
 
+enum ClipCodes : uint16_t {
+    G = 0x0001,
+    L = 0x0002,
+    I = 0x0004,
+};
+
 RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 }
@@ -99,21 +105,29 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
 
 void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
-        int outside_vert_count = 0;
+        uint16_t vertex_coords[3];
 
         for (int i = 0; i < 3; i++) {
             auto max_x = poly.trans_verts[i].v.z * camera.tan_fov_div2;
-            if (Math::fabs(poly.trans_verts[i].v.x) > max_x) {
-                outside_vert_count++;
+            if (poly.trans_verts[i].v.x > max_x)
+                vertex_coords[i] = ClipCodes::G;
+            else if (poly.trans_verts[i].v.x < - max_x) {
+                vertex_coords[i] = ClipCodes::L;
+            } else {
+                vertex_coords[i] = ClipCodes::I;
             }
+
         }
 
-        if (outside_vert_count == 3) {
+        if ((vertex_coords[0] == ClipCodes::G && vertex_coords[1] == ClipCodes::G && vertex_coords[2] == ClipCodes::G) ||
+            (vertex_coords[0] == ClipCodes::L && vertex_coords[1] == ClipCodes::L && vertex_coords[2] == ClipCodes::L)) {
             poly.state |= PolyStateClipped;
             continue;
         }
+
     }
 }
+
 
 void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
     for (auto &poly : render_list) {
