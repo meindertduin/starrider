@@ -125,6 +125,24 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
             continue;
         }
 
+        for (int i = 0; i < 3; i++) {
+            auto max_y = poly.trans_verts[i].v.z * (camera.tan_fov_div2 / camera.aspect_ratio);
+            if (poly.trans_verts[i].v.y > max_y)
+                vertex_coords[i] = ClipCodes::G;
+            else if (poly.trans_verts[i].v.y < - max_y) {
+                vertex_coords[i] = ClipCodes::L;
+            } else {
+                vertex_coords[i] = ClipCodes::I;
+            }
+        }
+
+        if ((vertex_coords[0] == ClipCodes::G && vertex_coords[1] == ClipCodes::G && vertex_coords[2] == ClipCodes::G) ||
+            (vertex_coords[0] == ClipCodes::L && vertex_coords[1] == ClipCodes::L && vertex_coords[2] == ClipCodes::L)) {
+            poly.state |= PolyStateClipped;
+            printf("clip\n");
+            continue;
+        }
+
     }
 }
 
