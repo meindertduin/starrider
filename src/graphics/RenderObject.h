@@ -197,8 +197,13 @@ typedef struct Light_Type {
     RGBA c_ambient;
     RGBA c_diffuse;
     RGBA c_specular;
+
     Point4D pos;
+    Point4D trans_pos;
+
     V4D dir;
+    V4D trans_dir;
+
     float kc, kl, kq;
     float spot_inner;
     float spot_outer;

@@ -25,6 +25,8 @@ void world_transform_object(RenderObject &object, CoordSelect coord_select = Coo
 
 void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list);
 
+void camera_transform_lights(const Matrix4x4 &vp);
+
 void light_renderlist(std::vector<RenderListPoly> &render_list);
 
 void backface_removal_object(RenderObject& object, const Camera &camera);
