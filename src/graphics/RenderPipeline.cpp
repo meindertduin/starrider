@@ -162,8 +162,10 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
         }
 
         int v0, v1, v2;
-        V4D v;
+        V4D u, v, n;
         float t1, t2, xi, yi, ui, vi;
+        float x01i, y01i, x02i, y02i, u01i, v01i, u02i, v02i;
+        RenderListPoly temp_poly;
 
         // clip for one point inside
         if ((vertex_clip_code[0] | vertex_clip_code[1] | vertex_clip_code[2]) & ClipCodes::L) {
@@ -181,7 +183,7 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
 
                 t1 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
                 xi = poly.trans_verts[v0].v.x + v.x * t1;
-                yi = poly.trans_verts[v0].v.y + v.x * t1;
+                yi = poly.trans_verts[v0].v.y + v.y * t1;
 
                 poly.trans_verts[v1].v.x = xi;
                 poly.trans_verts[v1].v.y = yi;
@@ -191,7 +193,7 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
 
                 t2 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
                 xi = poly.trans_verts[v0].v.x + v.x * t2;
-                yi = poly.trans_verts[v0].v.y + v.x * t2;
+                yi = poly.trans_verts[v0].v.y + v.y * t2;
 
                 poly.trans_verts[v2].v.x = xi;
                 poly.trans_verts[v2].v.y = yi;
@@ -207,8 +209,83 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
                 vi = poly.trans_verts[v0].t.y + (poly.trans_verts[v2].t.y - poly.trans_verts[v0].t.y) * t2;
                 poly.trans_verts[v1].t.x = ui;
                 poly.trans_verts[v1].t.y = vi;
-            } else {
 
+                u = V4D(poly.trans_verts[v0].v, poly.trans_verts[v1].v);
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v2].v);
+
+                // TODO optimize normalising
+                n = u.normalized().cross(v.normalized());
+                poly.n_length = 1;
+                poly.normal = n;
+            } else if (num_inside == 2) {
+                temp_poly = poly;
+
+                if (vertex_clip_code[0] == ClipCodes::L) {
+                    v0 = 0; v1 = 1; v2 = 2;
+                } else if (vertex_clip_code[1] == ClipCodes::L) {
+                    v0 = 1; v1 = 2; v2 = 0;
+                } else {
+                    v0 = 2; v1 = 0; v2 = 1;
+                }
+
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v1].v);
+
+                t1 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
+                x01i = poly.trans_verts[v0].v.x + v.x * t1;
+                y01i = poly.trans_verts[v0].v.y + v.y * t1;
+
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v2].v);
+
+                t2 = ((camera.m_znear - poly.trans_verts[v0].v.z) / v.z);
+                x02i = poly.trans_verts[v0].v.x + v.x * t2;
+                y02i = poly.trans_verts[v0].v.y + v.y * t2;
+
+                poly.trans_verts[v0].v.x = x01i;
+                poly.trans_verts[v0].v.y = y01i;
+                poly.trans_verts[v0].v.z = camera.m_znear;
+
+                temp_poly.trans_verts[v1].v.x = x01i;
+                temp_poly.trans_verts[v1].v.y = y01i;
+                temp_poly.trans_verts[v1].v.z = camera.m_znear;
+
+                temp_poly.trans_verts[v0].v.x = x02i;
+                temp_poly.trans_verts[v0].v.y = y02i;
+                temp_poly.trans_verts[v0].v.z = camera.m_znear;
+
+                // TODO: check if poly is textured
+                u01i = poly.trans_verts[v0].t.x + (poly.trans_verts[v1].t.x - poly.trans_verts[v0].t.x) * t1;
+                v01i = poly.trans_verts[v0].t.y + (poly.trans_verts[v1].t.y - poly.trans_verts[v0].t.y) * t1;
+
+                u02i = poly.trans_verts[v0].t.x + (poly.trans_verts[v2].t.x - poly.trans_verts[v0].t.x) * t2;
+                v02i = poly.trans_verts[v0].t.y + (poly.trans_verts[v2].t.y - poly.trans_verts[v0].t.y) * t2;
+
+                poly.trans_verts[v0].t.x = u01i;
+                poly.trans_verts[v0].t.y = v01i;
+
+                temp_poly.trans_verts[v0].t.x = u02i;
+                temp_poly.trans_verts[v0].t.y = v02i;
+
+                temp_poly.trans_verts[v1].t.x = u01i;
+                temp_poly.trans_verts[v1].t.y = v01i;
+
+                // Recalculate polys normals
+                u = V4D(poly.trans_verts[v0].v, poly.trans_verts[v1].v);
+                v = V4D(poly.trans_verts[v0].v, poly.trans_verts[v2].v);
+
+                // TODO optimize normalising
+                n = u.normalized().cross(v.normalized());
+                poly.n_length = 1;
+                poly.normal = n;
+
+                u = V4D(temp_poly.trans_verts[v0].v, temp_poly.trans_verts[v1].v);
+                v = V4D(temp_poly.trans_verts[v0].v, temp_poly.trans_verts[v2].v);
+
+                // TODO optimize normalising
+                n = u.normalized().cross(v.normalized());
+                temp_poly.n_length = 1;
+                temp_poly.normal = n;
+
+                render_list.push_back(temp_poly);
             }
         }
     }
