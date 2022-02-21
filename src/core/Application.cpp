@@ -67,13 +67,13 @@ void Application::run() {
     ObjectRepository object_repository;
 
     auto object = object_repository.create_game_object("assets/monkey.obj", "assets/test_texture.bmp");
-    // auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/test_texture.bmp");
+    auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/test_texture.bmp");
 
     object.transform = Transform(V4D(0, 0, 3));
-    //plateau.transform = Transform(V4D(0, -5, 0));
+    plateau.transform = Transform(V4D(0, -5, 0));
 
+    objects.push_back(plateau);
     objects.push_back(object);
-    //objects.push_back(plateau);
 
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
@@ -91,7 +91,7 @@ void Application::run() {
         renderer.render_text(time_text, ttf_font, {20, 52});
 
         renderer.render_framebuffer();
-        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+        objects[1].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;

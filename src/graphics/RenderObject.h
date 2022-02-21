@@ -235,8 +235,8 @@ constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
 }
 
 constexpr bool render_polygon_avg_sort(const RenderListPoly &a, const RenderListPoly &b) {
-    return 0.3333f * (a.trans_verts[0].v.z * a.trans_verts[1].v.z * a.trans_verts[2].v.z) >
-        0.3333f * (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
+    return (a.trans_verts[0].v.z * a.trans_verts[1].v.z * a.trans_verts[2].v.z) >
+        (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
 }
 
 void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly> &render_list);

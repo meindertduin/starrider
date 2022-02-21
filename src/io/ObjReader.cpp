@@ -146,7 +146,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         object.polygons[i] = polygons[i];
     }
 
-    if (has_normal_indices) {
+    if (!has_normal_indices) {
         compute_vertex_normals(object);
     }
 }

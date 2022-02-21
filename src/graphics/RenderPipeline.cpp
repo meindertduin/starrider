@@ -17,41 +17,39 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables) {
     rast_set_frame_buffer(camera.width, camera.height, p_renderer->get_framebuffer());
-
     p_renderer->clear_screen();
-    auto vp = camera.get_view_projection();
 
-    auto v_forward = camera.m_transform.rot.get_back();
+    auto vp = camera.get_view_projection();
+    camera_transform_lights(vp);
+
+    std::vector<RenderListPoly> render_list;
 
     for (auto object : renderables) {
-        std::vector<RenderListPoly> render_list;
-
         world_transform_object(object);
 
         backface_removal_object(object, camera);
 
         insert_object_render_list(object, render_list);
-
-        camera_transform_lights(vp);
-
-        camera_transform_renderlist(vp, render_list);
-
-        frustrum_clip_renderlist(camera, render_list);
-
-        light_renderlist(render_list);
-
-        std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
-
-        for (auto render_poly : render_list) {
-            if (render_poly.state & PolyStateClipped) {
-                continue;
-            }
-
-            perspective_screen_transform(camera, render_poly);
-            draw_intensity_gouraud_triangle(render_poly);
-            // draw_colored_gouraud_triangle(render_poly);
-        }
     }
+
+    camera_transform_renderlist(vp, render_list);
+
+    frustrum_clip_renderlist(camera, render_list);
+
+    light_renderlist(render_list);
+
+    std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
+
+    for (auto render_poly : render_list) {
+        if (render_poly.state & PolyStateClipped) {
+            continue;
+        }
+
+        perspective_screen_transform(camera, render_poly);
+        draw_intensity_gouraud_triangle(render_poly);
+        // draw_colored_gouraud_triangle(render_poly);
+    }
+
 }
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select) {
