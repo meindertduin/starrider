@@ -202,11 +202,8 @@ typedef struct Light_Type {
     Point4D trans_pos;
 
     V4D dir;
-    V4D trans_dir;
 
     float kc, kl, kq;
-    float spot_inner;
-    float spot_outer;
 
     float pf;
 } Light;

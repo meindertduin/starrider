@@ -302,8 +302,8 @@ void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly
 
 void camera_transform_lights(const Matrix4x4 &vp) {
     for (int i = 0; i < num_lights; i++) {
-        g_lights[i].trans_dir = vp.transform(g_lights[i].dir);
-        g_lights[i].trans_pos = vp.transform(g_lights[i].pos);
+        if (g_lights[i].attributes == LightAttributePoint)
+            g_lights[i].trans_pos = vp.transform(g_lights[i].pos);
     }
 }
 
@@ -370,7 +370,7 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
                 b2_sum += bi;
             }
             else if (lights[curr_light].attributes & LightAttributeInfinite) {
-                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].trans_dir);
+                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -380,7 +380,7 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
                     b0_sum += ((lights[curr_light].c_diffuse.b * polygon.color.b * i) / (256 * 128));
                 }
 
-                dp = polygon.trans_verts[1].n.dot(lights[curr_light].trans_dir);
+                dp = polygon.trans_verts[1].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -390,7 +390,7 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
                     b1_sum += ((lights[curr_light].c_diffuse.b * polygon.color.b * i) / (256 * 128));
                 }
 
-                dp = polygon.trans_verts[2].n.dot(lights[curr_light].trans_dir);
+                dp = polygon.trans_verts[2].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -485,7 +485,7 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
                 r2_sum += ri;
             }
             else if (lights[curr_light].attributes & LightAttributeInfinite) {
-                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].trans_dir);
+                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -493,7 +493,7 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
                     r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                 }
 
-                dp = polygon.trans_verts[1].n.dot(lights[curr_light].trans_dir);
+                dp = polygon.trans_verts[1].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -501,7 +501,7 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
                     r1_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                 }
 
-                dp = polygon.trans_verts[2].n.dot(lights[curr_light].trans_dir);
+                dp = polygon.trans_verts[2].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -576,7 +576,7 @@ void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
                 g_sum += ((lights[curr_light].c_ambient.g * polygon.color.g) >> 8);
                 b_sum += ((lights[curr_light].c_ambient.b * polygon.color.b) >> 8);
             } else if (lights[curr_light].attributes & LightAttributeInfinite) {
-                auto dp = polygon.normal.dot(lights[curr_light].trans_dir);
+                auto dp = polygon.normal.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     // TODO optimaize the normal length

@@ -28,7 +28,6 @@ int init_light(int index,
         Point4D pos,
         V4D dir,
         float kc, float kl, float kq,
-        float spot_inner, float spot_outer,
         float pf)
 {
     if (index < 0 || index >= MaxLights) {
@@ -49,8 +48,6 @@ int init_light(int index,
     g_lights[index].pos = pos;
     g_lights[index].dir = dir.normalized();
 
-    g_lights[index].spot_inner = spot_inner;
-    g_lights[index].spot_outer = spot_outer;
     g_lights[index].pf = pf;
 
     num_lights++;
@@ -63,7 +60,7 @@ int create_base_amb_light(int index, RGBA col) {
             col, RGBA { 0 }, RGBA { 0 },
             V4D(), V4D(),
             0, 0, 0,
-            0, 0, 0);
+            0);
 }
 
 int create_base_dir_light(int index, RGBA col, V4D dir) {
@@ -71,7 +68,7 @@ int create_base_dir_light(int index, RGBA col, V4D dir) {
             RGBA { 0 }, col, RGBA { 0 },
             V4D(), dir,
             0, 1, 0,
-            0, 0, 0);
+            0);
 }
 
 
@@ -80,7 +77,7 @@ int create_base_point_light(int index, RGBA col, V4D pos, float kc, float kl, fl
             RGBA { 0 }, col, RGBA { 0 },
             pos, V4D(),
             kc, kl, kq,
-            0, 0, 0);
+            0);
 }
 
 int RenderObject_Type::set_frame(int frame) {
