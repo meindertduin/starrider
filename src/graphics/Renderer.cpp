@@ -144,10 +144,10 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
             for (int x_out = 0; x_out < dest.width; x_out++) {
                 auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
 
-                if (pixel.rgba.alpha > 0) {
-                    if (pixel.rgba.alpha != 0xFF) {
+                if (pixel.alpha > 0) {
+                    if (pixel.alpha != 0xFF) {
                         Pixel current = get_pixel(x_out + dest.x_pos, y_out + dest.y_pos);
-                        pixel.rgba.blend(current.rgba);
+                        pixel_blend(pixel, current);
                     }
 
 		            //*((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;

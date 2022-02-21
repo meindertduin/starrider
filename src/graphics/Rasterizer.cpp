@@ -173,7 +173,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.rgba.red * i, pixel.rgba.green * i, pixel.rgba.blue * i, 0xFF);;
+            p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.red * i, pixel.green * i, pixel.blue * i, 0xFF);;
 
             i += dix;
 
@@ -241,9 +241,9 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
 
         for(int x = left.x; x < right.x; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            uint32_t r_col = pixel.rgba.red * (r / 255);
-            uint32_t g_col = pixel.rgba.green * (g / 255);
-            uint32_t b_col = pixel.rgba.blue * (b / 255);
+            uint32_t r_col = pixel.red * (r / 255);
+            uint32_t g_col = pixel.green * (g / 255);
+            uint32_t b_col = pixel.blue * (b / 255);
 
             p_frame_buffer[m_width * y + x].value = rgba_bit(r_col, g_col, b_col, 0xFF);
 
