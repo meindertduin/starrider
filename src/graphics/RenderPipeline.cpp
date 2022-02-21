@@ -484,16 +484,38 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
                     r2_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                 }
             } else if (lights[curr_light].attributes * LightAttributePoint) {
-                auto l = V4D(polygon.trans_verts[0].v, lights[curr_light].trans_pos);
+
+                auto l = V4D(lights[curr_light].trans_pos, polygon.trans_verts[0].v);
                 dist = l.length();
-                dp = polygon.normal.dot(l);
+                dp = polygon.trans_verts[0].n.dot(l);
 
                 if (dp > 0.0f) {
                     atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
-                    i = 128 * dp / (polygon.normal.length() * dist * atten);
+                    i = 128 * dp / (dist * atten);
 
                     r0_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+
+                l = V4D(lights[curr_light].trans_pos, polygon.trans_verts[1].v);
+
+                dist = l.length();
+                dp = polygon.trans_verts[1].n.dot(l);
+
+                if (dp > 0.0f) {
+                    atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
+                    i = 128 * dp / (dist * atten);
+
                     r1_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
+                }
+
+                l = V4D(lights[curr_light].trans_pos, polygon.trans_verts[2].v);
+                dist = l.length();
+                dp = polygon.trans_verts[2].n.dot(l);
+
+                if (dp > 0.0f) {
+                    atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
+                    i = 128 * dp / (dist * atten);
+
                     r2_sum += ((lights[curr_light].c_diffuse.r * polygon.color.r * i) / (256 * 128));
                 }
             }
