@@ -103,7 +103,13 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
 
         // TODO: get these values from obj file
         polygon.state = PolyStateActive;
-        polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 | PolyAttributeShadeModeGouraud;
+
+        polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
+            PolyAttributeShadeModeIntensityGourad;
+
+        if (has_tex_coords) {
+            polygon.attributes |= PolyAttributeShadeModeTexture;
+        }
 
         for (int j = 0; j < 3; j++) {
             auto current_index = m_indices[i + j];
@@ -122,7 +128,9 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
             }
         }
 
-        if (polygon.attributes & ShadeModeGouraud || polygon.attributes & ShadeModeFastPhong) {
+        if (polygon.attributes & PolyAttributeShadeModeGouraud ||
+                polygon.attributes & PolyAttributeShadeModeIntensityGourad) {
+
             auto line1 = object.transformed_vertices[polygon.vert[0]].v
                 - object.transformed_vertices[polygon.vert[1]].v;
 

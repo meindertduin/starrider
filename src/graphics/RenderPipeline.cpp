@@ -46,8 +46,9 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         }
 
         perspective_screen_transform(camera, render_poly);
-        // draw_intensity_gouraud_triangle(render_poly);
-        draw_colored_gouraud_triangle(render_poly);
+
+        draw_intensity_gouraud_triangle(render_poly);
+        // draw_colored_gouraud_triangle(render_poly);
     }
 
 }
@@ -311,8 +312,8 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
             continue;
         }
 
-        // gourad_intensity_light_polygon(poly, g_lights, num_lights);
-        gourad_light_polygon(poly, g_lights, num_lights);
+        gourad_intensity_light_polygon(poly, g_lights, num_lights);
+        // gourad_light_polygon(poly, g_lights, num_lights);
     }
 }
 
@@ -465,7 +466,7 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
 
     float dp, dist, n1, atten, i;
 
-    if (polygon.attributes & PolyAttributeShadeModeGouraud) {
+    if (polygon.attributes & PolyAttributeShadeModeIntensityGourad) {
         r0_sum = 0;
         r1_sum = 0;
         r2_sum = 0;
@@ -561,7 +562,7 @@ void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
 
     float dp, dist, i, n1, atten;
 
-    if (polygon.attributes & PolyAttributeShadeModeFlat || polygon.attributes & PolyAttributeShadeModeGouraud) {
+    if (polygon.attributes & PolyAttributeShadeModeFlat) {
         r_sum = g_sum = b_sum = 0;
 
         for (int curr_light = 0; curr_light < max_lights; curr_light++) {
