@@ -207,6 +207,7 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
 
     for(int y = y_start; y < y_end; y++) {
         float x_dist = right.x - left.x;
+
         float drx = (right.r - left.r) / x_dist;
         float r = left.r;
 
@@ -239,8 +240,9 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
         if (x_end > m_width)
             x_end = m_width;
 
-        for(int x = left.x; x < right.x; x++) {
+        for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+
             uint32_t r_col = pixel.red * (r / 255);
             uint32_t g_col = pixel.green * (g / 255);
             uint32_t b_col = pixel.blue * (b / 255);
