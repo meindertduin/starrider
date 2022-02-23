@@ -228,6 +228,16 @@ int create_base_amb_light(int index, RGBA col);
 int create_base_dir_light(int index, RGBA col, V4D dir);
 int create_base_point_light(int index, RGBA col, V4D pos, float kc, float kl, float kq);
 
+constexpr uint32_t rgb_from_565(int r, int g, int b) {
+    return ((b & 31) + ((g & 63) << 5) + ((r & 31) << 11));
+}
+
+constexpr void rgb565_from_16bit(uint32_t bit, uint32_t &r, uint32_t &g, uint32_t &b) {
+    r = (bit >> 11) & 31;
+    g = (bit >> 5) & 63;
+    b = bit & 31;
+}
+
 constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return (a << 24) | (r << 16) | (g << 8) | b;
 }
