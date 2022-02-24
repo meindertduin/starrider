@@ -1,5 +1,6 @@
 #include "core/Application.h"
 #include "graphics/Font.h"
+#include "graphics/Rasterizer.h"
 
 #include "math/Core.h"
 #include "io/Logger.h"
@@ -7,6 +8,7 @@
 int main() {
     try {
         Math::build_lookup_tables();
+        Graphics::build_rgb_lookup(8);
         Logger::initialize("log.txt");
 
         if (!ttf_init())
@@ -20,6 +22,7 @@ int main() {
 
         app->run();
         ttf_quit();
+        Graphics::cleanup_rgb_lookup();
     } catch(const std::exception) {
         return EXIT_FAILURE;
     };

@@ -7,6 +7,9 @@ namespace Graphics {
 
 Pixel* p_frame_buffer;
 
+uint32_t **rgb_lookup;
+int lookup_levels = 0;
+
 int min_clip_y {0};
 int min_clip_x {0};
 
@@ -171,9 +174,14 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         if (x_end > m_width)
             x_end = m_width;
 
+
+        uint32_t r, g, b;
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            p_frame_buffer[m_width * y + x].value = rgba_bit(pixel.red * i, pixel.green * i, pixel.blue * i, 0xFF);;
+            auto bit = rgb_from_565(pixel.red >> 3, pixel.green >> 2, pixel.blue >> 3);
+            rgb565_from_16bit(bit, r, g, b);
+
+            p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
 
             i += dix;
 
@@ -283,6 +291,41 @@ void rast_set_frame_buffer(int width, int height, Pixel *frame_buffer) {
 
         p_frame_buffer = frame_buffer;
     }
+}
+
+void build_rgb_lookup(int levels) {
+    rgb_lookup = new uint32_t*[levels];
+
+    for (int i = 0; i < levels; i++)
+        rgb_lookup[i] = new uint32_t[65536];
+
+    uint32_t r, g, b;
+    float alhpa = 0;
+    float delta_alpha = Math::EPSILON_E6 + 1 / ((float)(levels - 1));
+
+    for (int level_index = 0; level_index < levels; level_index++) {
+        for (uint32_t rgb_index = 0; rgb_index < 65536; rgb_index++) {
+            rgb565_from_16bit(rgb_index, r, g, b);
+
+            r = (uint32_t) ((float) r * (float) alhpa);
+            g = (uint32_t) ((float) g * (float) alhpa);
+            b = (uint32_t) ((float) b * (float) alhpa);
+
+            rgb_lookup[level_index][rgb_index] = rgba_bit(r << 3, g << 2, b << 3, 0xFF);
+        }
+
+        alhpa += delta_alpha;
+    }
+
+    lookup_levels = levels;
+}
+
+void cleanup_rgb_lookup() {
+    for (int i = 0; i < lookup_levels; i++) {
+        delete[] rgb_lookup[i];
+    }
+
+    delete[] rgb_lookup;
 }
 
 }

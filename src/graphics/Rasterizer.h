@@ -141,5 +141,8 @@ void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly);
 void scan_edges(CGouradEdge &left, CGouradEdge &right, bool handedness, RGBA color, const RenderListPoly &poly);
 
+void build_rgb_lookup(int levels);
+void cleanup_rgb_lookup();
+
 }
 
