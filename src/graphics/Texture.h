@@ -63,36 +63,15 @@ public:
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
-    constexpr Pixel get_pixel(int x_pos, int y_pos) const {
-        return {
-            .value = get_pixel_value(x_pos, y_pos),
-        };
+    uint32_t get_pixel(int x_pos, int y_pos) const {
+        return pixels[width * y_pos + x_pos];
     };
 
     int width;
     int height;
 private:
-    void *pixels = nullptr;
+    uint32_t *pixels = nullptr;
     Format format;
-
-    constexpr uint32_t get_pixel_value(int x_pos, int y_pos) const {
-        switch(format) {
-            case Format::RED:
-                {
-                    uint32_t val = reinterpret_cast<unsigned char*>(pixels)[width * y_pos + x_pos];
-                    return (val << 24) | (val << 16) | (val << 8) | val;
-                }
-            case Format::RGBA:
-                return reinterpret_cast<uint32_t*>(pixels)[width * y_pos + x_pos];
-            case Format::RGB:
-                {
-                    auto rgb =  reinterpret_cast<RGB*>(pixels)[width * y_pos + x_pos];
-                    return (0x000000FF << 24) | (rgb.red << 16) | (rgb.green << 8) | (rgb.blue);
-                }
-            default:
-                return 0;
-        }
-    }
 };
 
 

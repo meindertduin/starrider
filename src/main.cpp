@@ -8,7 +8,7 @@
 int main() {
     try {
         Math::build_lookup_tables();
-        Graphics::build_rgb_lookup(8);
+        Graphics::build_rgb_lookup(12);
         Logger::initialize("log.txt");
 
         if (!ttf_init())

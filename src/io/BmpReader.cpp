@@ -1,4 +1,5 @@
 #include "BmpReader.h"
+#include "../graphics/RenderObject.h"
 #include <iostream>
 
 BmpReader::BmpReader() {}
@@ -34,6 +35,10 @@ size_t BmpReader::read_to_buffer(std::unique_ptr<unsigned char> &bitmap) {
         // reading the rows in inverse order, so that the bitmap of the image isn't inverted.
         uint32_t* row_ptr = row(m_dib_header.height - i - 1, reinterpret_cast<uint32_t*>(bitmap.get()));
         m_ifs.read(reinterpret_cast<char*>(row_ptr), 4 * m_dib_header.width);
+
+        // TODO: add this in a derivative class?
+        for (int i = 0; i < m_dib_header.width; i++)
+            row_ptr[i] = rgb_from_565(((row_ptr[i] >> 16) & 0xFF) >> 3, ((row_ptr[i] >> 8) & 0xFF) >> 2, ((row_ptr[i] >> 0) & 0xFF) >> 3);
     }
 
     return m_dib_header.bitmap_size;

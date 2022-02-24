@@ -132,33 +132,33 @@ inline Pixel Renderer::get_pixel(int x_pos, int y_pos) {
 
 
 void Renderer::render_texture(const Texture &texture, const Rect &src, const Rect &dest) {
-    if(dest.x_pos >= 0 && dest.width + dest.x_pos <= m_width
-            && dest.y_pos >= 0 && dest.height + dest.y_pos <= m_height)
-    {
-        float x_step = (float)src.width / (float)dest.width;
-        float y_step = (float)src.height / (float)dest.height;
+    // if(dest.x_pos >= 0 && dest.width + dest.x_pos <= m_width
+    //         && dest.y_pos >= 0 && dest.height + dest.y_pos <= m_height)
+    // {
+    //     float x_step = (float)src.width / (float)dest.width;
+    //     float y_step = (float)src.height / (float)dest.height;
 
-        float y = 0;
-        for (int y_out = 0; y_out < dest.height; y_out++) {
-            float x = 0;
-            for (int x_out = 0; x_out < dest.width; x_out++) {
-                auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
+    //     float y = 0;
+    //     for (int y_out = 0; y_out < dest.height; y_out++) {
+    //         float x = 0;
+    //         for (int x_out = 0; x_out < dest.width; x_out++) {
+    //             auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
 
-                if (pixel.alpha > 0) {
-                    if (pixel.alpha != 0xFF) {
-                        Pixel current = get_pixel(x_out + dest.x_pos, y_out + dest.y_pos);
-                        pixel_blend(pixel, current);
-                    }
+    //             if (pixel.alpha > 0) {
+    //                 if (pixel.alpha != 0xFF) {
+    //                     Pixel current = get_pixel(x_out + dest.x_pos, y_out + dest.y_pos);
+    //                     pixel_blend(pixel, current);
+    //                 }
 
-		            //*((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;
-                    p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = pixel.value;
-                }
+	// 	            //*((int*) m_shm_info.shmaddr + m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)) = pixel.value;
+    //                 p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = pixel.value;
+    //             }
 
-                x += x_step;
-            }
-            y += y_step;
-        }
-    }
+    //             x += x_step;
+    //         }
+    //         y += y_step;
+    //     }
+    // }
 }
 
 void Renderer::render_text(std::string text, const TTFFont &font, const Point &point) {

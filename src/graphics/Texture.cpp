@@ -10,14 +10,7 @@ Texture::Texture(const Texture &other) : pixels(nullptr),
 {
     if (other.pixels != nullptr) {
         std::size_t size(other.width * other.height);
-        switch (other.format) {
-            case Format::RED:
-                this->pixels = new unsigned char[size];
-                break;
-            case Format::RGBA:
-                this->pixels = new uint32_t[size];
-                break;
-        }
+        this->pixels = new uint32_t[size];
 
         std::memcpy(pixels, other.pixels, size);
     }
@@ -37,14 +30,7 @@ Texture::Texture(Format format, int width, int height, void* data) {
 
     if (data != nullptr) {
         std::size_t size(width * height);
-        switch (format) {
-            case Format::RED:
-                this->pixels = new unsigned char[size];
-                break;
-            case Format::RGBA:
-                this->pixels = new uint32_t[size];
-                break;
-        }
+        this->pixels = new uint32_t[size];
 
         std::memcpy(pixels, data, size);
     }
@@ -79,7 +65,7 @@ void Texture::load_from_bmp(std::string path) {
     auto bitmap = std::unique_ptr<unsigned char>(nullptr);
     bmp_reader.read_to_buffer(bitmap);
 
-    pixels = bitmap.get();
+    pixels = reinterpret_cast<uint32_t*>(bitmap.get());
 
     // Ownership is released because this class manages the pointer for a bit extra performance
     bitmap.release();
@@ -100,7 +86,7 @@ Texture Texture::from_section(Rect src) {
 
     for (int y = 0; y < src.height; y++)
         for (int x = 0; x < src.width; x++)
-            data[src.width * y + x] = get_pixel_value(x + src.x_pos, y + src.y_pos);
+            data[src.width * y + x] = get_pixel(x + src.x_pos, y + src.y_pos);
 
     return Texture(Format::RGBA, src.width, src.height, data);
 }
