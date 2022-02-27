@@ -146,16 +146,12 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
             float x = 0;
             for (int x_out = 0; x_out < dest.width; x_out++) {
                 auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
-                // rgb565_from_16bit(pixel, r, g, b);
-                // rgba565_from_16bit(pixel, a, r, g, b);
+                rgba565_from_16bit(pixel, a, r, g, b);
 
-                // if (a > 0) {
-                //     p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value =
-                //         rgba_bit((r << 3), (g << 2), (b << 3), a);
-                // }
-
-
-                p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = pixel;
+                if (a > 0) {
+                    p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value =
+                        rgba_bit((r << 3), (g << 2), (b << 3), a);
+                }
 
                 x += x_step;
             }
