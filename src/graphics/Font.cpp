@@ -1,6 +1,7 @@
 #include "../io/BmpReader.h"
 #include "Font.h"
 #include <iostream>
+#include "RenderObject.h"
 
 FT_Library library;
 
@@ -80,8 +81,9 @@ Texture TTFFont::from_char(char c) {
     FT_Set_Pixel_Sizes(m_face, 0, 32);
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
 
-    return Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, m_face->glyph->bitmap.buffer);
+    auto glyph_buffer = reinterpret_cast<uint32_t*>(m_face->glyph->bitmap.buffer);
 
+    return Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, glyph_buffer);
 }
 
 Glyph TTFFont::get_glyph(char c) const {

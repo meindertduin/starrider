@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include "Core.h"
+#include "RenderObject.h"
 
 
 Texture::Texture() {
@@ -33,6 +34,13 @@ Texture::Texture(Format format, int width, int height, void* data) {
         this->pixels = new uint32_t[size];
 
         std::memcpy(pixels, data, size);
+
+        // convert form ARGB format to 5 6 5 with alpha
+        for (int i = 0; i < size; i++) {
+            // pixels[i] = rgb_from_565(((pixels[i] >> 16) & 0xFF) >> 3, ((pixels[i] >> 8) & 0xFF) >> 2, ((pixels[i] >> 0) & 0xFF) >> 3);
+            pixels[i] = rgb_from_565(0xFF >> 3, 0xFF >> 2, 0xFF >> 3);
+            pixels[i] |= pixels[i] & 0xFF000000;
+        }
     }
 }
 
