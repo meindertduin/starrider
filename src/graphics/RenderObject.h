@@ -238,6 +238,13 @@ constexpr void rgb565_from_16bit(uint32_t bit, uint32_t &r, uint32_t &g, uint32_
     b = bit & 31;
 }
 
+constexpr void rgba565_from_16bit(uint32_t bit, uint32_t &a, uint32_t &r, uint32_t &g, uint32_t &b) {
+    a = (bit >> 24) & 0xFF;
+    r = (bit >> 11) & 31;
+    g = (bit >> 5) & 63;
+    b = bit & 31;
+}
+
 constexpr uint32_t rgba_bit(uint32_t r, uint32_t g, uint32_t b, uint32_t a) {
     return (a << 24) | (r << 16) | (g << 8) | b;
 }

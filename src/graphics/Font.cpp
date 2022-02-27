@@ -81,9 +81,25 @@ Texture TTFFont::from_char(char c) {
     FT_Set_Pixel_Sizes(m_face, 0, 32);
     FT_Load_Char(m_face, c, FT_LOAD_RENDER);
 
-    auto glyph_buffer = reinterpret_cast<uint32_t*>(m_face->glyph->bitmap.buffer);
+    auto width = m_face->glyph->bitmap.width;
+    auto height = m_face->glyph->bitmap.rows * 4;
 
-    return Texture(Format::RED, m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows, glyph_buffer);
+    int size = width * height;
+    auto buffer = new uint32_t[size];
+
+    // convert form RR format to 5 6 5 with alpha
+    for (int i = 0; i < size; i++) {
+        // pixels[i] = rgb_from_565(((pixels[i] >> 8) & 0xFF) >> 3, ((pixels[i] >> 16) & 0xFF) >> 2, ((pixels[i] >> 24) & 0xFF) >> 3);
+        // pixels[i] = rgb_from_565(0xFF >> 3, 0xFF >> 2, 0xFF >> 3);
+        auto val = reinterpret_cast<unsigned char*>(m_face->glyph->bitmap.buffer)[i];
+        buffer[i] = (val << 24) | (val << 16) | (val << 8) | val;
+        // buffer[i] = 0xFFFFFFFF;
+    }
+
+    auto texture = Texture(Format::RED, width, height, buffer);
+    delete[] buffer;
+
+    return texture;
 }
 
 Glyph TTFFont::get_glyph(char c) const {

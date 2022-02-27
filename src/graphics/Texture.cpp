@@ -24,23 +24,16 @@ Texture::Texture(Texture &&other) noexcept : pixels(nullptr), width(other.width)
     other.pixels = nullptr;
 }
 
-Texture::Texture(Format format, int width, int height, void* data) {
+Texture::Texture(Format format, int width, int height, uint32_t* data) {
     this->format = format;
     this->width = width;
     this->height = height;
 
     if (data != nullptr) {
-        std::size_t size(width * height);
+        auto size = width * height;
         this->pixels = new uint32_t[size];
 
         std::memcpy(pixels, data, size);
-
-        // convert form ARGB format to 5 6 5 with alpha
-        for (int i = 0; i < size; i++) {
-            // pixels[i] = rgb_from_565(((pixels[i] >> 16) & 0xFF) >> 3, ((pixels[i] >> 8) & 0xFF) >> 2, ((pixels[i] >> 0) & 0xFF) >> 3);
-            pixels[i] = rgb_from_565(0xFF >> 3, 0xFF >> 2, 0xFF >> 3);
-            pixels[i] |= pixels[i] & 0xFF000000;
-        }
     }
 }
 
@@ -90,7 +83,6 @@ void Texture::load_from_bmp(std::string path) {
 
 Texture Texture::from_section(Rect src) {
     uint32_t *data = new uint32_t[src.width * src.height];
-    auto pixels = static_cast<uint32_t*>(this->pixels);
 
     for (int y = 0; y < src.height; y++)
         for (int x = 0; x < src.width; x++)

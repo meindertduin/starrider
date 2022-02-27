@@ -140,15 +140,22 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
         float y_step = (float)src.height / (float)dest.height;
 
         float y = 0;
-        uint32_t r, g, b;
+        uint32_t a, r, g, b;
 
         for (int y_out = 0; y_out < dest.height; y_out++) {
             float x = 0;
             for (int x_out = 0; x_out < dest.width; x_out++) {
-                // auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
-                auto pixel = texture.get_pixel(0, 0);
-                rgb565_from_16bit(pixel, r, g, b);
-                p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = rgba_bit((r << 3), (g << 2), (b << 3), 0xFF);
+                auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
+                // rgb565_from_16bit(pixel, r, g, b);
+                // rgba565_from_16bit(pixel, a, r, g, b);
+
+                // if (a > 0) {
+                //     p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value =
+                //         rgba_bit((r << 3), (g << 2), (b << 3), a);
+                // }
+
+
+                p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value = pixel;
 
                 x += x_step;
             }
