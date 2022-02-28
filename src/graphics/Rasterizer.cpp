@@ -142,6 +142,8 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    uint32_t r, g, b;
+
     if (y_start > m_height || y_end < 0)
         return;
 
@@ -174,7 +176,6 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         if (x_end > m_width)
             x_end = m_width;
 
-        uint32_t r, g, b;
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
             rgb565_from_16bit(pixel, r, g, b);
@@ -210,6 +211,8 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
+
+    uint32_t rp, gp, bp;
 
     if (y_start > m_height || y_end < 0)
         return;
@@ -254,12 +257,13 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
 
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+            rgb565_from_16bit(pixel, rp, gp, bp);
 
-            // uint32_t r_col = pixel.red * (r / 255);
-            // uint32_t g_col = pixel.green * (g / 255);
-            // uint32_t b_col = pixel.blue * (b / 255);
+            uint32_t r_col = (rp << 3) * (r / 255);
+            uint32_t g_col = (gp << 2) * (g / 255);
+            uint32_t b_col = (bp << 3) * (b / 255);
 
-            // p_frame_buffer[m_width * y + x].value = rgba_bit(r_col, g_col, b_col, 0xFF);
+            p_frame_buffer[m_width * y + x].value = rgba_bit(r_col, g_col, b_col, 0xFF);
 
             r += drx;
             g += dgx;
