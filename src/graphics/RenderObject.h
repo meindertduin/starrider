@@ -111,7 +111,7 @@ typedef struct Polygon_Type {
     uint16_t state;
     uint16_t attributes;
     A565Color color;
-    RGBA lit_color[3];
+    A565Color lit_color[3];
 
     int mati;
     Texture *texture;
@@ -130,7 +130,7 @@ typedef struct RenderListPoly_Type {
     uint16_t state;
     uint16_t attributes;
     A565Color color;
-    RGBA lit_color[3];
+    A565Color lit_color[3];
     Texture *texture;
     int mati;
 

@@ -55,7 +55,7 @@ typedef struct A565Color_Type {
         b = (value & 31) << 3;
     }
 
-    constexpr void rgba565_from_16bit(uint32_t &a, uint32_t &r, uint32_t &g, uint32_t &b) {
+    constexpr void rgba565_from_16bit(uint32_t &r, uint32_t &g, uint32_t &b, uint32_t &a) {
         a = (value >> 24) & 0xFF;
         r = (value >> 11) & 31;
         g = (value >> 5) & 63;

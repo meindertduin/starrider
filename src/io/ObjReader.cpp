@@ -105,7 +105,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
         polygon.state = PolyStateActive;
 
         polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
-            PolyAttributeShadeModeIntensityGourad;
+            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud;
 
         if (has_tex_coords) {
             polygon.attributes |= PolyAttributeShadeModeTexture;

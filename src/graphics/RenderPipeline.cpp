@@ -47,8 +47,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         perspective_screen_transform(camera, render_poly);
 
-        draw_intensity_gouraud_triangle(render_poly);
-        // draw_colored_gouraud_triangle(render_poly);
+        // draw_intensity_gouraud_triangle(render_poly);
+        draw_colored_gouraud_triangle(render_poly);
     }
 
 }
@@ -312,8 +312,8 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
             continue;
         }
 
-        gourad_intensity_light_polygon(poly, g_lights, num_lights);
-        // gourad_light_polygon(poly, g_lights, num_lights);
+        // gourad_intensity_light_polygon(poly, g_lights, num_lights);
+        gourad_light_polygon(poly, g_lights, num_lights);
     }
 }
 
@@ -452,9 +452,9 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
         if (g2_sum > 255) g2_sum = 255;
         if (b2_sum > 255) b2_sum = 255;
 
-        polygon.lit_color[0] = RGBA(r0_sum, g0_sum, b0_sum, 0xFF);
-        polygon.lit_color[1] = RGBA(r1_sum, g1_sum, b1_sum, 0xFF);
-        polygon.lit_color[2] = RGBA(r2_sum, g2_sum, b2_sum, 0xFF);
+        polygon.lit_color[0] = A565Color(r0_sum, g0_sum, b0_sum, 0xFF);
+        polygon.lit_color[1] = A565Color(r1_sum, g1_sum, b1_sum, 0xFF);
+        polygon.lit_color[2] = A565Color(r2_sum, g2_sum, b2_sum, 0xFF);
     }
 }
 
@@ -612,7 +612,7 @@ void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
         if (g_sum > 255) g_sum = 255;
         if (b_sum > 255) b_sum = 255;
 
-        auto verts_color = RGBA(r_sum, g_sum, b_sum, 0xFF);
+        auto verts_color = A565Color(r_sum, g_sum, b_sum, 0xFF);
 
         // TODO: only change the poly color in light mode
         polygon.lit_color[0] = verts_color;

@@ -89,7 +89,7 @@ struct CGouradEdge {
 
     CGouradEdge() = default;
 
-    CGouradEdge(const Vertex4D &min_y_vert, RGBA min_y_vert_col, const Vertex4D &max_y_vert, RGBA max_y_vert_col) {
+    CGouradEdge(const Vertex4D &min_y_vert, A565Color min_y_vert_col, const Vertex4D &max_y_vert, A565Color max_y_vert_col) {
         y_start = min_y_vert.v.y;
         y_end = max_y_vert.v.y;
 
@@ -99,13 +99,18 @@ struct CGouradEdge {
         x_step = x_dist / y_dist;
         x = min_y_vert.v.x;
 
-        dr_dy = (max_y_vert_col.r - min_y_vert_col.r) / y_dist;
-        dg_dy = (max_y_vert_col.g - min_y_vert_col.g) / y_dist;
-        db_dy = (max_y_vert_col.b - min_y_vert_col.b) / y_dist;
+        uint32_t max_y_r, max_y_g, max_y_b, min_y_r, min_y_g, min_y_b;
 
-        r = min_y_vert_col.r;
-        g = min_y_vert_col.g;
-        b = min_y_vert_col.b;
+        max_y_vert_col.rgb888_from_16bit(max_y_r, max_y_g, max_y_b);
+        min_y_vert_col.rgb888_from_16bit(min_y_r, min_y_g, min_y_b);
+
+        dr_dy = (max_y_r - min_y_r) / y_dist;
+        dg_dy = (max_y_g - min_y_g) / y_dist;
+        db_dy = (max_y_b - min_y_b) / y_dist;
+
+        r = min_y_r;
+        g = min_y_g;
+        b = min_y_b;
 
         u = min_y_vert.t.x;
         v = min_y_vert.t.y;

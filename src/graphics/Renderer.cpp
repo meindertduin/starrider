@@ -146,7 +146,7 @@ void Renderer::render_texture(const Texture &texture, const Rect &src, const Rec
             float x = 0;
             for (int x_out = 0; x_out < dest.width; x_out++) {
                 auto pixel = texture.get_pixel(x + src.x_pos, y + src.y_pos);
-                pixel.rgba565_from_16bit(a, r, g, b);
+                pixel.rgba565_from_16bit(r, g, b, a);
 
                 if (a > 0) {
                     p_framebuffer[m_width * (y_out + dest.y_pos) + (x_out + dest.x_pos)].value =
