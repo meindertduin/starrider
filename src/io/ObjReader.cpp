@@ -83,7 +83,7 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
     object.head_local_vertices = &object.local_vertices[0];
     object.head_transformed_vertices = &object.transformed_vertices[0];
 
-    object.color = RGBA(255, 255, 255, 255);
+    object.color = A565Color(0xFF, 0xFF, 0xFF);
 
     for (int i = 0; i < object.vertex_count; i++) {
         object.local_vertices[i].v = m_vertices[i];

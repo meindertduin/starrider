@@ -110,7 +110,7 @@ typedef struct Vertext4D_Type {
 typedef struct Polygon_Type {
     uint16_t state;
     uint16_t attributes;
-    RGBA color;
+    A565Color color;
     RGBA lit_color[3];
 
     int mati;
@@ -129,7 +129,7 @@ typedef struct Polygon_Type {
 typedef struct RenderListPoly_Type {
     uint16_t state;
     uint16_t attributes;
-    RGBA color;
+    A565Color color;
     RGBA lit_color[3];
     Texture *texture;
     int mati;
@@ -151,7 +151,7 @@ typedef struct RenderObject_Type {
 
     Transform transform;
     Texture *texture;
-    RGBA color;
+    A565Color color;
 
     int vertex_count;
     int frames_count;
@@ -180,7 +180,7 @@ typedef struct Material_Type {
     int id;
     uint16_t state;
     uint16_t attributes;
-    RGBA color;
+    A565Color color;
     RGBA ra, rd, rs; // reflectivities
     Texture *texutre = nullptr;
 } Material;

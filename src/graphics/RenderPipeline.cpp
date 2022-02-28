@@ -341,10 +341,7 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
 
     float dp, dist, n1, atten, i;
 
-    rgb565_from_16bit(polygon.color.rgba, r_base, g_base, b_base);
-    r_base <<= 3;
-    g_base <<= 2;
-    b_base <<= 3;
+    polygon.color.rgb888_from_16bit(r_base, g_base, b_base);
 
     if (polygon.attributes & PolyAttributeShadeModeGouraud) {
         r0_sum = g0_sum = b0_sum = 0;
@@ -469,10 +466,7 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
              ri,
              shaded_color;
 
-    rgb565_from_16bit(polygon.color.rgba, r_base, g_base, b_base);
-    r_base <<= 3;
-    g_base <<= 2;
-    b_base <<= 3;
+    polygon.color.rgb888_from_16bit(r_base, g_base, b_base);
 
     float dp, dist, n1, atten, i;
 
@@ -572,10 +566,7 @@ void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
 
     float dp, dist, i, n1, atten;
 
-    rgb565_from_16bit(polygon.color.rgba, r_base, g_base, b_base);
-    r_base <<= 3;
-    g_base <<= 3;
-    b_base <<= 3;
+    polygon.color.rgb888_from_16bit(r_base, g_base, b_base);
 
     if (polygon.attributes & PolyAttributeShadeModeFlat) {
         r_sum = g_sum = b_sum = 0;

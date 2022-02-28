@@ -138,7 +138,7 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
     }
 }
 
-void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
+void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -208,7 +208,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
     }
 }
 
-void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, RGBA color, const RenderListPoly &poly) {
+void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
