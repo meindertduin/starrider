@@ -22,6 +22,42 @@ constexpr float fast_abs(float value) {
     return value > 0 ? value : -value;
 }
 
+typedef struct A565Color_Type {
+    union {
+        uint32_t value;
+        struct {
+            uint32_t alpha : 8;
+            uint32_t noise : 8;
+            uint32_t rgb_bit : 16;
+        };
+    };
+
+    A565Color_Type() = default;
+    constexpr A565Color_Type(uint32_t bit) : value(bit) { }
+
+    A565Color_Type(int r, int g, int b) {
+        value = (((b >> 3) & 31) + (((g >> 2) & 63) << 5) + (((b >> 3) & 31) << 11));
+    }
+
+    A565Color_Type(int r, int g, int b, int a) {
+        value = ((b & 31) + ((g & 63) << 5) + ((r & 31) << 11)) | a << 24;
+    }
+
+    constexpr void rgb565_from_16bit(uint32_t &r, uint32_t &g, uint32_t &b) {
+        r = (value >> 11) & 31;
+        g = (value >> 5) & 63;
+        b = value & 31;
+    }
+
+    constexpr void rgba565_from_16bit(uint32_t &a, uint32_t &r, uint32_t &g, uint32_t &b) {
+        a = (value >> 24) & 0xFF;
+        r = (value >> 11) & 31;
+        g = (value >> 5) & 63;
+        b = value & 31;
+    }
+} A565Color;
+
+
 struct Color {
     float r, g, b;
     Color() {

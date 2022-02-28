@@ -38,7 +38,7 @@ size_t BmpReader::read_to_buffer(std::unique_ptr<unsigned char> &bitmap) {
 
         // TODO: add this in a derivative class?
         for (int i = 0; i < m_dib_header.width; i++)
-            row_ptr[i] = rgb_from_565(((row_ptr[i] >> 16) & 0xFF) >> 3, ((row_ptr[i] >> 8) & 0xFF) >> 2, ((row_ptr[i] >> 0) & 0xFF) >> 3);
+            row_ptr[i] = A565Color(row_ptr[i] >> 16, row_ptr[i] >> 8, row_ptr[i]).value;
     }
 
     return m_dib_header.bitmap_size;

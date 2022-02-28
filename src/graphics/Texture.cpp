@@ -24,7 +24,7 @@ Texture::Texture(Texture &&other) noexcept : pixels(nullptr), width(other.width)
     other.pixels = nullptr;
 }
 
-Texture::Texture(Format format, int width, int height, uint32_t* data) {
+Texture::Texture(Format format, int width, int height, A565Color* data) {
     this->format = format;
     this->width = width;
     this->height = height;
@@ -82,7 +82,7 @@ void Texture::load_from_bmp(std::string path) {
 }
 
 Texture Texture::from_section(Rect src) {
-    uint32_t *data = new uint32_t[src.width * src.height];
+    A565Color *data = new A565Color[src.width * src.height];
 
     for (int y = 0; y < src.height; y++)
         for (int x = 0; x < src.width; x++)

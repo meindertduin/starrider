@@ -7,7 +7,7 @@ namespace Graphics {
 
 Pixel* p_frame_buffer;
 
-uint32_t **rgb_lookup;
+A565Color **rgb_lookup;
 int lookup_levels = 0;
 
 int min_clip_y {0};
@@ -178,7 +178,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            rgb565_from_16bit(pixel, r, g, b);
+            pixel.rgb565_from_16bit(r, g, b);
 
             p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
 
@@ -257,7 +257,7 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
 
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            rgb565_from_16bit(pixel, rp, gp, bp);
+            pixel.rgb565_from_16bit(rp, gp, bp);
 
             uint32_t r_col = (rp << 3) * (r / 255);
             uint32_t g_col = (gp << 2) * (g / 255);
@@ -302,10 +302,10 @@ void rast_set_frame_buffer(int width, int height, Pixel *frame_buffer) {
 }
 
 void build_rgb_lookup(int levels) {
-    rgb_lookup = new uint32_t*[levels];
+    rgb_lookup = new A565Color*[levels];
 
     for (int i = 0; i < levels; i++)
-        rgb_lookup[i] = new uint32_t[65536];
+        rgb_lookup[i] = new A565Color[65536];
 
     uint32_t r, g, b;
     float alhpa = 0;
@@ -313,7 +313,7 @@ void build_rgb_lookup(int levels) {
 
     for (int level_index = 0; level_index < levels; level_index++) {
         for (uint32_t rgb_index = 0; rgb_index < 65536; rgb_index++) {
-            rgb565_from_16bit(rgb_index, r, g, b);
+            ((A565Color) rgb_index).rgb565_from_16bit(r, g, b);
 
             r = (uint32_t) ((float) r * (float) alhpa);
             g = (uint32_t) ((float) g * (float) alhpa);

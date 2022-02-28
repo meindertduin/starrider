@@ -85,13 +85,12 @@ Texture TTFFont::from_char(char c) {
     auto height = m_face->glyph->bitmap.rows * 4;
 
     int size = width * height;
-    auto buffer = new uint32_t[size];
+    auto buffer = new A565Color[size];
 
     // convert form RR format to 5 6 5 with alpha
     for (int i = 0; i < size; i++) {
         auto val = reinterpret_cast<unsigned char*>(m_face->glyph->bitmap.buffer)[i];
-        buffer[i] = rgb_from_565(val >> 3, val >> 2, val >> 3);
-        buffer[i] |= val << 24 & 0xFF000000;
+        buffer[i] = A565Color(val, val, val, val);
     }
 
     auto texture = Texture(Format::RED, width, height, buffer);

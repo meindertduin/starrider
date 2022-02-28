@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core.h"
 #include <string>
 #include "../io/BmpReader.h"
 
@@ -49,7 +50,7 @@ constexpr void pixel_blend(Pixel &pixel, const Pixel &other) {
 class Texture {
 public:
     Texture();
-    Texture(Format format, int width, int height, uint32_t* data);
+    Texture(Format format, int width, int height, A565Color* data);
 
     Texture(const Texture &other);
     Texture(Texture &&other) noexcept;
@@ -63,7 +64,7 @@ public:
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
-    constexpr uint32_t get_pixel(int x_pos, int y_pos) const {
+    constexpr A565Color get_pixel(int x_pos, int y_pos) const {
         return pixels[width * y_pos + x_pos];
     };
 

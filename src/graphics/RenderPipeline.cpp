@@ -47,8 +47,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         perspective_screen_transform(camera, render_poly);
 
-        // draw_intensity_gouraud_triangle(render_poly);
-        draw_colored_gouraud_triangle(render_poly);
+        draw_intensity_gouraud_triangle(render_poly);
+        // draw_colored_gouraud_triangle(render_poly);
     }
 
 }
@@ -313,7 +313,7 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
         }
 
         gourad_intensity_light_polygon(poly, g_lights, num_lights);
-        gourad_light_polygon(poly, g_lights, num_lights);
+        // gourad_light_polygon(poly, g_lights, num_lights);
     }
 }
 
