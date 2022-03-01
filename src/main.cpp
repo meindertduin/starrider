@@ -8,7 +8,7 @@
 int main() {
     try {
         Math::build_lookup_tables();
-        Graphics::build_rgb_lookup(18);
+        Graphics::init_rasterizer(18);
 
         Logger::initialize("log.txt");
 
@@ -23,7 +23,7 @@ int main() {
 
         app->run();
         ttf_quit();
-        Graphics::cleanup_rgb_lookup();
+        Graphics::cleanup_rasterizer();
     } catch(const std::exception) {
         return EXIT_FAILURE;
     };

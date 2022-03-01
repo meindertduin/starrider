@@ -16,6 +16,8 @@ int min_clip_x {0};
 int m_width {0};
 int m_height {0};
 
+float *inv_z_buffer = nullptr;
+
 void draw_colored_gouraud_triangle(RenderListPoly &poly) {
     if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
         (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
@@ -139,6 +141,7 @@ void draw_intensity_gouraud_triangle(RenderListPoly &poly) {
 }
 
 void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
+    float *iz_ptr;
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -161,8 +164,12 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         float u = left.u;
         float v = left.v;
 
+        float diz = (right.iz - left.iz) / x_dist;
+        float iz = left.iz;
+
         float x_start = left.x;
         float x_end = right.x;
+
 
         if (x_start < min_clip_x) {
             i += dix * -x_start;
@@ -170,17 +177,24 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
             u += du * -x_start;
             v += dv * -x_start;
 
+            iz += diz * -x_start;
+
             x_start = min_clip_x;
         }
 
         if (x_end > m_width)
             x_end = m_width;
 
-        for(int x = x_start; x < x_end; x++) {
-            auto pixel = poly.texture->get_pixel_by_shift(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
-            pixel.rgb565_from_16bit(r, g, b);
+        iz_ptr = inv_z_buffer + (y * m_width);
 
-            p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+        for(int x = x_start; x < x_end; x++) {
+            if (iz > iz_ptr[x]) {
+                auto pixel = poly.texture->get_pixel_by_shift(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+                pixel.rgb565_from_16bit(r, g, b);
+
+                p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+                iz_ptr[x] = iz;
+            }
 
             // auto v = (int)(i * (lookup_levels - 1));
             // if (v > lookup_levels - 1) v = lookup_levels - 1;
@@ -192,6 +206,8 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
             u += du;
             v += dv;
+
+            iz += diz;
         }
 
         left.x += left.x_step;
@@ -205,6 +221,9 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
         right.u += right.du_dy;
         right.v += right.dv_dy;
+
+        left.iz += left.diz_dy;
+        right.iz += right.diz_dy;
     }
 }
 
@@ -297,11 +316,15 @@ void rast_set_frame_buffer(int width, int height, Pixel *frame_buffer) {
         m_width = width;
         m_height = height;
 
+        delete[] inv_z_buffer;
+        inv_z_buffer = new float[m_width * m_height];
         p_frame_buffer = frame_buffer;
     }
+
+    std::fill(inv_z_buffer, inv_z_buffer + m_width * m_height, 0);
 }
 
-void build_rgb_lookup(int levels) {
+void init_rasterizer(int levels) {
     rgb_lookup = new A565Color*[levels];
 
     for (int i = 0; i < levels; i++)
@@ -328,12 +351,13 @@ void build_rgb_lookup(int levels) {
     lookup_levels = levels;
 }
 
-void cleanup_rgb_lookup() {
+void cleanup_rasterizer() {
     for (int i = 0; i < lookup_levels; i++) {
         delete[] rgb_lookup[i];
     }
 
     delete[] rgb_lookup;
+    delete[] inv_z_buffer;
 }
 
 }

@@ -29,6 +29,10 @@ struct IGouradEdge {
     float u;
     float v;
 
+    // perspective z
+    float iz;
+    float diz_dy;
+
     IGouradEdge() = default;
 
     IGouradEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
@@ -50,12 +54,19 @@ struct IGouradEdge {
         du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
         dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
 
+        float tz_max = 1.0f / (max_y_vert.v.z + 0.5f);
+        float tz_min = 1.0f / (min_y_vert.v.z + 0.5f);
+        diz_dy = (tz_max - tz_min) / y_dist;
+        iz = tz_min;
+
         if (y_start < min_clip_y) {
             x += x_step * -y_start;
             i += di_dy * -y_start;
 
             u += du_dy * -y_start;
             v += dv_dy * -y_start;
+
+            iz += diz_dy *-y_start;
 
             y_start = min_clip_y;
         }
@@ -146,8 +157,8 @@ void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly);
 void scan_edges(CGouradEdge &left, CGouradEdge &right, bool handedness, A565Color color, const RenderListPoly &poly);
 
-void build_rgb_lookup(int levels);
-void cleanup_rgb_lookup();
+void init_rasterizer(int levels);
+void cleanup_rasterizer();
 
 }
 
