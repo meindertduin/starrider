@@ -21,15 +21,6 @@ struct Glyph {
     int advance; // 1 = 1/64 of a pixel. See freetype documentation
 };
 
-class BitmapFont {
-public:
-    BitmapFont(std::string bitmap_path);
-    ~BitmapFont();
-    Glyph get_glyph(char c);
-private:
-    std::map<char, Glyph*> m_glyphs;
-};
-
 class TTFFont {
 public:
     TTFFont(std::string path, int size);
