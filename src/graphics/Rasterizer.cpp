@@ -177,7 +177,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
             x_end = m_width;
 
         for(int x = x_start; x < x_end; x++) {
-            auto pixel = poly.texture->get_pixel(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+            auto pixel = poly.texture->get_pixel_by_shift(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
             pixel.rgb565_from_16bit(r, g, b);
 
             p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);

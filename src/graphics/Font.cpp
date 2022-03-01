@@ -93,7 +93,7 @@ Texture TTFFont::from_char(char c) {
         buffer[i] = A565Color(val, val, val, val);
     }
 
-    auto texture = Texture(Format::RED, width, height, buffer);
+    auto texture = Texture(width, height, buffer);
     delete[] buffer;
 
     return texture;

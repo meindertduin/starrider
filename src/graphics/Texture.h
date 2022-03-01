@@ -15,12 +15,6 @@ struct Rect {
     int y_pos;
 };
 
-enum class Format {
-    RED,
-    RGB,
-    RGBA,
-};
-
 struct RGB {
     uint32_t blue : 8;
     uint32_t green : 8;
@@ -49,8 +43,8 @@ constexpr void pixel_blend(Pixel &pixel, const Pixel &other) {
 
 class Texture {
 public:
-    Texture();
-    Texture(Format format, int width, int height, A565Color* data);
+    Texture() = default;
+    Texture(int width, int height, A565Color* data);
 
     Texture(const Texture &other);
     Texture(Texture &&other) noexcept;
@@ -68,11 +62,15 @@ public:
         return pixels[width * y_pos + x_pos];
     };
 
+    constexpr A565Color get_pixel_by_shift(int x_pos, int y_pos) const {
+        return pixels[(y_pos << m_pitch_shift) + x_pos];
+    };
+
     int width;
     int height;
 private:
+    int m_pitch_shift = 0;
     uint32_t *pixels = nullptr;
-    Format format;
 };
 
 
