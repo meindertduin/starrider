@@ -3,8 +3,6 @@
 
 #include "../core/Window.h"
 #include "Renderer.h"
-#include "RenderObject.h"
-
 
 Renderer::Renderer() {
     p_app = Application::get_instance();

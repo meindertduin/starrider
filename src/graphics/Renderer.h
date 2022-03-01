@@ -10,6 +10,27 @@
 
 using Math::Point2D;
 
+union Pixel {
+    struct {
+        uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
+        uint32_t alpha : 8;
+
+    };
+    uint32_t value;
+};
+
+constexpr void pixel_blend(Pixel &pixel, const Pixel &other) {
+    float u_alpha = (float) pixel.alpha / (float) 0xFF;
+
+    pixel.blue = pixel.blue * u_alpha + other.blue * (1.0f - u_alpha);
+    pixel.red =  pixel.red * u_alpha + other.red * (1.0f - u_alpha);
+    pixel.green = pixel.green * u_alpha + other.green * (1.0f - u_alpha);
+    pixel.alpha = pixel.alpha * u_alpha + other.alpha * (1.0f - u_alpha);
+}
+
+
 class Renderer : EventObserver<WindowEvent> {
 public:
     Renderer();

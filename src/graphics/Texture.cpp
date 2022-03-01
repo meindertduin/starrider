@@ -1,6 +1,5 @@
 #include "Texture.h"
 #include "Core.h"
-#include "RenderObject.h"
 #include <exception>
 
 Texture::Texture(const Texture &other) : pixels(nullptr),

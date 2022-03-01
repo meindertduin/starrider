@@ -1,7 +1,6 @@
 #include "../io/BmpReader.h"
 #include "Font.h"
 #include <iostream>
-#include "RenderObject.h"
 
 FT_Library library;
 
