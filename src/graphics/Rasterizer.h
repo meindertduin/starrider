@@ -33,6 +33,13 @@ struct IGouradEdge {
     float iz;
     float diz_dy;
 
+    // perspective texturing
+    float iu;
+    float iv;
+
+    float diu_dy;
+    float div_dy;
+
     IGouradEdge() = default;
 
     IGouradEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
@@ -54,10 +61,23 @@ struct IGouradEdge {
         du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
         dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
 
-        float tz_max = 1.0f / (max_y_vert.v.z + 0.5f);
-        float tz_min = 1.0f / (min_y_vert.v.z + 0.5f);
+        // float 1/z perspective
+        float tz_max = 1.0f / (max_y_vert.v.z);
+        float tz_min = 1.0f / (min_y_vert.v.z);
         diz_dy = (tz_max - tz_min) / y_dist;
         iz = tz_min;
+
+        float iu_max = (max_y_vert.t.x) / (max_y_vert.v.z);
+        float iu_min = (min_y_vert.t.x) / (min_y_vert.v.z);
+
+        float iv_max = (max_y_vert.t.y) / (max_y_vert.v.z);
+        float iv_min = (min_y_vert.t.y) / (min_y_vert.v.z);
+
+        iu = iu_min;
+        iv = iv_min;
+
+        diu_dy = (iu_max - iu_min) / y_dist;
+        div_dy = (iv_max - iv_min) / y_dist;
 
         if (y_start < min_clip_y) {
             x += x_step * -y_start;
@@ -68,13 +88,15 @@ struct IGouradEdge {
 
             iz += diz_dy *-y_start;
 
+            iu += diu_dy *-y_start;
+            iv += div_dy *-y_start;
+
             y_start = min_clip_y;
         }
 
         if (y_end > m_height) {
             y_end = m_height;
         }
-
     }
 };
 

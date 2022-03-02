@@ -167,9 +167,13 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         float diz = (right.iz - left.iz) / x_dist;
         float iz = left.iz;
 
+        float diu = (right.iu - left.iu) / x_dist;
+        float iu = left.iu;
+        float div = (right.iv - left.iv) / x_dist;
+        float iv = left.iv;
+
         float x_start = left.x;
         float x_end = right.x;
-
 
         if (x_start < min_clip_x) {
             i += dix * -x_start;
@@ -178,6 +182,9 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
             v += dv * -x_start;
 
             iz += diz * -x_start;
+
+            iu += diu * -x_start;
+            iv += div * -x_start;
 
             x_start = min_clip_x;
         }
@@ -189,7 +196,7 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
-                auto pixel = poly.texture->get_pixel_by_shift(u * 16 -1 + 0.5f, v * 16 -1 + 0.5f);
+                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
                 p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
@@ -208,6 +215,9 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
             v += dv;
 
             iz += diz;
+
+            iu += diu;
+            iv += div;
         }
 
         left.x += left.x_step;
@@ -224,6 +234,12 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
 
         left.iz += left.diz_dy;
         right.iz += right.diz_dy;
+
+        left.iu += left.diu_dy;
+        right.iu += right.diu_dy;
+
+        left.iv += left.div_dy;
+        right.iv += right.div_dy;
     }
 }
 
