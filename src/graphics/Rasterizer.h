@@ -13,93 +13,6 @@ extern int min_clip_x;
 extern int m_width;
 extern int m_height;
 
-struct IGouradEdge {
-    float x;
-    float x_step;
-    int y_start;
-    int y_end;
-
-    // lighting
-    float di_dy;
-    float i;
-
-    // texturing
-    float du_dy;
-    float dv_dy;
-    float u;
-    float v;
-
-    // perspective z
-    float iz;
-    float diz_dy;
-
-    // perspective texturing
-    float iu;
-    float iv;
-
-    float diu_dy;
-    float div_dy;
-
-    IGouradEdge() = default;
-
-    IGouradEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
-        y_start = min_y_vert.v.y + 0.5f;
-        y_end = max_y_vert.v.y + 0.5f;
-
-        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
-        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
-
-        x_step = x_dist / y_dist;
-        x = min_y_vert.v.x;
-
-        di_dy = (max_y_vert.i - min_y_vert.i) / y_dist;
-        i = min_y_vert.i;
-
-        u = min_y_vert.t.x;
-        v = min_y_vert.t.y;
-
-        du_dy = ((max_y_vert.t.x - min_y_vert.t.x) / y_dist);
-        dv_dy = ((max_y_vert.t.y - min_y_vert.t.y) / y_dist);
-
-        // float 1/z perspective
-        float tz_max = 1.0f / (max_y_vert.v.z);
-        float tz_min = 1.0f / (min_y_vert.v.z);
-        diz_dy = (tz_max - tz_min) / y_dist;
-        iz = tz_min;
-
-        float iu_max = (max_y_vert.t.x) / (max_y_vert.v.z);
-        float iu_min = (min_y_vert.t.x) / (min_y_vert.v.z);
-
-        float iv_max = (max_y_vert.t.y) / (max_y_vert.v.z);
-        float iv_min = (min_y_vert.t.y) / (min_y_vert.v.z);
-
-        iu = iu_min;
-        iv = iv_min;
-
-        diu_dy = (iu_max - iu_min) / y_dist;
-        div_dy = (iv_max - iv_min) / y_dist;
-
-        if (y_start < min_clip_y) {
-            x += x_step * -y_start;
-            i += di_dy * -y_start;
-
-            u += du_dy * -y_start;
-            v += dv_dy * -y_start;
-
-            iz += diz_dy *-y_start;
-
-            iu += diu_dy *-y_start;
-            iv += div_dy *-y_start;
-
-            y_start = min_clip_y;
-        }
-
-        if (y_end > m_height) {
-            y_end = m_height;
-        }
-    }
-};
-
 struct CGouradEdge {
     float x;
     float x_step;
@@ -170,8 +83,13 @@ struct CGouradEdge {
     }
 };
 
+
+void init_rasterizer(int levels);
+void cleanup_rasterizer();
+void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
+
+// TODO Old legecy functions that that will be replaced once all newer ones are implemented
 void draw_colored_gouraud_triangle(RenderListPoly &poly);
-void draw_intensity_gouraud_triangle(RenderListPoly &poly);
 
 // Perfect perspective texture mapping
 void draw_perspective_textured_triangle_fsinvzb(RenderListPoly &poly);
@@ -180,11 +98,18 @@ void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly);
 void draw_perspective_textured_triangle_fs(RenderListPoly &poly);
 void draw_perspective_textured_triangle_i(RenderListPoly &poly);
 
-// Piecewise perspective texture mapping
+////////// Piecewise perspective texture mapping //////////
+
+// Draws triangle with piecewise perspective texture mapping with flat shading and using inverse z-buffering.
 void draw_piecewise_textured_triangle_fsinvzb(RenderListPoly &poly);
+
+// Draws triangle with piecewise perspective texture mapping with intensity gourad shading and using inverse z-buffering.
 void draw_piecewise_textured_triangle_iinvzb(RenderListPoly &poly);
 
+// Draws triangle with piecewise perspective texture mapping with flat shading and using inverse z-buffering.
 void draw_piecewise_textured_triangle_fs(RenderListPoly &poly);
+//
+// Draws triangle with piecewise perspective texture mapping with intensity gourad shading and using inverse z-buffering.
 void draw_piecewise_textured_triangle_i(RenderListPoly &poly);
 
 // Affine texture mapping
@@ -203,13 +128,7 @@ void draw_triangle_sinvzb(RenderListPoly &poly);
 void draw_triangle_fsinvzb(RenderListPoly &poly);
 void draw_triangle_iinvzb(RenderListPoly &poly);
 
-void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
-
-void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly);
 void scan_edges(CGouradEdge &left, CGouradEdge &right, bool handedness, A565Color color, const RenderListPoly &poly);
-
-void init_rasterizer(int levels);
-void cleanup_rasterizer();
 
 }
 
