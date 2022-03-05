@@ -50,10 +50,10 @@ void Application::run() {
     Graphics::RenderPipeline render_pipeline {&renderer};
 
     reset_materials();
-    reset_lights();
+    Graphics::reset_lights();
 
-    create_base_amb_light(0, RGBA { 25, 25, 25, 255 });
-    create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(1, 0, 0).normalized());
+    Graphics::create_base_amb_light(0, RGBA { 25, 25, 25, 255 });
+    Graphics::create_base_dir_light(1, RGBA { 225, 225, 225, 255 }, V4D(1, 0, 0).normalized());
 
     //create_base_point_light(2, RGBA { 225, 225, 225, 255 }, V4D(0, 1, 0), 0, 0, 0.2f);
 
@@ -66,7 +66,7 @@ void Application::run() {
     std::vector<RenderObject> objects;
     ObjectRepository object_repository;
 
-    auto object = object_repository.create_game_object("assets/monkey.obj", "assets/test_texture.bmp");
+    auto object = object_repository.create_game_object("assets/cube.obj", "assets/test_texture.bmp");
     auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/test_texture.bmp");
 
     object.transform = Transform(V4D(0, 0, 3));

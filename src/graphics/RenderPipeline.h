@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "Rasterizer.h"
 #include "RenderObject.h"
+#include "Lighting.h"
 
 namespace Graphics {
 
@@ -34,12 +35,6 @@ void backface_removal_object(RenderObject& object, const Camera &camera);
 void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list);
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
-
-void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
-
-void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
-
-void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights);
 
 class RenderPipeline {
 public:
