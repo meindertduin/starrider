@@ -171,8 +171,37 @@ struct CGouradEdge {
 };
 
 void draw_colored_gouraud_triangle(RenderListPoly &poly);
-
 void draw_intensity_gouraud_triangle(RenderListPoly &poly);
+
+// Perfect perspective texture mapping
+void draw_perspective_textured_triangle_fsinvzb(RenderListPoly &poly);
+void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly);
+
+void draw_perspective_textured_triangle_fs(RenderListPoly &poly);
+void draw_perspective_textured_triangle_i(RenderListPoly &poly);
+
+// Piecewise perspective texture mapping
+void draw_piecewise_textured_triangle_fsinvzb(RenderListPoly &poly);
+void draw_piecewise_textured_triangle_iinvzb(RenderListPoly &poly);
+
+void draw_piecewise_textured_triangle_fs(RenderListPoly &poly);
+void draw_piecewise_textured_triangle_i(RenderListPoly &poly);
+
+// Affine texture mapping
+void draw_affine_textured_triangle_fsinvzb(RenderListPoly &poly);
+void draw_affine_textured_triangle_iinvzb(RenderListPoly &poly);
+
+void draw_affine_textured_triangle_fs(RenderListPoly &poly);
+void draw_affine_textured_triangle_i(RenderListPoly &poly);
+
+// Non-textured rastization methods
+void draw_triangle_s(RenderListPoly &poly);
+void draw_triangle_fs(RenderListPoly &poly);
+void draw_triangle_i(RenderListPoly &poly);
+
+void draw_triangle_sinvzb(RenderListPoly &poly);
+void draw_triangle_fsinvzb(RenderListPoly &poly);
+void draw_triangle_iinvzb(RenderListPoly &poly);
 
 void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 
