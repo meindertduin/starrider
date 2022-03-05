@@ -91,7 +91,8 @@ void rast_set_frame_buffer(int width, int height, Pixel* frame_buffer);
 // TODO Old legecy functions that that will be replaced once all newer ones are implemented
 void draw_colored_gouraud_triangle(RenderListPoly &poly);
 
-// Perfect perspective texture mapping
+////////// Perfect perspective texture mapping //////////
+
 void draw_perspective_textured_triangle_fsinvzb(RenderListPoly &poly);
 void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly);
 
@@ -112,7 +113,8 @@ void draw_piecewise_textured_triangle_fs(RenderListPoly &poly);
 // Draws triangle with piecewise perspective texture mapping with intensity gourad shading and using inverse z-buffering.
 void draw_piecewise_textured_triangle_i(RenderListPoly &poly);
 
-// Affine texture mapping
+////////// Affine texture mapping //////////
+
 void draw_affine_textured_triangle_fsinvzb(RenderListPoly &poly);
 void draw_affine_textured_triangle_iinvzb(RenderListPoly &poly);
 

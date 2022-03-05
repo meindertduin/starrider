@@ -47,7 +47,8 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         perspective_screen_transform(camera, render_poly);
 
-        draw_piecewise_textured_triangle_iinvzb(render_poly);
+        // draw_piecewise_textured_triangle_iinvzb(render_poly);
+        draw_perspective_textured_triangle_iinvzb(render_poly);
         // draw_colored_gouraud_triangle(render_poly);
     }
 
