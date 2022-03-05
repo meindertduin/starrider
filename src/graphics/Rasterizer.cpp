@@ -164,12 +164,11 @@ void scan_edges(IGouradEdge &long_edge, IGouradEdge &short_edge, bool handedness
         float u = left.u;
         float v = left.v;
 
-
         float ivl = left.iv / left.iz;
         float ivr = right.iv / right.iz;
 
-        float iul = left.iv / left.iz;
-        float iur = right.iv / right.iz;
+        float iul = left.iu / left.iz;
+        float iur = right.iu / right.iz;
 
         float iz = left.iz;
         float iu = iul;
