@@ -2899,5 +2899,483 @@ void draw_triangle_i(RenderListPoly &poly) {
     }
 }
 
+struct SINVZBEdge {
+    float x;
+    float dx_dy;
+
+    int y_start;
+    int y_end;
+
+    // perspective z
+    float iz;
+    float diz_dy;
+
+    SINVZBEdge() = default;
+
+    SINVZBEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
+        y_start = min_y_vert.v.y + 0.5f;
+        y_end = max_y_vert.v.y + 0.5f;
+
+        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
+        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
+
+        dx_dy = x_dist / y_dist;
+        x = min_y_vert.v.x;
+
+        // float 1/z perspective
+        float tz_max = 1.0f / (max_y_vert.v.z);
+        float tz_min = 1.0f / (min_y_vert.v.z);
+        diz_dy = (tz_max - tz_min) / y_dist;
+        iz = tz_min;
+
+        if (y_start < min_clip_y) {
+            x += dx_dy * -y_start;
+
+            iz += diz_dy *-y_start;
+
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
+    }
+};
+
+void scan_edges(SINVZBEdge &long_edge, SINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
+    float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
+    int y_start = short_edge.y_start;
+    int y_end = short_edge.y_end;
+
+    float x_dist, iz, diz_dx;
+
+    if (y_start > m_height || y_end < 0)
+        return;
+
+    SINVZBEdge &left = handedness ? short_edge : long_edge;
+    SINVZBEdge &right = handedness ? long_edge : short_edge;
+
+    auto pixel_argb = poly.color.rgba_bit();
+
+    for(int y = y_start; y < y_end; y++) {
+        x_dist = right.x - left.x;
+
+        float x_start = left.x;
+        float x_end = right.x;
+
+        iz = left.iz;
+
+        if (x_dist > 0) {
+            diz_dx = (right.iz - left.iz) / x_dist;
+        } else {
+            diz_dx = (right.iz - left.iz);
+        }
+
+        if (x_start < min_clip_x) {
+            iz += diz_dx * -x_start;
+
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        auto y_pixel_offset = (m_width * y);
+
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+
+        for(int x = x_start; x < x_end; x++) {
+            if (iz > iz_ptr[x]) {
+                (screen_buffer_ptr + x)->value = pixel_argb;
+                iz_ptr[x] = iz;
+            }
+
+            iz += diz_dx;
+        }
+
+        left.x += left.dx_dy;
+        right.x += right.dx_dy;
+
+        left.iz += left.diz_dy;
+        right.iz += right.diz_dy;
+    }
+}
+
+
+void draw_triangle_sinvzb(RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v1, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v2, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y)
+        SWAP(v1, v2, temp);
+
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
+
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
+
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    SINVZBEdge bottom_to_top = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        SINVZBEdge bottom_to_middle = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        SINVZBEdge middle_to_top = SINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        SINVZBEdge bottom_to_middle = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        SINVZBEdge middle_to_top = SINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    }
+}
+
+struct FSINVZBEdge {
+    float x;
+    float dx_dy;
+
+    int y_start;
+    int y_end;
+
+    // lighting
+    float i;
+
+    // perspective z
+    float iz;
+    float diz_dy;
+
+    FSINVZBEdge() = default;
+
+    FSINVZBEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
+        y_start = min_y_vert.v.y + 0.5f;
+        y_end = max_y_vert.v.y + 0.5f;
+
+        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
+        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
+
+        dx_dy = x_dist / y_dist;
+        x = min_y_vert.v.x;
+
+        i = min_y_vert.i;
+
+        // float 1/z perspective
+        float tz_max = 1.0f / (max_y_vert.v.z);
+        float tz_min = 1.0f / (min_y_vert.v.z);
+        diz_dy = (tz_max - tz_min) / y_dist;
+        iz = tz_min;
+
+        if (y_start < min_clip_y) {
+            x += dx_dy * -y_start;
+
+            iz += diz_dy *-y_start;
+
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
+    }
+};
+
+void scan_edges(FSINVZBEdge &long_edge, FSINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
+    float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
+    int y_start = short_edge.y_start;
+    int y_end = short_edge.y_end;
+
+    float x_dist, iz, diz_dx;
+
+    uint32_t r, g, b;
+
+    if (y_start > m_height || y_end < 0)
+        return;
+
+    FSINVZBEdge &left = handedness ? short_edge : long_edge;
+    FSINVZBEdge &right = handedness ? long_edge : short_edge;
+
+    auto pixel_argb = poly.color.rgba_bit(left.i);
+
+    for(int y = y_start; y < y_end; y++) {
+        x_dist = right.x - left.x;
+
+        iz = left.iz;
+
+        if (x_dist > 0) {
+            diz_dx = (right.iz - left.iz) / x_dist;
+        } else {
+            diz_dx = (right.iz - left.iz);
+        }
+
+        float x_start = left.x;
+        float x_end = right.x;
+
+        if (x_start < min_clip_x) {
+            iz += diz_dx * -x_start;
+
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
+
+        for(int x = x_start; x < x_end; x++) {
+            if (iz > iz_ptr[x]) {
+                (screen_buffer_ptr + x)->value = pixel_argb;
+                iz_ptr[x] = iz;
+            }
+
+            iz += diz_dx;
+        }
+
+        left.x += left.dx_dy;
+        right.x += right.dx_dy;
+
+        left.iz += left.diz_dy;
+        right.iz += right.diz_dy;
+    }
+}
+
+
+void draw_triangle_fsinvzb(RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v1, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v2, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y)
+        SWAP(v1, v2, temp);
+
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
+
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
+
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    FSINVZBEdge bottom_to_top = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        FSINVZBEdge bottom_to_middle = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        FSINVZBEdge middle_to_top = FSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        FSINVZBEdge bottom_to_middle = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        FSINVZBEdge middle_to_top = FSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    }
+}
+
+struct IINVZBEdge {
+    float x;
+    float dx_dy;
+
+    int y_start;
+    int y_end;
+
+    // lighting
+    float di_dy;
+    float i;
+
+    // perspective z
+    float iz;
+    float diz_dy;
+
+    IINVZBEdge() = default;
+
+    IINVZBEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
+        y_start = min_y_vert.v.y + 0.5f;
+        y_end = max_y_vert.v.y + 0.5f;
+
+        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
+        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
+
+        dx_dy = x_dist / y_dist;
+        x = min_y_vert.v.x;
+
+        di_dy = (max_y_vert.i - min_y_vert.i) / y_dist;
+        i = min_y_vert.i;
+
+        // float 1/z perspective
+        float tz_max = 1.0f / (max_y_vert.v.z);
+        float tz_min = 1.0f / (min_y_vert.v.z);
+        diz_dy = (tz_max - tz_min) / y_dist;
+        iz = tz_min;
+
+        if (y_start < min_clip_y) {
+            iz += diz_dy *-y_start;
+
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
+    }
+};
+
+void scan_edges(IINVZBEdge &long_edge, IINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
+    float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
+    int y_start = short_edge.y_start;
+    int y_end = short_edge.y_end;
+
+    float x_dist, di_dx, i, iz, diz_dx;
+
+    if (y_start > m_height || y_end < 0)
+        return;
+
+    IINVZBEdge &left = handedness ? short_edge : long_edge;
+    IINVZBEdge &right = handedness ? long_edge : short_edge;
+
+    for(int y = y_start; y < y_end; y++) {
+        x_dist = right.x - left.x;
+        di_dx = (right.i - left.i) / x_dist;
+        i = left.i;
+
+        iz = left.iz;
+
+        if (x_dist > 0) {
+            diz_dx = (right.iz - left.iz) / x_dist;
+        } else {
+            diz_dx = (right.iz - left.iz);
+        }
+
+        float x_start = left.x;
+        float x_end = right.x;
+
+        if (x_start < min_clip_x) {
+            i += di_dx * -x_start;
+            iz += diz_dx * -x_start;
+
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
+
+        for(int x = x_start; x < x_end; x++) {
+            if (iz > iz_ptr[x]) {
+                (screen_buffer_ptr + x)->value = poly.color.rgba_bit(i);
+
+                iz_ptr[x] = iz;
+            }
+
+            i += di_dx;
+
+            iz += diz_dx;
+        }
+
+        left.x += left.dx_dy;
+        right.x += right.dx_dy;
+
+        left.i += left.di_dy;
+        right.i += right.di_dy;
+
+        left.iz += left.diz_dy;
+        right.iz += right.diz_dy;
+    }
+}
+
+
+void draw_triangle_iinvzb(RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v1, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v2, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y)
+        SWAP(v1, v2, temp);
+
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
+
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
+
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    IINVZBEdge bottom_to_top = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        IINVZBEdge bottom_to_middle = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        IINVZBEdge middle_to_top = IINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        IINVZBEdge bottom_to_middle = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        IINVZBEdge middle_to_top = IINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    }
+}
+
 }
 
