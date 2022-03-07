@@ -2511,6 +2511,128 @@ void draw_affine_textured_triangle_i(RenderListPoly &poly) {
 }
 
 
-// Non-textured rastization methods
+////////// Non-textured rastization methods //////////
+
+struct SEdge {
+    float x;
+    float dx_dy;
+
+    int y_start;
+    int y_end;
+
+    SEdge() = default;
+
+    SEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
+        y_start = min_y_vert.v.y + 0.5f;
+        y_end = max_y_vert.v.y + 0.5f;
+
+        float y_dist = max_y_vert.v.y - min_y_vert.v.y;
+        float x_dist = max_y_vert.v.x - min_y_vert.v.x;
+
+        dx_dy = x_dist / y_dist;
+        x = min_y_vert.v.x;
+
+
+        if (y_start < min_clip_y) {
+            x += dx_dy * -y_start;
+            y_start = min_clip_y;
+        }
+
+        if (y_end > m_height) {
+            y_end = m_height;
+        }
+    }
+};
+
+void scan_edges(SEdge &long_edge, SEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
+    float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
+    int y_start = short_edge.y_start;
+    int y_end = short_edge.y_end;
+
+    float x_dist;
+
+    if (y_start > m_height || y_end < 0)
+        return;
+
+    SEdge &left = handedness ? short_edge : long_edge;
+    SEdge &right = handedness ? long_edge : short_edge;
+
+    for(int y = y_start; y < y_end; y++) {
+        x_dist = right.x - left.x;
+
+        float x_start = left.x;
+        float x_end = right.x;
+
+        if (x_start < min_clip_x) {
+            x_start = min_clip_x;
+        }
+
+        if (x_end > m_width)
+            x_end = m_width;
+
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
+
+        for(int x = x_start; x < x_end; x++) {
+            (screen_buffer_ptr + x)->value = poly.color.rgba_bit();
+        }
+
+        left.x += left.dx_dy;
+        right.x += right.dx_dy;
+    }
+}
+
+
+void draw_triangle_s(RenderListPoly &poly) {
+    if ((Math::f_cmp(poly.trans_verts[0].v.x, poly.trans_verts[1].v.x) && Math::f_cmp(poly.trans_verts[1].v.x, poly.trans_verts[2].v.x)) ||
+        (Math::f_cmp(poly.trans_verts[0].v.y, poly.trans_verts[1].v.y) && Math::f_cmp(poly.trans_verts[1].v.y, poly.trans_verts[2].v.y)))
+        return;
+
+    int v0 = 0;
+    int v1 = 1;
+    int v2 = 2;
+    int temp = 0;
+
+    if (poly.trans_verts[v1].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v1, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v0].v.y)
+        SWAP(v0, v2, temp);
+
+    if (poly.trans_verts[v2].v.y < poly.trans_verts[v1].v.y)
+        SWAP(v1, v2, temp);
+
+    float dx1 = poly.trans_verts[v2].v.x - poly.trans_verts[v0].v.x;
+    float dy1 = poly.trans_verts[v2].v.y - poly.trans_verts[v0].v.y;
+
+    float dx2 = poly.trans_verts[v1].v.x - poly.trans_verts[v0].v.x;
+    float dy2 = poly.trans_verts[v1].v.y - poly.trans_verts[v0].v.y;
+
+    bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
+
+    SEdge bottom_to_top = SEdge(poly.trans_verts[v0], poly.trans_verts[v2]);
+
+    if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
+        SEdge bottom_to_middle = SEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+    }
+    else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
+        SEdge middle_to_top = SEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    } else {
+        SEdge bottom_to_middle = SEdge(poly.trans_verts[v0], poly.trans_verts[v1]);
+        SEdge middle_to_top = SEdge(poly.trans_verts[v1], poly.trans_verts[v2]);
+
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly);
+        scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly);
+    }
+}
+
 }
 
