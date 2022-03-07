@@ -78,7 +78,6 @@ struct PTFSINVZBEdge {
     int y_end;
 
     // lighting
-    float di_dy;
     float i;
 
     // perspective z
@@ -104,7 +103,6 @@ struct PTFSINVZBEdge {
         dx_dy = x_dist / y_dist;
         x = min_y_vert.v.x;
 
-        di_dy = (max_y_vert.i - min_y_vert.i) / y_dist;
         i = min_y_vert.i;
 
         // float 1/z perspective
@@ -127,7 +125,6 @@ struct PTFSINVZBEdge {
 
         if (y_start < min_clip_y) {
             x += dx_dy * -y_start;
-            i += di_dy * -y_start;
 
             iz += diz_dy *-y_start;
 
@@ -149,7 +146,7 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
-    float x_dist, di_dx, i, iz, iu, iv, x_start, x_end, diz_dx, diu_dx, div_dx;
+    float x_dist, iz, iu, iv, x_start, x_end, diz_dx, diu_dx, div_dx;
 
     uint32_t r, g, b;
 
@@ -159,10 +156,10 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
     PTFSINVZBEdge &left = handedness ? short_edge : long_edge;
     PTFSINVZBEdge &right = handedness ? long_edge : short_edge;
 
+    float i = left.i;
+
     for(int y = y_start; y < y_end; y++) {
         x_dist = right.x - left.x;
-        di_dx = (right.i - left.i) / x_dist;
-        i = left.i;
 
         iz = left.iz;
         iu = left.iu;
@@ -184,8 +181,6 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
         }
 
         if (x_start < min_clip_x) {
-            i += di_dx * -x_start;
-
             iz += diz_dx * -x_start;
 
             iu += diu_dx * -x_start;
@@ -208,8 +203,6 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
                 iz_ptr[x] = iz;
             }
 
-            i += di_dx;
-
             iz += diz_dx;
 
             iu += diu_dx;
@@ -218,9 +211,6 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
 
         left.x += left.dx_dy;
         right.x += right.dx_dy;
-
-        left.i += left.di_dy;
-        right.i += right.di_dy;
 
         left.iz += left.diz_dy;
         right.iz += right.diz_dy;
