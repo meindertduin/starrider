@@ -297,6 +297,8 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    float x_dist, di_dx, i, iz, iu, iv, x_start, x_end, diz_dx, diu_dx, div_dx;
+
     uint32_t r, g, b;
 
     if (y_start > m_height || y_end < 0)
@@ -306,18 +308,16 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
     PTIINVZBEdge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
-        float x_dist = right.x - left.x;
-        float di_dx = (right.i - left.i) / x_dist;
-        float i = left.i;
+        x_dist = right.x - left.x;
+        di_dx = (right.i - left.i) / x_dist;
+        i = left.i;
 
-        float iz = left.iz;
-        float iu = left.iu;
-        float iv = left.iv;
+        iz = left.iz;
+        iu = left.iu;
+        iv = left.iv;
 
-        float x_start = left.x;
-        float x_end = right.x;
-
-        float diz_dx, diu_dx, div_dx;
+        x_start = left.x;
+        x_end = right.x;
 
         if (x_dist > 0) {
             diz_dx = (right.iz - left.iz) / x_dist;
@@ -512,6 +512,8 @@ void scan_edges(PPTIINVZBEdge &long_edge, PPTIINVZBEdge &short_edge, bool handed
 
     uint32_t r, g, b;
 
+    float x_dist, di_dx, i, ivl, ivr, iul, iur, iz, iu, iv, diz_dx, diu_dx, div_dx;
+
     if (y_start > m_height || y_end < 0)
         return;
 
@@ -519,21 +521,20 @@ void scan_edges(PPTIINVZBEdge &long_edge, PPTIINVZBEdge &short_edge, bool handed
     PPTIINVZBEdge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
-        float x_dist = right.x - left.x;
-        float di_dx = (right.i - left.i) / x_dist;
-        float i = left.i;
+        x_dist = right.x - left.x;
+        di_dx = (right.i - left.i) / x_dist;
+        i = left.i;
 
-        float ivl = left.iv / left.iz;
-        float ivr = right.iv / right.iz;
+        ivl = left.iv / left.iz;
+        ivr = right.iv / right.iz;
 
-        float iul = left.iu / left.iz;
-        float iur = right.iu / right.iz;
+        iul = left.iu / left.iz;
+        iur = right.iu / right.iz;
 
-        float iz = left.iz;
-        float iu = iul;
-        float iv = ivl;
+        iz = left.iz;
+        iu = iul;
+        iv = ivl;
 
-        float diz_dx, diu_dx, div_dx;
         if (x_dist > 0) {
             diz_dx = (right.iz - left.iz) / x_dist;
 
@@ -727,6 +728,8 @@ void scan_edges(ATIINVZBEdge &long_edge, ATIINVZBEdge &short_edge, bool handedne
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    float x_dist, di_dx, i, du_dx, dv_dx, u, v, iz, diz_dx;
+
     uint32_t r, g, b;
 
     if (y_start > m_height || y_end < 0)
@@ -736,19 +739,17 @@ void scan_edges(ATIINVZBEdge &long_edge, ATIINVZBEdge &short_edge, bool handedne
     ATIINVZBEdge &right = handedness ? long_edge : short_edge;
 
     for(int y = y_start; y < y_end; y++) {
-        float x_dist = right.x - left.x;
-        float di_dx = (right.i - left.i) / x_dist;
-        float i = left.i;
+        x_dist = right.x - left.x;
+        di_dx = (right.i - left.i) / x_dist;
+        i = left.i;
 
-        float du_dx = (right.u - left.u) / x_dist;
-        float dv_dx = (right.v - left.v) / x_dist;
+        du_dx = (right.u - left.u) / x_dist;
+        dv_dx = (right.v - left.v) / x_dist;
 
-        float u = left.u;
-        float v = left.v;
+        u = left.u;
+        v = left.v;
 
-        float iz = left.iz;
-
-        float diz_dx;
+        iz = left.iz;
 
         if (x_dist > 0) {
             diz_dx = (right.iz - left.iz) / x_dist;
