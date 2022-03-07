@@ -70,6 +70,15 @@ typedef struct A565Color_Type {
 
         return (a << 24) | (r << 19) | (g << 10) | b << 3;
     }
+
+    constexpr uint32_t rgba_bit(float f) const {
+        uint32_t a = ((value >> 24) & 0xFF) * f;
+        uint32_t r = ((value >> 11) & 31) * f;
+        uint32_t g = ((value >> 5) & 63) * f;
+        uint32_t b = (value & 31) * f;
+
+        return (a << 24) | (r << 19) | (g << 10) | b << 3;
+    }
 } A565Color;
 
 constexpr uint32_t rgb_from_565(int r, int g, int b) {
