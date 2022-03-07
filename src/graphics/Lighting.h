@@ -45,6 +45,6 @@ void gourad_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights
 
 void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
 
-void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights);
+void flat_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights);
 }
 

@@ -295,17 +295,18 @@ void gourad_intensity_light_polygon(RenderListPoly &polygon, Light *lights, int 
     }
 }
 
-void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
+void flat_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights) {
     uint32_t r_base, g_base, b_base,
-             r_sum, g_sum, b_sum,
+             r_sum,
+             ri,
              shaded_color;
-
-    float dp, dist, i, n1, atten;
 
     polygon.color.rgb888_from_16bit(r_base, g_base, b_base);
 
-    if (polygon.attributes & PolyAttributeShadeModeFlat) {
-        r_sum = g_sum = b_sum = 0;
+    float dp, dist, n1, atten, i;
+
+    if (polygon.attributes & PolyAttributeShadeModeIntensityGourad) {
+        r_sum = 0;
 
         for (int curr_light = 0; curr_light < max_lights; curr_light++) {
             if (!lights[curr_light].state) {
@@ -313,47 +314,39 @@ void flat_light_polygon(Polygon &polygon, Light *lights, int max_lights) {
             }
 
             if (lights[curr_light].attributes & LightAttributeAmbient) {
-                r_sum += ((lights[curr_light].c_ambient.r * r_base) >> 8);
-                g_sum += ((lights[curr_light].c_ambient.g * g_base) >> 8);
-                b_sum += ((lights[curr_light].c_ambient.b * b_base) >> 8);
-            } else if (lights[curr_light].attributes & LightAttributeInfinite) {
-                auto dp = polygon.normal.dot(lights[curr_light].dir);
+                ri = ((lights[curr_light].c_ambient.r * r_base) >> 8);
+
+                r_sum += ri;
+            }
+            else if (lights[curr_light].attributes & LightAttributeInfinite) {
+                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
-                    // TODO optimaize the normal length
-                    i = 128 * dp / polygon.normal.length();
+                    i = 128 * dp;
 
                     r_sum += ((lights[curr_light].c_diffuse.r * r_base * i) / (256 * 128));
-                    g_sum += ((lights[curr_light].c_diffuse.g * g_base * i) / (256 * 128));
-                    b_sum += ((lights[curr_light].c_diffuse.b * b_base * i) / (256 * 128));
                 }
             } else if (lights[curr_light].attributes * LightAttributePoint) {
-                auto l = V4D(polygon.vertices[polygon.vert[0]].v, lights[curr_light].trans_pos);
-
+                auto l = V4D(lights[curr_light].trans_pos, polygon.trans_verts[0].v);
                 dist = l.length();
-                dp = polygon.normal.dot(l);
+                dp = polygon.trans_verts[0].n.dot(l);
 
-                if (dp > 0) {
+                if (dp > 0.0f) {
                     atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
-                    i = 128 * dp / (polygon.normal.length() * dist * atten);
+                    i = 128 * dp / (dist * atten);
 
                     r_sum += ((lights[curr_light].c_diffuse.r * r_base * i) / (256 * 128));
-                    g_sum += ((lights[curr_light].c_diffuse.g * g_base * i) / (256 * 128));
-                    b_sum += ((lights[curr_light].c_diffuse.b * b_base * i) / (256 * 128));
                 }
             }
         }
 
         if (r_sum > 255) r_sum = 255;
-        if (g_sum > 255) g_sum = 255;
-        if (b_sum > 255) b_sum = 255;
 
-        auto verts_color = A565Color(r_sum, g_sum, b_sum, 0xFF);
+        auto intensity = r_sum / 255.0f;
 
-        // TODO: only change the poly color in light mode
-        polygon.lit_color[0] = verts_color;
-        polygon.lit_color[1] = verts_color;
-        polygon.lit_color[2] = verts_color;
+        polygon.trans_verts[0].i = intensity;
+        polygon.trans_verts[1].i = intensity;
+        polygon.trans_verts[2].i = intensity;
     }
 }
 }
