@@ -222,7 +222,6 @@ void scan_edges(CGouradEdge &long_edge, CGouradEdge &short_edge, bool handedness
 struct PTIINVZBEdge {
     float x;
     float dx_dy;
-
     int y_start;
     int y_end;
 
@@ -244,7 +243,7 @@ struct PTIINVZBEdge {
     PTIINVZBEdge() = default;
 
     PTIINVZBEdge(const Vertex4D &min_y_vert, const Vertex4D &max_y_vert) {
-    y_start = min_y_vert.v.y + 0.5f;
+        y_start = min_y_vert.v.y + 0.5f;
         y_end = max_y_vert.v.y + 0.5f;
 
         float y_dist = max_y_vert.v.y - min_y_vert.v.y;
@@ -294,6 +293,7 @@ struct PTIINVZBEdge {
 
 void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     float *iz_ptr;
+
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -314,6 +314,9 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
         float iu = left.iu;
         float iv = left.iv;
 
+        float x_start = left.x;
+        float x_end = right.x;
+
         float diz_dx, diu_dx, div_dx;
 
         if (x_dist > 0) {
@@ -327,10 +330,6 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
             diu_dx = (right.iu - left.iu);
             div_dx = (right.iv - left.iv);
         }
-
-
-        float x_start = left.x;
-        float x_end = right.x;
 
         if (x_start < min_clip_x) {
             i += di_dx * -x_start;
@@ -362,7 +361,7 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
             iz += diz_dx;
 
             iu += diu_dx;
-            iu += div_dx;
+            iv += div_dx;
         }
 
         left.x += left.dx_dy;
@@ -378,7 +377,8 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
         right.iu += right.diu_dy;
 
         left.iv += left.div_dy;
-        right.iv += right.div_dy;    }
+        right.iv += right.div_dy;
+    }
 }
 
 
