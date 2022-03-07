@@ -142,6 +142,7 @@ struct PTFSINVZBEdge {
 
 void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     float *iz_ptr;
+    Pixel *screen_buffer_ptr;
 
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
@@ -192,14 +193,17 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
         if (x_end > m_width)
             x_end = m_width;
 
-        iz_ptr = inv_z_buffer + (y * m_width);
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
                 auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
+                (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
 
-                p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
                 iz_ptr[x] = iz;
             }
 
@@ -345,6 +349,7 @@ struct PTIINVZBEdge {
 
 void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     float *iz_ptr;
+    Pixel *screen_buffer_ptr;
 
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
@@ -397,14 +402,17 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
         if (x_end > m_width)
             x_end = m_width;
 
-        iz_ptr = inv_z_buffer + (y * m_width);
+        auto y_pixel_offset = (y * m_width);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
                 auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
-                p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+                (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
                 iz_ptr[x] = iz;
             }
 
@@ -750,6 +758,8 @@ void scan_edges(PTIEdge &long_edge, PTIEdge &short_edge, bool handedness, A565Co
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
+    Pixel *screen_buffer_ptr;
+
     float x_dist, di_dx, i, iz, iu, iv, x_start, x_end, diz_dx, diu_dx, div_dx;
 
     uint32_t r, g, b;
@@ -798,11 +808,13 @@ void scan_edges(PTIEdge &long_edge, PTIEdge &short_edge, bool handedness, A565Co
         if (x_end > m_width)
             x_end = m_width;
 
+        screen_buffer_ptr = p_frame_buffer + (y * m_width);
+
         for(int x = x_start; x < x_end; x++) {
             auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
             pixel.rgb565_from_16bit(r, g, b);
 
-            p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+            (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
 
             i += di_dx;
 
@@ -956,6 +968,8 @@ struct PPTIINVZBEdge {
 
 void scan_edges(PPTIINVZBEdge &long_edge, PPTIINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -1014,14 +1028,17 @@ void scan_edges(PPTIINVZBEdge &long_edge, PPTIINVZBEdge &short_edge, bool handed
         if (x_end > m_width)
             x_end = m_width;
 
-        iz_ptr = inv_z_buffer + (y * m_width);
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
                 auto pixel = poly.texture->get_pixel_by_shift(iu * poly.texture->width -1 + 0.5f, iv * poly.texture->height -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
-                p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+                (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
                 iz_ptr[x] = iz;
             }
 
@@ -1174,6 +1191,8 @@ struct ATIINVZBEdge {
 
 void scan_edges(ATIINVZBEdge &long_edge, ATIINVZBEdge &short_edge, bool handedness, A565Color color, const RenderListPoly &poly) {
     float *iz_ptr;
+    Pixel *screen_buffer_ptr;
+
     int y_start = short_edge.y_start;
     int y_end = short_edge.y_end;
 
@@ -1223,14 +1242,17 @@ void scan_edges(ATIINVZBEdge &long_edge, ATIINVZBEdge &short_edge, bool handedne
         if (x_end > m_width)
             x_end = m_width;
 
-        iz_ptr = inv_z_buffer + (y * m_width);
+        auto y_pixel_offset = (m_width * y);
+
+        iz_ptr = inv_z_buffer + y_pixel_offset;
+        screen_buffer_ptr = p_frame_buffer + y_pixel_offset;
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
                 auto pixel = poly.texture->get_pixel_by_shift(u * poly.texture->width -1 + 0.5f, v * poly.texture->height -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
-                p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
+                (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
                 iz_ptr[x] = iz;
             }
 
