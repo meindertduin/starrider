@@ -55,7 +55,7 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
             .texture = current_poly.texture,
             .mati = current_poly.mati,
             .n_length = current_poly.n_length,
-            .normal = current_poly.normal,
+            .normal = current_poly.normal.normalized(),
             .verts = {
                 object.local_vertices[current_poly.vert[0]],
                 object.local_vertices[current_poly.vert[1]],

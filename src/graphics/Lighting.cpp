@@ -319,7 +319,7 @@ void flat_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights) 
                 r_sum += ri;
             }
             else if (lights[curr_light].attributes & LightAttributeInfinite) {
-                auto dp = polygon.trans_verts[0].n.dot(lights[curr_light].dir);
+                auto dp = polygon.normal.dot(lights[curr_light].dir);
 
                 if (dp > 0.0f) {
                     i = 128 * dp;
@@ -329,7 +329,7 @@ void flat_light_polygon(RenderListPoly &polygon, Light *lights, int max_lights) 
             } else if (lights[curr_light].attributes * LightAttributePoint) {
                 auto l = V4D(lights[curr_light].trans_pos, polygon.trans_verts[0].v);
                 dist = l.length();
-                dp = polygon.trans_verts[0].n.dot(l);
+                dp = polygon.normal.dot(l);
 
                 if (dp > 0.0f) {
                     atten = (lights[curr_light].kc + lights[curr_light].kl * dist + lights[curr_light].kq * dist * dist);
