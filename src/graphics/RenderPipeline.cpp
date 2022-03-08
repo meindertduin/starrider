@@ -11,6 +11,10 @@ enum ClipCodes : uint16_t {
     I = 0x0004,
 };
 
+constexpr const float PerfectRange = 10;
+constexpr const float PieceWiseRange = 20;
+constexpr const float AffineRange = 20;
+
 RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 }
@@ -48,7 +52,13 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         perspective_screen_transform(camera, render_poly);
 
         // draw_affine_textured_triangle_fs(render_poly);
-        draw_triangle_fs(render_poly);
+        if (render_poly.trans_verts[0].v.z < PerfectRange) {
+            draw_piecewise_textured_triangle_iinvzb(render_poly);
+        } else if (render_poly.trans_verts[0].v.z > PerfectRange && render_poly.trans_verts[0].v.z < PieceWiseRange) {
+            draw_piecewise_textured_triangle_iinvzb(render_poly);
+        } else {
+            draw_affine_textured_triangle_iinvzb(render_poly);
+        }
     }
 
 }
@@ -312,8 +322,8 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
             continue;
         }
 
-        // gourad_intensity_light_polygon(poly, g_lights, num_lights);
-        flat_light_polygon(poly, g_lights, num_lights);
+        gourad_intensity_light_polygon(poly, g_lights, num_lights);
+        // flat_light_polygon(poly, g_lights, num_lights);
     }
 }
 
