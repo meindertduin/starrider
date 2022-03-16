@@ -21,6 +21,8 @@ void draw_perspective_textured_triangle_fsinvzb(RenderListPoly &poly);
 // Draws triangle with perfect perspective texture mapping with intensity gourad shading and using inverse z-buffering.
 void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly);
 
+void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly, float alpha);
+
 // Draws triangle with perfect perspective texture mapping with flat shading and using inverse z-buffering.
 void draw_perspective_textured_triangle_fs(RenderListPoly &poly);
 
