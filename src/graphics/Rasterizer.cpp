@@ -200,7 +200,7 @@ void scan_edges(PTFSINVZBEdge &long_edge, PTFSINVZBEdge &short_edge, bool handed
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
-                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
+                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
                 (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
 
@@ -409,7 +409,7 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
-                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
+                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
                 (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
@@ -551,7 +551,7 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
 
         for(int x = x_start; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
-                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
+                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
                 auto current_pixel = (screen_buffer_ptr + x);
@@ -756,7 +756,7 @@ void scan_edges(PTFSEdge &long_edge, PTFSEdge &short_edge, bool handedness, A565
             x_end = m_width;
 
         for(int x = x_start; x < x_end; x++) {
-            auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
+            auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
             pixel.rgb565_from_16bit(r, g, b);
 
             p_frame_buffer[m_width * y + x].value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
@@ -958,7 +958,7 @@ void scan_edges(PTIEdge &long_edge, PTIEdge &short_edge, bool handedness, A565Co
         screen_buffer_ptr = p_frame_buffer + (y * m_width);
 
         for(int x = x_start; x < x_end; x++) {
-            auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * 16 -1 + 0.5f, (iv / iz) * 16 -1 + 0.5f);
+            auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
             pixel.rgb565_from_16bit(r, g, b);
 
             (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);
