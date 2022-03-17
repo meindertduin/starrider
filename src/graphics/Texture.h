@@ -32,6 +32,8 @@ public:
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
+    void set_data(int width, int height, A565Color* data);
+
     Texture* quarter_size(float gamma);
 
     constexpr A565Color get_pixel(int x_pos, int y_pos) const {

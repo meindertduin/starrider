@@ -149,7 +149,10 @@ typedef struct RenderObject_Type {
     int mati;
 
     Transform transform;
-    Texture *texture;
+
+    std::vector<Texture*> textures;
+    int mip_levels;
+
     A565Color color;
 
     int vertex_count;

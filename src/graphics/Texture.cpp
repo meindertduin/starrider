@@ -18,15 +18,7 @@ Texture::Texture(Texture &&other) noexcept : pixels(nullptr), width(other.width)
 }
 
 Texture::Texture(int width, int height, A565Color* data) {
-    this->width = width;
-    this->height = height;
-
-    if (data != nullptr) {
-        auto size = width * height;
-        this->pixels = new uint32_t[size];
-
-        std::memcpy(pixels, data, size);
-    }
+    set_data(width, height, data);
 }
 
 Texture& Texture::operator=(const Texture &other) {
@@ -101,6 +93,18 @@ Texture Texture::from_section(Rect src) {
             data[src.width * y + x] = get_pixel(x + src.x_pos, y + src.y_pos);
 
     return Texture(src.width, src.height, data);
+}
+
+void Texture::set_data(int width, int height, A565Color* data) {
+    this->width = width;
+    this->height = height;
+
+    if (data != nullptr) {
+        auto size = width * height;
+        this->pixels = new uint32_t[size];
+
+        std::memcpy(pixels, data, size);
+    }
 }
 
 Texture* Texture::quarter_size(float gamma) {

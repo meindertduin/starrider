@@ -2,7 +2,6 @@ build
 compile_commands.json
 .vimspector.json
 .ccls
-.ccls-cache/
 debug/
 run.sh
 debug.sh

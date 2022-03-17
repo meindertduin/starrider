@@ -72,6 +72,8 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
         render_poly.trans_verts[1].i = current_poly.vertices[1].i;
         render_poly.trans_verts[2].i = current_poly.vertices[2].i;
 
+        render_poly.texture = object.textures[1];
+
         // TODO optimize
         render_poly.trans_verts[0].t = current_poly.text_coords[current_poly.text[0]];
         render_poly.trans_verts[1].t = current_poly.text_coords[current_poly.text[1]];

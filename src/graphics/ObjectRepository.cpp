@@ -10,8 +10,6 @@ ObjectRepository::~ObjectRepository() {
         delete[] object.transformed_vertices;
         delete[] object.texture_coords;
         delete[] object.polygons;
-
-        delete object.texture;
     }
 }
 
@@ -28,9 +26,14 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    object.texture = texture;
+    object.textures.push_back(texture);
+    object.mip_levels = std::log(texture->width) / std::log(2) + 1;
 
-    obj_reader.create_render_object(object, object.texture);
+    for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
+        object.textures.push_back(object.textures[mip_level - 1]->quarter_size(1.01f));
+    }
+
+    obj_reader.create_render_object(object, object.textures[0]);
 
     m_game_objects.push_back(object);
     return object;

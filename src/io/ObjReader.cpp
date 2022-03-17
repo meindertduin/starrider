@@ -97,7 +97,6 @@ void ObjReader::create_render_object(RenderObject &object, Texture *texture) {
     std::vector<Polygon> polygons;
     for (int i = 0; i < m_indices.size(); i += 3) {
         Polygon polygon;
-        polygon.texture = texture;
         polygon.vertices = object.local_vertices;
         polygon.text_coords = object.texture_coords;
 
