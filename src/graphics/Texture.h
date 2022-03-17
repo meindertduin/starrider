@@ -32,7 +32,7 @@ public:
     void load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
-    Texture quarter_size(float gamma);
+    Texture* quarter_size(float gamma);
 
     constexpr A565Color get_pixel(int x_pos, int y_pos) const {
         return pixels[width * y_pos + x_pos];

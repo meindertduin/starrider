@@ -29,6 +29,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
     object.texture = texture;
+
     obj_reader.create_render_object(object, object.texture);
 
     m_game_objects.push_back(object);
