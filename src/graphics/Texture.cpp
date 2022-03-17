@@ -102,3 +102,36 @@ Texture Texture::from_section(Rect src) {
 
     return Texture(src.width, src.height, data);
 }
+
+Texture Texture::quarter_size(float gamma) {
+    int new_width = width * 0.25f;
+    int new_height = width * 0.25f;
+
+    A565Color *data = new A565Color[new_width * new_height];
+
+    for (int x = 0; x < new_width; x++) {
+        for (int y = 0; y < new_height; y++) {
+            uint32_t r0, g0, b0,
+                  r1, g1, b1,
+                  r2, g2, b2,
+                  r3, g3, b3;
+
+            int r_avg, g_avg, b_avg;
+
+            get_pixel(x * 2 + 0, y * 2 + 0).rgb565_from_16bit(r0, g0, b0);
+            get_pixel(x * 2 + 1, y * 2 + 0).rgb565_from_16bit(r1, g1, b1);
+            get_pixel(x * 2 + 0, y * 2 + 1).rgb565_from_16bit(r2, g2, b2);
+            get_pixel(x * 2 + 1, y * 2 + 1).rgb565_from_16bit(r3, g3, b3);
+
+            r_avg = (int)(0.5f + gamma * (r0 + r1 + r2 + 3) / 4.0f);
+            g_avg = (int)(0.5f + gamma * (g0 + g1 + g2 + 3) / 4.0f);
+            b_avg = (int)(0.5f + gamma * (b0 + b1 + b2 + 3) / 4.0f);
+
+            if (r_avg > 31) r_avg = 31;
+            if (g_avg > 63) g_avg = 63;
+            if (b_avg > 31) b_avg = 31;
+
+            data[x + y * new_width] = A565Color(r_avg, g_avg, b_avg);
+        }
+    }
+}

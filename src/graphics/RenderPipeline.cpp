@@ -52,7 +52,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
         perspective_screen_transform(camera, render_poly);
 
         if (render_poly.trans_verts[0].v.z < PerfectRange) {
-            draw_perspective_textured_triangle_iinvzb(render_poly, 0.4f);
+            draw_perspective_textured_triangle_iinvzb(render_poly);
             // draw_perspective_textured_triangle_iinvzb(render_poly, 0.4f);
         } else if (render_poly.trans_verts[0].v.z > PerfectRange && render_poly.trans_verts[0].v.z < PieceWiseRange) {
             draw_piecewise_textured_triangle_iinvzb(render_poly);
