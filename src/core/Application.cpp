@@ -73,7 +73,7 @@ void Application::run() {
     plateau.transform = Transform(V4D(0, -5, 0));
 
     objects.push_back(object);
-    // objects.push_back(plateau);
+    objects.push_back(plateau);
 
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;

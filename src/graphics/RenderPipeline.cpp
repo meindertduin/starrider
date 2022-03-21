@@ -385,8 +385,8 @@ void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly
 
         camera_transform(vp, render_poly);
 
-        int mip_level = (object.mip_levels * current_poly.vertices[0].v.z) / 20;
-        if (mip_level > object.mip_levels) mip_level = object.mip_levels;
+        int mip_level = (object.mip_levels * render_poly.trans_verts[0].v.z) / 100;
+        if (mip_level > object.mip_levels - 1) mip_level = object.mip_levels - 1;
 
         render_poly.texture = object.textures[mip_level];
 
