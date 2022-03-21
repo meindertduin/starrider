@@ -11,15 +11,11 @@ enum ClipCodes : uint16_t {
     I = 0x0004,
 };
 
-constexpr const float PerfectRange = 10;
-constexpr const float PieceWiseRange = 20;
-constexpr const float AffineRange = 20;
-
 RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 }
 
-void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables) {
+void RenderPipeline::render_objects(const Camera &camera, RenderContext &context) {
     rast_set_frame_buffer(camera.width, camera.height, p_renderer->get_framebuffer());
     p_renderer->clear_screen();
 
@@ -28,19 +24,21 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
     std::vector<RenderListPoly> render_list;
 
-    for (auto object : renderables) {
+    for (auto object : context.renderables) {
         world_transform_object(object);
 
         backface_removal_object(object, camera);
 
-        camera_trans_to_renderlist(object, render_list, vp);
+        camera_trans_to_renderlist(object, render_list, vp, context);
     }
 
     frustrum_clip_renderlist(camera, render_list);
 
     light_renderlist(render_list);
 
-    std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
+    if (context.attributes & RCAttributeZSort) {
+        std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
+    }
 
     for (auto render_poly : render_list) {
         if (render_poly.state & PolyStateClipped) {
@@ -49,10 +47,9 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
         perspective_screen_transform(camera, render_poly);
 
-        if (render_poly.trans_verts[0].v.z < PerfectRange) {
+        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
             draw_perspective_textured_triangle_iinvzb(render_poly);
-            // draw_perspective_textured_triangle_iinvzb(render_poly, 0.4f);
-        } else if (render_poly.trans_verts[0].v.z > PerfectRange && render_poly.trans_verts[0].v.z < PieceWiseRange) {
+        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
             draw_piecewise_textured_triangle_iinvzb(render_poly);
         } else {
             draw_affine_textured_triangle_iinvzb(render_poly);
@@ -339,7 +336,7 @@ void perspective_screen_transform(const Camera &camera, RenderListPoly &poly) {
     }
 }
 
-void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp) {
+void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp, RenderContext &context) {
    if (!(object.state & ObjectStateActive) ||
            object.state & ObjectStateCulled ||
            !(object.state & ObjectStateVisible)) {
@@ -385,10 +382,15 @@ void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly
 
         camera_transform(vp, render_poly);
 
-        int mip_level = (object.mip_levels * render_poly.trans_verts[0].v.z) / 100;
-        if (mip_level > object.mip_levels - 1) mip_level = object.mip_levels - 1;
+        if (context.attributes & RCAttributeMipMapped) {
+            int mip_level = (object.mip_levels * render_poly.trans_verts[0].v.z) / context.mip_z_dist;
+            if (mip_level > object.mip_levels - 1) mip_level = object.mip_levels - 1;
 
-        render_poly.texture = object.textures[mip_level];
+            render_poly.texture = object.textures[mip_level];
+        } else {
+            render_poly.texture = object.textures[0];
+        }
+
 
         render_list.push_back(render_poly);
    }

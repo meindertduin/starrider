@@ -191,11 +191,9 @@ extern Material_Type g_materials[MaxMaterials];
 
 void reset_materials();
 
-
 constexpr bool render_polygon_avg_sort(const RenderListPoly &a, const RenderListPoly &b) {
     return (a.trans_verts[0].v.z * a.trans_verts[1].v.z * a.trans_verts[2].v.z) >
         (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
 }
 
-void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list);
 
