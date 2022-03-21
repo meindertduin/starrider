@@ -49,6 +49,8 @@ public:
 private:
     int m_pitch_shift = 0;
     uint32_t *pixels = nullptr;
+
+    void set_pitch_shift();
 };
 
 

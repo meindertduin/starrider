@@ -72,9 +72,15 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
         render_poly.trans_verts[1].i = current_poly.vertices[1].i;
         render_poly.trans_verts[2].i = current_poly.vertices[2].i;
 
+        // TODO optimize
+        render_poly.trans_verts[0].t = current_poly.text_coords[current_poly.text[0]];
+        render_poly.trans_verts[1].t = current_poly.text_coords[current_poly.text[1]];
+        render_poly.trans_verts[2].t = current_poly.text_coords[current_poly.text[2]];
+
         int mip_level = (object.mip_levels * current_poly.vertices[0].v.z) / 20;
         if (mip_level > object.mip_levels) mip_level = object.mip_levels;
 
+        // int mip_level = 2;
         for (int ts = 0; ts < mip_level; ts++) {
             render_poly.trans_verts[0].t.x *= 0.5f;
             render_poly.trans_verts[0].t.y *= 0.5f;
@@ -86,12 +92,8 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
             render_poly.trans_verts[2].t.y *= 0.5f;
         }
 
-        render_poly.texture = object.textures[1];
+        render_poly.texture = object.textures[mip_level];
 
-        // TODO optimize
-        render_poly.trans_verts[0].t = current_poly.text_coords[current_poly.text[0]];
-        render_poly.trans_verts[1].t = current_poly.text_coords[current_poly.text[1]];
-        render_poly.trans_verts[2].t = current_poly.text_coords[current_poly.text[2]];
 
         render_list.push_back(render_poly);
    }
