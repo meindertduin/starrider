@@ -36,6 +36,8 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
+void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp);
+
 class RenderPipeline {
 public:
     RenderPipeline(Renderer *renderer);
