@@ -19,6 +19,7 @@ class Texture {
 public:
     Texture() = default;
     Texture(int width, int height, A565Color* data);
+    Texture(int width, int height, A565Color*&& data);
 
     Texture(const Texture &other);
     Texture(Texture &&other) noexcept;

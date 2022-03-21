@@ -80,20 +80,9 @@ void insert_object_render_list(RenderObject &object, std::vector<RenderListPoly>
         int mip_level = (object.mip_levels * current_poly.vertices[0].v.z) / 20;
         if (mip_level > object.mip_levels) mip_level = object.mip_levels;
 
-        // int mip_level = 2;
-        for (int ts = 0; ts < mip_level; ts++) {
-            render_poly.trans_verts[0].t.x *= 0.5f;
-            render_poly.trans_verts[0].t.y *= 0.5f;
-
-            render_poly.trans_verts[1].t.x *= 0.5f;
-            render_poly.trans_verts[1].t.y *= 0.5f;
-
-            render_poly.trans_verts[2].t.x *= 0.5f;
-            render_poly.trans_verts[2].t.y *= 0.5f;
-        }
-
         render_poly.texture = object.textures[mip_level];
 
+        // render_poly.texture = object.textures[1];
 
         render_list.push_back(render_poly);
    }

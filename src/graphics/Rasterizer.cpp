@@ -409,7 +409,7 @@ void scan_edges(PTIINVZBEdge &long_edge, PTIINVZBEdge &short_edge, bool handedne
 
         for(int x = x_start + 1; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
-                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->width -1 + 0.5f);
+                auto pixel = poly.texture->get_pixel_by_shift((iu / iz) * poly.texture->width -1 + 0.5f, (iv / iz) * poly.texture->height -1 + 0.5f);
                 pixel.rgb565_from_16bit(r, g, b);
 
                 (screen_buffer_ptr + x)->value = rgba_bit((r << 3) * i, (g << 2) * i, (b << 3) * i, 0xFF);

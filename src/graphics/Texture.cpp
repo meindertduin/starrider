@@ -21,6 +21,14 @@ Texture::Texture(int width, int height, A565Color* data) {
     set_data(width, height, data);
 }
 
+Texture::Texture(int width, int height, A565Color*&& data) {
+    pixels = reinterpret_cast<uint32_t*>(data);
+    this->width = width;
+    this->height = height;
+
+    set_pitch_shift();
+}
+
 Texture& Texture::operator=(const Texture &other) {
     *this = Texture(other);
     return *this;
@@ -75,19 +83,19 @@ void Texture::set_data(int width, int height, A565Color* data) {
     this->width = width;
     this->height = height;
 
-    set_pitch_shift();
-
     if (data != nullptr) {
         auto size = width * height;
         this->pixels = new uint32_t[size];
 
-        std::memcpy(pixels, data, size);
+        std::memcpy(pixels, data, size * sizeof(uint32_t));
     }
+
+    set_pitch_shift();
 }
 
 Texture* Texture::quarter_size(float gamma) {
     int new_width = width * 0.5;
-    int new_height = width * 0.5f;
+    int new_height = height * 0.5f;
 
     A565Color *data = new A565Color[new_width * new_height];
 
@@ -117,7 +125,10 @@ Texture* Texture::quarter_size(float gamma) {
         }
     }
 
-    return new Texture(new_width, new_height, data);
+    auto result = new Texture(new_width, new_height, data);
+    delete[] data;
+
+    return result;
 }
 
 void Texture::set_pitch_shift() {
