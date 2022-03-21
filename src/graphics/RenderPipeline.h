@@ -54,8 +54,7 @@ void backface_removal_object(RenderObject& object, const Camera &camera);
 
 void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list);
 
-void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
-
+void perspective_screen_transform_renderlist(const Camera &camera, std::vector<RenderListPoly> &renderlist);
 
 class RenderPipeline {
 public:

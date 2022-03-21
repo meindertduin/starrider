@@ -36,16 +36,17 @@ void RenderPipeline::render_objects(const Camera &camera, RenderContext &context
 
     light_renderlist(render_list);
 
+
     if (context.attributes & RCAttributeZSort) {
         std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
     }
+
+    perspective_screen_transform_renderlist(camera, render_list);
 
     for (auto render_poly : render_list) {
         if (render_poly.state & PolyStateClipped) {
             continue;
         }
-
-        perspective_screen_transform(camera, render_poly);
 
         if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
             draw_perspective_textured_triangle_iinvzb(render_poly);
@@ -315,17 +316,23 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
     }
 }
 
-void perspective_screen_transform(const Camera &camera, RenderListPoly &poly) {
-    float alpha = (0.5f * camera.width - 0.5f);
-    float beta = (0.5f * camera.height - 0.5f);
+void perspective_screen_transform_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
+    for (auto &poly : render_list) {
+        if (poly.state & PolyStateClipped) {
+            continue;
+        }
 
-    for (int vertex = 0; vertex < 3; vertex++) {
-        float z = poly.trans_verts[vertex].v.z;
-        poly.trans_verts[vertex].v.x = camera.view_dist_h * poly.trans_verts[vertex].v.x / z;
-        poly.trans_verts[vertex].v.y =  camera.view_dist_v * poly.trans_verts[vertex].v.y * camera.aspect_ratio / z;
+        float alpha = (0.5f * camera.width - 0.5f);
+        float beta = (0.5f * camera.height - 0.5f);
 
-        poly.trans_verts[vertex].v.x = alpha + poly.trans_verts[vertex].v.x * alpha;
-        poly.trans_verts[vertex].v.y = beta - poly.trans_verts[vertex].v.y * beta;
+        for (int vertex = 0; vertex < 3; vertex++) {
+            float z = poly.trans_verts[vertex].v.z;
+            poly.trans_verts[vertex].v.x = camera.view_dist_h * poly.trans_verts[vertex].v.x / z;
+            poly.trans_verts[vertex].v.y =  camera.view_dist_v * poly.trans_verts[vertex].v.y * camera.aspect_ratio / z;
+
+            poly.trans_verts[vertex].v.x = alpha + poly.trans_verts[vertex].v.x * alpha;
+            poly.trans_verts[vertex].v.y = beta - poly.trans_verts[vertex].v.y * beta;
+        }
     }
 }
 
