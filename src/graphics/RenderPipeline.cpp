@@ -15,35 +15,34 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 }
 
-void RenderPipeline::render_objects(const Camera &camera, RenderContext &context) {
+void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables, RenderContext &context) {
     rast_set_frame_buffer(camera.width, camera.height, p_renderer->get_framebuffer());
     p_renderer->clear_screen();
 
     auto vp = camera.get_view_projection();
     camera_transform_lights(vp);
 
-    std::vector<RenderListPoly> render_list;
+    context.render_list = std::vector<RenderListPoly>();
 
-    for (auto object : context.renderables) {
+    for (auto object : renderables) {
         world_transform_object(object);
 
         backface_removal_object(object, camera);
 
-        camera_trans_to_renderlist(object, render_list, vp, context);
+        camera_trans_to_renderlist(object, vp, context);
     }
 
-    frustrum_clip_renderlist(camera, render_list);
+    frustrum_clip_renderlist(camera, context);
 
-    light_renderlist(render_list);
-
+    light_renderlist(context);
 
     if (context.attributes & RCAttributeZSort) {
-        std::sort(render_list.begin(), render_list.end(), &render_polygon_avg_sort);
+        std::sort(context.render_list.begin(), context.render_list.end(), &render_polygon_avg_sort);
     }
 
-    perspective_screen_transform_renderlist(camera, render_list);
+    perspective_screen_transform_renderlist(camera, context);
 
-    for (auto render_poly : render_list) {
+    for (auto render_poly : context.render_list) {
         if (render_poly.state & PolyStateClipped) {
             continue;
         }
@@ -110,8 +109,8 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
     }
 }
 
-void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
-    for (auto &poly : render_list) {
+void frustrum_clip_renderlist(const Camera &camera, RenderContext &context) {
+    for (auto &poly : context.render_list) {
         uint16_t vertex_clip_code[3];
 
         for (int i = 0; i < 3; i++) {
@@ -292,7 +291,7 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
                 temp_poly.n_length = 1;
                 temp_poly.normal = n;
 
-                render_list.push_back(temp_poly);
+                context.render_list.push_back(temp_poly);
             }
         }
     }
@@ -305,8 +304,8 @@ void camera_transform_lights(const Matrix4x4 &vp) {
     }
 }
 
-void light_renderlist(std::vector<RenderListPoly> &render_list) {
-    for (auto &poly : render_list) {
+void light_renderlist(RenderContext &context) {
+    for (auto &poly : context.render_list) {
         if (poly.state & PolyStateClipped) {
             continue;
         }
@@ -316,8 +315,8 @@ void light_renderlist(std::vector<RenderListPoly> &render_list) {
     }
 }
 
-void perspective_screen_transform_renderlist(const Camera &camera, std::vector<RenderListPoly> &render_list) {
-    for (auto &poly : render_list) {
+void perspective_screen_transform_renderlist(const Camera &camera, RenderContext &context) {
+    for (auto &poly : context.render_list) {
         if (poly.state & PolyStateClipped) {
             continue;
         }
@@ -336,7 +335,7 @@ void perspective_screen_transform_renderlist(const Camera &camera, std::vector<R
     }
 }
 
-void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp, RenderContext &context) {
+void camera_trans_to_renderlist(RenderObject &object, const Matrix4x4 &vp, RenderContext &context) {
    if (!(object.state & ObjectStateActive) ||
            object.state & ObjectStateCulled ||
            !(object.state & ObjectStateVisible)) {
@@ -392,7 +391,7 @@ void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly
         }
 
 
-        render_list.push_back(render_poly);
+        context.render_list.push_back(render_poly);
    }
 }
 

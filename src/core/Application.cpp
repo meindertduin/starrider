@@ -70,6 +70,7 @@ void Application::run() {
 
     m_cursor.initialize(&m_window);
 
+    std::vector<RenderObject> objects;
     ObjectRepository object_repository;
 
     auto object = object_repository.create_game_object("assets/cube.obj", "assets/bricks.bmp");
@@ -78,8 +79,8 @@ void Application::run() {
     object.transform = Transform(V4D(0, 0, 3));
     plateau.transform = Transform(V4D(0, -5, 0));
 
-    rc.renderables.push_back(object);
-    rc.renderables.push_back(plateau);
+    objects.push_back(object);
+    objects.push_back(plateau);
 
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
@@ -91,13 +92,13 @@ void Application::run() {
 
         poll_window_events();
 
-        render_pipeline.render_objects(*p_camera, rc);
+        render_pipeline.render_objects(*p_camera, objects, rc);
 
         string time_text = std::to_string(dt) + "MS";
         renderer.render_text(time_text, ttf_font, {20, 52});
 
         renderer.render_framebuffer();
-        rc.renderables[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
