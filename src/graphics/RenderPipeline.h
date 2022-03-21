@@ -56,6 +56,8 @@ void frustrum_clip_renderlist(const Camera &camera, RenderContext &context);
 
 void perspective_screen_transform_renderlist(const Camera &camera, RenderContext &context);
 
+void draw_renderlist(RenderContext &context);
+
 class RenderPipeline {
 public:
     RenderPipeline(Renderer *renderer);

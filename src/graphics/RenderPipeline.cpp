@@ -42,20 +42,7 @@ void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObje
 
     perspective_screen_transform_renderlist(camera, context);
 
-    for (auto render_poly : context.render_list) {
-        if (render_poly.state & PolyStateClipped) {
-            continue;
-        }
-
-        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
-            draw_perspective_textured_triangle_iinvzb(render_poly);
-        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
-            draw_piecewise_textured_triangle_iinvzb(render_poly);
-        } else {
-            draw_affine_textured_triangle_iinvzb(render_poly);
-        }
-    }
-
+    draw_renderlist(context);
 }
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select) {
@@ -393,6 +380,136 @@ void camera_trans_to_renderlist(RenderObject &object, const Matrix4x4 &vp, Rende
 
         context.render_list.push_back(render_poly);
    }
+}
+
+void draw_renderlist(RenderContext &context) {
+    if (context.attributes & RCAttributeNoBuffer) {
+        for (auto render_poly : context.render_list) {
+            if (render_poly.state & PolyStateClipped) {
+                continue;
+            }
+
+            if (render_poly.attributes & PolyAttributeShadeModeTexture) {
+                // SHADE MODE FLAT
+                if (render_poly.attributes & PolyAttributeShadeModeFlat) {
+                    if (context.attributes & RCAttributeTextureHybrid) {
+                        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
+                            draw_perspective_textured_triangle_fs(render_poly);
+                        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
+                            draw_piecewise_textured_triangle_fs(render_poly);
+                        } else {
+                            draw_affine_textured_triangle_fs(render_poly);
+                        }
+                    }
+                    else if (context.attributes & RCAttributeTextureCorrect) {
+                        draw_perspective_textured_triangle_fs(render_poly);
+                    }
+                    else if (context.attributes & RCAttributeTexturePiecewise) {
+                        draw_piecewise_textured_triangle_fs(render_poly);
+                    }
+                    else if(context.attributes & RCAttributeTextureAffine) {
+                        draw_affine_textured_triangle_fs(render_poly);
+                    }
+                }
+                // SHADE MODE I GOURAD
+                else if (render_poly.attributes & PolyAttributeShadeModeIntensityGourad) {
+                    if (context.attributes & RCAttributeTextureHybrid) {
+                        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
+                            draw_perspective_textured_triangle_i(render_poly);
+                        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
+                            draw_piecewise_textured_triangle_i(render_poly);
+                        } else {
+                            draw_affine_textured_triangle_i(render_poly);
+                        }
+                    }
+                    else if (context.attributes & RCAttributeTextureCorrect) {
+                        draw_perspective_textured_triangle_i(render_poly);
+                    }
+                    else if (context.attributes & RCAttributeTexturePiecewise) {
+                        draw_piecewise_textured_triangle_i(render_poly);
+                    }
+                    else if(context.attributes & RCAttributeTextureAffine) {
+                        draw_affine_textured_triangle_i(render_poly);
+                    }
+                }
+            } else {
+                // SHADE MODE SOLID
+                if (render_poly.attributes & PolyAttributeShadeModeConstant) {
+                    draw_triangle_s(render_poly);
+                }
+                else if (render_poly.attributes & PolyAttributeShadeModeFlat) {
+                    draw_triangle_fs(render_poly);
+                }
+                else if (render_poly.attributes & PolyAttributeShadeModeIntensityGourad) {
+                    draw_triangle_i(render_poly);
+                }
+            }
+        }
+    }
+
+    else if (context.attributes & RCAttributeINVZBuffer) {
+        for (auto render_poly : context.render_list) {
+            if (render_poly.state & PolyStateClipped) {
+                continue;
+            }
+
+            if (render_poly.attributes & PolyAttributeShadeModeTexture) {
+                // SHADE MODE FLAT
+                if (render_poly.attributes & PolyAttributeShadeModeFlat) {
+                    if (context.attributes & RCAttributeTextureHybrid) {
+                        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
+                            draw_perspective_textured_triangle_fsinvzb(render_poly);
+                        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
+                            draw_piecewise_textured_triangle_fsinvzb(render_poly);
+                        } else {
+                            draw_affine_textured_triangle_fsinvzb(render_poly);
+                        }
+                    }
+                    else if (context.attributes & RCAttributeTextureCorrect) {
+                        draw_perspective_textured_triangle_fsinvzb(render_poly);
+                    }
+                    else if (context.attributes & RCAttributeTexturePiecewise) {
+                        draw_piecewise_textured_triangle_fsinvzb(render_poly);
+                    }
+                    else if(context.attributes & RCAttributeTextureAffine) {
+                        draw_affine_textured_triangle_fsinvzb(render_poly);
+                    }
+                }
+                // SHADE MODE I GOURAD
+                else if (render_poly.attributes & PolyAttributeShadeModeIntensityGourad) {
+                    if (context.attributes & RCAttributeTextureHybrid) {
+                        if (render_poly.trans_verts[0].v.z < context.perfect_dist) {
+                            draw_perspective_textured_triangle_iinvzb(render_poly);
+                        } else if (render_poly.trans_verts[0].v.z > context.perfect_dist && render_poly.trans_verts[0].v.z < context.piecewise_dist) {
+                            draw_piecewise_textured_triangle_iinvzb(render_poly);
+                        } else {
+                            draw_affine_textured_triangle_iinvzb(render_poly);
+                        }
+                    }
+                    else if (context.attributes & RCAttributeTextureCorrect) {
+                        draw_perspective_textured_triangle_iinvzb(render_poly);
+                    }
+                    else if (context.attributes & RCAttributeTexturePiecewise) {
+                        draw_piecewise_textured_triangle_iinvzb(render_poly);
+                    }
+                    else if(context.attributes & RCAttributeTextureAffine) {
+                        draw_affine_textured_triangle_iinvzb(render_poly);
+                    }
+                }
+            } else {
+                // SHADE MODE SOLID
+                if (render_poly.attributes & PolyAttributeShadeModeConstant) {
+                    draw_triangle_sinvzb(render_poly);
+                }
+                else if (render_poly.attributes & PolyAttributeShadeModeFlat) {
+                    draw_triangle_fsinvzb(render_poly);
+                }
+                else if (render_poly.attributes & PolyAttributeShadeModeIntensityGourad) {
+                    draw_triangle_iinvzb(render_poly);
+                }
+            }
+        }
+    }
 }
 
 }

@@ -32,9 +32,10 @@ const uint16_t PolyAttributeRGB24 = 1 << 4;
 const uint16_t PolyAttributeShadeModeFlat = 1 << 5;
 const uint16_t PolyAttributeShadeModeGouraud = 1 << 6;
 const uint16_t PolyAttributeShadeModeIntensityGourad = 1 << 7;
-const uint16_t PolyAttributeShadeModeTexture = 1 << 8;
-const uint16_t PolyAttributeEnableMaterial = 1 << 9;
-const uint16_t PolyAttributeDisableMaterial = 1 << 10;
+const uint16_t PolyAttributeShadeModeConstant = 1 << 8;
+const uint16_t PolyAttributeShadeModeTexture = 1 << 9;
+const uint16_t PolyAttributeEnableMaterial = 1 << 10;
+const uint16_t PolyAttributeDisableMaterial = 1 << 11;
 
 const uint16_t MaterialStateTransparent = 1 << 1;
 const uint16_t MaterialStateEightBitColor = 1 << 2;
