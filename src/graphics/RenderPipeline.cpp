@@ -297,13 +297,6 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
     }
 }
 
-
-void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list) {
-    for (auto &poly : render_list) {
-        camera_transform(vp, poly);
-    }
-}
-
 void camera_transform_lights(const Matrix4x4 &vp) {
     for (int i = 0; i < num_lights; i++) {
         if (g_lights[i].attributes == LightAttributePoint)

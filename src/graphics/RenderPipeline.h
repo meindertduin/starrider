@@ -44,7 +44,7 @@ constexpr void camera_transform(const Matrix4x4 &vp, RenderListPoly &list_poly) 
 
 void world_transform_object(RenderObject &object, CoordSelect coord_select = CoordSelect::Local_To_Trans);
 
-void camera_transform_renderlist(const Matrix4x4 &vp, std::vector<RenderListPoly> &render_list);
+void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp, RenderContext &context);
 
 void camera_transform_lights(const Matrix4x4 &vp);
 
@@ -56,7 +56,6 @@ void frustrum_clip_renderlist(const Camera &camera, std::vector<RenderListPoly> 
 
 void perspective_screen_transform(const Camera &camera, RenderListPoly &poly);
 
-void camera_trans_to_renderlist(RenderObject &object, std::vector<RenderListPoly> &render_list, const Matrix4x4 &vp, RenderContext &context);
 
 class RenderPipeline {
 public:
