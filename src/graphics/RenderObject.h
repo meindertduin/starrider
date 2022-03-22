@@ -171,7 +171,6 @@ typedef struct RenderObject_Type {
     // them stored in the vertex
     Point2D *texture_coords;
 
-    int poly_count;
     std::vector<Polygon> polygons;
 
     RenderObject_Type(int id) : id(id) {}

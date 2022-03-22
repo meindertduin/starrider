@@ -23,7 +23,6 @@ struct ObjFileContent {
     int text_count;
     Point2D *text_coords;
 
-    int poly_count;
     std::vector<Polygon> polygons;
 };
 

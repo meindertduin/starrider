@@ -134,7 +134,6 @@ ObjFileContent ObjReader::extract_content() {
         polygons.push_back(polygon);
     }
 
-    result.poly_count = polygons.size();
     result.polygons = polygons;
 
     if (!has_normal_indices) {
@@ -148,7 +147,7 @@ int ObjReader::compute_vertex_normals(ObjFileContent &object) {
     int polys_touch_vertices[ObjectMaxVertices];
     memset((void*)polys_touch_vertices, 0, sizeof(int) * ObjectMaxVertices);
 
-    for (int poly = 0; poly < object.poly_count; poly++) {
+    for (int poly = 0; poly < object.polygons.size(); poly++) {
         if (object.polygons[poly].attributes & PolyAttributeShadeModeGouraud) {
             int vi0 = object.polygons[poly].vert[0];
             int vi1 = object.polygons[poly].vert[1];

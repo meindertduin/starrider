@@ -76,21 +76,21 @@ void world_transform_object(RenderObject &object, CoordSelect coord_select) {
 }
 
 void backface_removal_object(RenderObject& object, const Camera &camera) {
-    for (int i = 0; i < object.poly_count; i++) {
-        auto line1 = object.transformed_vertices[object.polygons[i].vert[0]].v
-            - object.transformed_vertices[object.polygons[i].vert[1]].v;
+    for (auto &poly : object.polygons) {
+        auto line1 = object.transformed_vertices[poly.vert[0]].v
+            - object.transformed_vertices[poly.vert[1]].v;
 
-        auto line2 = object.transformed_vertices[object.polygons[i].vert[0]].v
-            - object.transformed_vertices[object.polygons[i].vert[2]].v;
+        auto line2 = object.transformed_vertices[poly.vert[0]].v
+            - object.transformed_vertices[poly.vert[2]].v;
 
-        auto camera_ray =  camera.m_transform.pos - object.transformed_vertices[object.polygons[i].vert[0]].v;
-        object.polygons[i].normal = line1.cross(line2);
+        auto camera_ray =  camera.m_transform.pos - object.transformed_vertices[poly.vert[0]].v;
+        poly.normal = line1.cross(line2);
 
         if (object.state & PolyAttributeTwoSided) {
-            if (object.polygons[i].normal.dot(camera_ray) < 0.0f) {
-                object.polygons[i].state |= PolyStateBackface;
-            } else if(object.polygons[i].state & PolyStateBackface) {
-                object.polygons[i].state ^= PolyStateBackface;
+            if (poly.normal.dot(camera_ray) < 0.0f) {
+                poly.state |= PolyStateBackface;
+            } else if(poly.state & PolyStateBackface) {
+                poly.state ^= PolyStateBackface;
             }
         }
     }
@@ -329,9 +329,7 @@ void camera_trans_to_renderlist(RenderObject &object, const Matrix4x4 &vp, Rende
         return;
    }
 
-   for (int poly = 0; poly < object.poly_count; poly++) {
-        auto current_poly = object.polygons[poly];
-
+   for (auto current_poly : object.polygons) {
         if (!(current_poly.state & PolyStateActive) ||
                 current_poly.state & PolyStateBackface) {
             continue;
@@ -379,6 +377,7 @@ void camera_trans_to_renderlist(RenderObject &object, const Matrix4x4 &vp, Rende
 
 
         context.render_list.push_back(render_poly);
+
    }
 }
 
