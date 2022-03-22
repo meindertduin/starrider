@@ -135,11 +135,7 @@ ObjFileContent ObjReader::extract_content() {
     }
 
     result.poly_count = polygons.size();
-    result.polygons = new Polygon[result.poly_count];
-
-    for (int i = 0; i < polygons.size(); i++) {
-        result.polygons[i] = polygons[i];
-    }
+    result.polygons = polygons;
 
     if (!has_normal_indices) {
         compute_vertex_normals(result);

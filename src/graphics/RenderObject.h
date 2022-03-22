@@ -172,7 +172,7 @@ typedef struct RenderObject_Type {
     Point2D *texture_coords;
 
     int poly_count;
-    Polygon *polygons;
+    std::vector<Polygon> polygons;
 
     RenderObject_Type(int id) : id(id) {}
 

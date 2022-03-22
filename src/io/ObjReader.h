@@ -24,7 +24,7 @@ struct ObjFileContent {
     Point2D *text_coords;
 
     int poly_count;
-    Polygon *polygons;
+    std::vector<Polygon> polygons;
 };
 
 class ObjReader {

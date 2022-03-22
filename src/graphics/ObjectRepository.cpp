@@ -9,7 +9,6 @@ ObjectRepository::~ObjectRepository() {
         delete[] object.local_vertices;
         delete[] object.transformed_vertices;
         delete[] object.texture_coords;
-        delete[] object.polygons;
     }
 }
 
@@ -57,7 +56,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.color = A565Color(0xFF, 0, 0, 0);
 
     object.poly_count = obj_content.poly_count;
-    object.polygons = obj_content.polygons;
+    object.polygons = std::move(obj_content.polygons);
 
     m_game_objects.push_back(object);
     return object;
