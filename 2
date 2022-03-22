@@ -38,7 +38,6 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     // obj_reader.create_render_object(object, object.textures[0]);
 
     // TODO abstract the object creation
-    object.state = ObjectStateActive | ObjectStateVisible;
     object.attributes |= ObjectAttributeSingleFrame;
     object.curr_frame = 0;
     object.frames_count = 1;
@@ -47,6 +46,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.local_vertices = obj_content.vertices;
 
     object.transformed_vertices = new Vertex4D[obj_content.vertex_count];
+    object.transformed_vertices = obj_content.vertices;
 
     object.text_count = obj_content.text_count;
     object.texture_coords = obj_content.text_coords;
