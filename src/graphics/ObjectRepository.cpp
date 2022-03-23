@@ -15,8 +15,12 @@ ObjectRepository::~ObjectRepository() {
 RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
     ObjReader obj_reader;
 
-    auto texture = new Texture();
-    texture->load_from_bmp(texture_file);
+    auto texture_id = load_texture(texture_file);
+    if (texture_id == -1) {
+        return -1;
+    }
+
+    auto texture = m_textures[texture_id];
 
     if (!obj_reader.read_file(obj_file, texture->width, texture->height)) {
         return -1;
@@ -59,4 +63,16 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
 
     m_game_objects.push_back(object);
     return object;
+}
+
+int ObjectRepository::load_texture(std::string path) {
+    auto texture = new Texture();
+    if (!texture->load_from_bmp(path)) {
+        return -1;
+    }
+
+    m_textures.push_back(texture);
+
+    // TODO create a better id system and texture collection for that matter
+    return m_textures.size() -1;
 }

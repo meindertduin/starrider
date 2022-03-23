@@ -20,9 +20,12 @@ public:
     ObjectRepository& operator=(const ObjectRepository &other) = delete;
     ObjectRepository& operator=(ObjectRepository &&other) = delete;
 
-    /* Returns -1 if no object could be created */
     RenderObject create_game_object(std::string obj_file, std::string texture_fil);
-    RenderObject create_test_cube(std::string texture_fil);
+
+    int load_texture(std::string path);
+    int load_geometry(bool mip_texture);
 private:
     std::vector<RenderObject> m_game_objects;
+
+    std::vector<Texture*> m_textures;
 };

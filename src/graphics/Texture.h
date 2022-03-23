@@ -17,6 +17,7 @@ struct Rect {
 
 class Texture {
 public:
+    int id;
     Texture() = default;
     Texture(int width, int height, A565Color* data);
     Texture(int width, int height, A565Color*&& data);
@@ -30,7 +31,7 @@ public:
     Texture& operator=(const Texture &other);
     Texture& operator=(Texture &&other) noexcept;
 
-    void load_from_bmp(std::string path);
+    bool load_from_bmp(std::string path);
     Texture from_section(Rect src);
 
     void set_data(int width, int height, A565Color* data);

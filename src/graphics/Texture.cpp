@@ -47,11 +47,13 @@ Texture::~Texture() {
     delete[] reinterpret_cast<char*>(pixels);
 }
 
-void Texture::load_from_bmp(std::string path) {
+bool Texture::load_from_bmp(std::string path) {
     BmpReader bmp_reader;
 
     // fucntion call allocates memory for pixels
-    bmp_reader.open_file(path);
+    if (!bmp_reader.open_file(path)) {
+        return false;
+    }
 
     size_t s {0};
     auto bitmap = std::unique_ptr<unsigned char>(nullptr);
@@ -67,6 +69,8 @@ void Texture::load_from_bmp(std::string path) {
     set_pitch_shift();
 
     height = bmp_reader.get_height();
+
+    return true;
 }
 
 Texture Texture::from_section(Rect src) {
