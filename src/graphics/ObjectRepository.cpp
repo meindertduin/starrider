@@ -10,6 +10,10 @@ ObjectRepository::~ObjectRepository() {
         delete[] object.transformed_vertices;
         delete[] object.texture_coords;
     }
+
+    for (auto texture : m_textures) {
+        delete texture;
+    }
 }
 
 RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
