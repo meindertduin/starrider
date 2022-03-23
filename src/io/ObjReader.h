@@ -16,21 +16,11 @@ struct ObjIndex {
     int normal_index;
 };
 
-struct ObjFileContent {
-    int vertex_count;
-    Vertex4D *vertices;
-
-    int text_count;
-    Point2D *text_coords;
-
-    std::vector<Polygon> polygons;
-};
-
 class ObjReader {
 public:
     ObjReader();
-    bool read_file(string path, int text_width, int text_height);
-    ObjFileContent extract_content();
+    bool read_file(string path);
+    Geometry extract_content();
     void create_render_object(RenderObject &object, Texture *texture);
 private:
     vector<V4D> m_vertices;
@@ -42,5 +32,5 @@ private:
     bool has_normal_indices = false;
 
     ObjIndex parse_object_index(string token);
-    int compute_vertex_normals(ObjFileContent &object);
+    int compute_vertex_normals(Geometry &object);
 };

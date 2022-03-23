@@ -8,7 +8,7 @@ ObjReader::ObjReader() {
 
 }
 
-bool ObjReader::read_file(string path, int text_width, int text_height) {
+bool ObjReader::read_file(string path) {
     std::ifstream fs(path);
 
     if (!fs.is_open())
@@ -65,8 +65,8 @@ bool ObjReader::read_file(string path, int text_width, int text_height) {
     return true;
 }
 
-ObjFileContent ObjReader::extract_content() {
-    auto result = ObjFileContent {};
+Geometry ObjReader::extract_content() {
+    auto result = Geometry {};
 
     result.vertex_count = m_vertices.size();
     result.text_count = m_tex_coords.size();
@@ -143,7 +143,7 @@ ObjFileContent ObjReader::extract_content() {
     return result;
 }
 
-int ObjReader::compute_vertex_normals(ObjFileContent &object) {
+int ObjReader::compute_vertex_normals(Geometry &object) {
     int polys_touch_vertices[ObjectMaxVertices];
     memset((void*)polys_touch_vertices, 0, sizeof(int) * ObjectMaxVertices);
 

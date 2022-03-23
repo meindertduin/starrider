@@ -178,6 +178,16 @@ typedef struct RenderObject_Type {
     int set_frame(int frame);
 } RenderObject;
 
+typedef struct GeometryType {
+    int vertex_count;
+    Vertex4D *vertices;
+
+    int text_count;
+    Point2D *text_coords;
+
+    std::vector<Polygon> polygons;
+} Geometry;
+
 typedef struct Material_Type {
     int id;
     uint16_t state;

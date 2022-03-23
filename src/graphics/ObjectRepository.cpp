@@ -19,16 +19,15 @@ ObjectRepository::~ObjectRepository() {
 RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
     ObjReader obj_reader;
 
+    auto geometry_id = load_geometry(obj_file);
     auto texture_id = load_texture(texture_file);
-    if (texture_id == -1) {
+
+    if (geometry_id == -1 ||texture_id == -1) {
         return -1;
     }
 
+    auto obj_content = m_geometries[geometry_id];
     auto texture = m_textures[texture_id];
-
-    if (!obj_reader.read_file(obj_file, texture->width, texture->height)) {
-        return -1;
-    }
 
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
@@ -37,12 +36,11 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.mip_levels = std::log(texture->width) / std::log(2) + 1;
 
     for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
-        object.textures.push_back(object.textures[mip_level - 1]->quarter_size(1.01f));
+        auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);
+
+        object.textures.push_back(quarter_texture);
+        m_textures.push_back(quarter_texture);
     }
-
-    auto obj_content = obj_reader.extract_content();
-
-    // obj_reader.create_render_object(object, object.textures[0]);
 
     // TODO abstract the object creation
     object.state = ObjectStateActive | ObjectStateVisible;
@@ -79,4 +77,17 @@ int ObjectRepository::load_texture(std::string path) {
 
     // TODO create a better id system and texture collection for that matter
     return m_textures.size() -1;
+}
+
+int ObjectRepository::load_geometry(std::string path) {
+    ObjReader obj_reader;
+
+    if (!obj_reader.read_file(path)) {
+        return -1;
+    }
+
+    auto geometry = obj_reader.extract_content();
+    m_geometries.push_back(geometry);
+
+    return m_geometries.size() - 1;
 }

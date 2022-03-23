@@ -23,9 +23,10 @@ public:
     RenderObject create_game_object(std::string obj_file, std::string texture_fil);
 
     int load_texture(std::string path);
-    int load_geometry(bool mip_texture);
+    int load_geometry(std::string path);
 private:
     std::vector<RenderObject> m_game_objects;
 
     std::vector<Texture*> m_textures;
+    std::vector<Geometry> m_geometries;
 };
