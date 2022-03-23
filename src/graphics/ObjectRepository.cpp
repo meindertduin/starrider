@@ -34,6 +34,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
 
     object.textures.push_back(texture);
     object.mip_levels = std::log(texture->width) / std::log(2) + 1;
+    object.mip_levels = 1;
 
     for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
         auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);

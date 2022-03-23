@@ -79,9 +79,7 @@ Geometry ObjReader::extract_content() {
         result.vertices[i].attributes = VertexAttributePoint;
     }
 
-    for (int i = 0; i < result.text_count; i++) {
-        result.text_coords[i] = m_tex_coords[i];
-    }
+    std::copy(m_tex_coords.begin(), m_tex_coords.end(), result.text_coords);
 
     std::vector<Polygon> polygons;
     for (int i = 0; i < m_indices.size(); i += 3) {
@@ -128,8 +126,6 @@ Geometry ObjReader::extract_content() {
             polygon.n_length = line1.cross(line2).length();
             polygon.text_coords = result.text_coords;
         }
-
-        // polygon.color = object.color;
 
         polygons.push_back(polygon);
     }
