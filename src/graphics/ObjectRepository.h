@@ -15,20 +15,14 @@ class ObjCollection {
             std::fill(p_objects, p_objects + size, nullptr);
         }
 
-        ~ObjCollection() {
-            for (int i = 0; i < m_size; i++) {
-                delete p_objects[i];
-            }
-        }
-
         T* get_value(int id) const {
-            return p_objects[id];
+            return p_objects[id].get();
         };
 
-        int store_value(T* value) {
+        int store_value(std::unique_ptr<T> &&value) {
             for (int i = 0; i < m_size; i++) {
                 if (p_objects[i] == nullptr) {
-                    p_objects[i] = value;
+                    p_objects[i] = std::move(value);
                     return i;
                 }
             }
@@ -38,7 +32,7 @@ class ObjCollection {
     private:
         int m_size;
 
-        T* p_objects[128];
+        std::unique_ptr<T> p_objects[128];
 };
 
 /*
