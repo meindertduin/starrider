@@ -34,3 +34,4 @@ private:
     ObjIndex parse_object_index(string token);
     int compute_vertex_normals(Geometry &object);
 };
+
