@@ -2,7 +2,7 @@
 
 #include "../io/ObjReader.h"
 
-ObjectRepository::ObjectRepository() : m_texture_collection(30) {}
+ObjectRepository::ObjectRepository() : m_texture_collection(128), m_geometry_collection(128) {}
 
 ObjectRepository::~ObjectRepository() {
     for (auto object : m_game_objects) {
@@ -17,6 +17,9 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
 
     auto texture_id = load_texture(texture_file);
     auto texture = m_texture_collection.get_value(texture_id);
+
+    auto geometry_id = load_geometry(obj_file);
+    auto obj_content = *m_geometry_collection.get_value(geometry_id);
 
     if (!obj_reader.read_file(obj_file)) {
         return -1;
@@ -33,8 +36,6 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
         object.textures.push_back(quarter_texture);
         m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
     }
-
-    auto obj_content = obj_reader.extract_content();
 
     // TODO abstract the object creation
     object.state = ObjectStateActive | ObjectStateVisible;
@@ -77,8 +78,7 @@ int ObjectRepository::load_geometry(std::string path) {
         return -1;
     }
 
-    auto geometry = obj_reader.extract_content();
-    m_geometries.push_back(geometry);
-
-    return m_geometries.size() - 1;
+    auto geometry = new Geometry {};
+    obj_reader.extract_content(*geometry);
+    return m_geometry_collection.store_value(std::unique_ptr<GeometryType>(geometry));
 }

@@ -20,7 +20,7 @@ class ObjReader {
 public:
     ObjReader();
     bool read_file(string path);
-    Geometry extract_content();
+    void extract_content(Geometry &result);
     void create_render_object(RenderObject &object, Texture *texture);
 private:
     vector<V4D> m_vertices;

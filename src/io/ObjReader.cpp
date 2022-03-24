@@ -65,9 +65,7 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-Geometry ObjReader::extract_content() {
-    auto result = Geometry {};
-
+void ObjReader::extract_content(Geometry &result) {
     result.vertex_count = m_vertices.size();
     result.text_count = m_tex_coords.size();
 
@@ -127,6 +125,9 @@ Geometry ObjReader::extract_content() {
             polygon.text_coords = result.text_coords;
         }
 
+        // TODO: change this, so that this doesnt set the lighting anymore
+        polygon.color = A565Color(0xFF, 0, 0, 0);
+
         polygons.push_back(polygon);
     }
 
@@ -135,8 +136,6 @@ Geometry ObjReader::extract_content() {
     if (!has_normal_indices) {
         compute_vertex_normals(result);
     }
-
-    return result;
 }
 
 int ObjReader::compute_vertex_normals(Geometry &object) {
