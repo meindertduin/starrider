@@ -56,9 +56,7 @@ public:
     int load_geometry(std::string path);
 private:
     ObjCollection<Texture> m_texture_collection;
-    ObjCollection<Geometry> m_geometry_collection;
+    ObjCollection<Mesh> m_mesh_collection;
 
     std::vector<RenderObject> m_game_objects;
-
-    std::vector<Geometry> m_geometries;
 };

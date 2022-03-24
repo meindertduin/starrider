@@ -2,13 +2,11 @@
 
 #include "../io/ObjReader.h"
 
-ObjectRepository::ObjectRepository() : m_texture_collection(128), m_geometry_collection(128) {}
+ObjectRepository::ObjectRepository() : m_texture_collection(128), m_mesh_collection(128) {}
 
 ObjectRepository::~ObjectRepository() {
     for (auto object : m_game_objects) {
-        delete[] object.local_vertices;
         delete[] object.transformed_vertices;
-        delete[] object.texture_coords;
     }
 }
 
@@ -19,7 +17,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     auto texture = m_texture_collection.get_value(texture_id);
 
     auto geometry_id = load_geometry(obj_file);
-    auto obj_content = *m_geometry_collection.get_value(geometry_id);
+    auto obj_content = m_mesh_collection.get_value(geometry_id);
 
     if (!obj_reader.read_file(obj_file)) {
         return -1;
@@ -43,20 +41,20 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.curr_frame = 0;
     object.frames_count = 1;
 
-    object.vertex_count = obj_content.vertex_count;
-    object.local_vertices = obj_content.vertices;
+    object.vertex_count = obj_content->vertex_count;
+    object.local_vertices = obj_content->vertices;
 
-    object.transformed_vertices = new Vertex4D[obj_content.vertex_count];
+    object.transformed_vertices = new Vertex4D[obj_content->vertex_count];
 
-    object.text_count = obj_content.text_count;
-    object.texture_coords = obj_content.text_coords;
+    object.text_count = obj_content->text_count;
+    object.texture_coords = obj_content->text_coords;
 
     object.head_local_vertices = &object.local_vertices[0];
     object.head_transformed_vertices = &object.transformed_vertices[0];
 
     object.color = A565Color(0xFF, 0, 0, 0);
 
-    object.polygons = std::move(obj_content.polygons);
+    object.polygons = std::move(obj_content->polygons);
 
     m_game_objects.push_back(object);
     return object;
@@ -78,7 +76,7 @@ int ObjectRepository::load_geometry(std::string path) {
         return -1;
     }
 
-    auto geometry = new Geometry {};
-    obj_reader.extract_content(*geometry);
-    return m_geometry_collection.store_value(std::unique_ptr<GeometryType>(geometry));
+    auto mesh = new Mesh {};
+    obj_reader.extract_content(*mesh);
+    return m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
 }

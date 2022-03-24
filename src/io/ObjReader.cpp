@@ -65,7 +65,7 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-void ObjReader::extract_content(Geometry &result) {
+void ObjReader::extract_content(Mesh &result) {
     result.vertex_count = m_vertices.size();
     result.text_count = m_tex_coords.size();
 
@@ -138,7 +138,7 @@ void ObjReader::extract_content(Geometry &result) {
     }
 }
 
-int ObjReader::compute_vertex_normals(Geometry &object) {
+int ObjReader::compute_vertex_normals(Mesh &object) {
     int polys_touch_vertices[ObjectMaxVertices];
     memset((void*)polys_touch_vertices, 0, sizeof(int) * ObjectMaxVertices);
 

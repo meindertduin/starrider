@@ -178,7 +178,7 @@ typedef struct RenderObject_Type {
     int set_frame(int frame);
 } RenderObject;
 
-typedef struct GeometryType {
+typedef struct MeshType {
     int vertex_count;
     Vertex4D *vertices;
 
@@ -186,7 +186,43 @@ typedef struct GeometryType {
     Point2D *text_coords;
 
     std::vector<Polygon> polygons;
-} Geometry;
+
+    MeshType() = default;
+    MeshType(const MeshType &other) {
+        vertex_count = other.vertex_count;
+        text_count = other.text_count;
+
+        std::memcpy(vertices, other.vertices, vertex_count);
+        std::memcpy(text_coords, other.text_coords, text_count);
+
+        polygons = other.polygons;
+    }
+
+    MeshType(MeshType &&other) {
+        vertex_count = other.vertex_count;
+        text_count = other.text_count;
+
+        vertices = other.vertices;
+        text_coords = other.text_coords;
+
+        polygons = std::move(other.polygons);
+    }
+
+    MeshType& operator=(const MeshType &other) {
+        *this = MeshType(other);
+        return *this;
+    }
+
+    MeshType& operator=(MeshType &&other) {
+        *this = MeshType(other);
+        return *this;
+    }
+
+    ~MeshType() {
+        delete[] vertices;
+        delete[] text_coords;
+    }
+} Mesh;
 
 typedef struct Material_Type {
     int id;

@@ -20,7 +20,7 @@ class ObjReader {
 public:
     ObjReader();
     bool read_file(string path);
-    void extract_content(Geometry &result);
+    void extract_content(Mesh &result);
     void create_render_object(RenderObject &object, Texture *texture);
 private:
     vector<V4D> m_vertices;
@@ -32,6 +32,6 @@ private:
     bool has_normal_indices = false;
 
     ObjIndex parse_object_index(string token);
-    int compute_vertex_normals(Geometry &object);
+    int compute_vertex_normals(Mesh &object);
 };
 
