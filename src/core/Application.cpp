@@ -50,7 +50,7 @@ void Application::run() {
     Graphics::RenderPipeline render_pipeline {&renderer};
 
     Graphics::RenderContext rc = {
-        .attributes = Graphics::RCAttributeMipMapped | Graphics::RCAttributeINVZBuffer | Graphics::RCAttributeTextureHybrid,
+        .attributes = Graphics::RCAttributeMipMapped | Graphics::RCAttributeINVZBuffer | Graphics::RCAttributeTextureHybrid | Graphics::RCAttributeZSort | Graphics::RCAttributeAlhpa,
         .mip_z_dist = 200,
         .perfect_dist = 20,
         .piecewise_dist = 40,
@@ -74,6 +74,7 @@ void Application::run() {
     ObjectRepository object_repository;
 
     auto object = object_repository.create_game_object("assets/cube.obj", "assets/bricks.bmp");
+    object.alpha = 0.4f;
     auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/bricks.bmp");
 
     object.transform = Transform(V4D(0, 0, 3));

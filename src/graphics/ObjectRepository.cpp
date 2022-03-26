@@ -16,8 +16,8 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     auto texture_id = load_texture(texture_file);
     auto texture = m_texture_collection.get_value(texture_id);
 
-    auto geometry_id = load_geometry(obj_file);
-    auto obj_content = m_mesh_collection.get_value(geometry_id);
+    auto mesh_id = load_geometry(obj_file);
+    auto mesh = m_mesh_collection.get_value(mesh_id);
 
     if (!obj_reader.read_file(obj_file)) {
         return -1;
@@ -42,20 +42,21 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.curr_frame = 0;
     object.frames_count = 1;
 
-    object.vertex_count = obj_content->vertex_count;
-    object.local_vertices = obj_content->vertices;
+    object.vertex_count = mesh->vertex_count;
+    object.local_vertices = mesh->vertices;
+    object.alpha = 1.0f;
 
-    object.transformed_vertices = new Vertex4D[obj_content->vertex_count];
+    object.transformed_vertices = new Vertex4D[mesh->vertex_count];
 
-    object.text_count = obj_content->text_count;
-    object.texture_coords = obj_content->text_coords;
+    object.text_count = mesh->text_count;
+    object.texture_coords = mesh->text_coords;
 
     object.head_local_vertices = &object.local_vertices[0];
     object.head_transformed_vertices = &object.transformed_vertices[0];
 
     object.color = A565Color(0xFF, 0, 0, 0);
 
-    object.polygons = std::move(obj_content->polygons);
+    object.polygons = std::move(mesh->polygons);
 
     m_game_objects.push_back(object);
     return object;

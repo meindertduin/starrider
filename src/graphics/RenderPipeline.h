@@ -27,7 +27,6 @@ constexpr const uint32_t RCAttributeTextureCorrect =    1 << 6;
 constexpr const uint32_t RCAttributeTexturePiecewise =  1 << 7;
 constexpr const uint32_t RCAttributeTextureHybrid =     1 << 8;
 
-
 struct RenderContext {
     int attributes;
     int mip_z_dist;

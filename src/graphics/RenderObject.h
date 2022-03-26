@@ -136,6 +136,7 @@ typedef struct RenderListPoly_Type {
 
     float n_length;
     V4D normal;
+    float alpha;
 
     float avg_z;
     Vertex4D verts[3];
@@ -146,6 +147,8 @@ typedef struct RenderObject_Type {
     int id;
     uint16_t state;
     uint16_t attributes;
+
+    float alpha;
 
     int mati;
 
