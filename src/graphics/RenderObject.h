@@ -228,6 +228,12 @@ typedef struct MeshType {
     }
 } Mesh;
 
+struct MeshAttributes {
+    uint16_t poly_state;
+    uint16_t poly_attributes;
+    A565Color poly_color;
+};
+
 typedef struct Material_Type {
     int id;
     uint16_t state;

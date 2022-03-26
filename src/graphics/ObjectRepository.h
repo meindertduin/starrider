@@ -53,7 +53,7 @@ public:
     RenderObject create_game_object(std::string obj_file, std::string texture_fil);
 
     int load_texture(std::string path);
-    int load_geometry(std::string path);
+    int load_mesh(std::string path, MeshAttributes attributes);
 private:
     ObjCollection<Texture> m_texture_collection;
     ObjCollection<Mesh> m_mesh_collection;

@@ -16,7 +16,14 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     auto texture_id = load_texture(texture_file);
     auto texture = m_texture_collection.get_value(texture_id);
 
-    auto mesh_id = load_geometry(obj_file);
+    auto object_color = A565Color(0xFF, 0, 0, 0);
+
+    auto mesh_id = load_mesh(obj_file, {
+        .poly_state = PolyStateActive,
+        .poly_attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
+            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud | PolyAttributeShadeModeTexture,
+        .poly_color = object_color,
+    });
     auto mesh = m_mesh_collection.get_value(mesh_id);
 
     if (!obj_reader.read_file(obj_file)) {
@@ -54,8 +61,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     object.head_local_vertices = &object.local_vertices[0];
     object.head_transformed_vertices = &object.transformed_vertices[0];
 
-    object.color = A565Color(0xFF, 0, 0, 0);
-
+    object.color = object_color;
     object.polygons = std::move(mesh->polygons);
 
     m_game_objects.push_back(object);
@@ -73,7 +79,7 @@ int ObjectRepository::load_texture(std::string path) {
     return id;
 }
 
-int ObjectRepository::load_geometry(std::string path) {
+int ObjectRepository::load_mesh(std::string path, MeshAttributes attributes) {
     ObjReader obj_reader;
 
     if (!obj_reader.read_file(path)) {
@@ -81,7 +87,7 @@ int ObjectRepository::load_geometry(std::string path) {
     }
 
     auto mesh = new Mesh {};
-    obj_reader.extract_content(*mesh);
+    obj_reader.extract_content(*mesh, attributes);
 
     auto id = m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
     mesh->id = id;

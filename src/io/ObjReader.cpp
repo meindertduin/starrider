@@ -65,7 +65,7 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-void ObjReader::extract_content(Mesh &result) {
+void ObjReader::extract_content(Mesh &result, MeshAttributes attributes) {
     result.vertex_count = m_vertices.size();
     result.text_count = m_tex_coords.size();
 
@@ -85,15 +85,9 @@ void ObjReader::extract_content(Mesh &result) {
         polygon.vertices = result.vertices;
         polygon.text_coords = result.text_coords;
 
-        // TODO: get these values from obj file
-        polygon.state = PolyStateActive;
+        polygon.state = attributes.poly_state;
 
-        polygon.attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
-            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud;
-
-        if (has_tex_coords) {
-            polygon.attributes |= PolyAttributeShadeModeTexture;
-        }
+        polygon.attributes = attributes.poly_attributes;
 
         for (int j = 0; j < 3; j++) {
             auto current_index = m_indices[i + j];
@@ -125,8 +119,7 @@ void ObjReader::extract_content(Mesh &result) {
             polygon.text_coords = result.text_coords;
         }
 
-        // TODO: change this, so that this doesnt set the lighting anymore
-        polygon.color = A565Color(0xFF, 0, 0, 0);
+        polygon.color = attributes.poly_color;
 
         polygons.push_back(polygon);
     }
