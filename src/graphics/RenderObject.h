@@ -179,6 +179,7 @@ typedef struct RenderObject_Type {
 } RenderObject;
 
 typedef struct MeshType {
+    int id;
     int vertex_count;
     Vertex4D *vertices;
 

@@ -32,7 +32,8 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
         auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);
         object.textures.push_back(quarter_texture);
-        m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
+        auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
+        quarter_texture->id = id;
     }
 
     // TODO abstract the object creation
@@ -66,7 +67,9 @@ int ObjectRepository::load_texture(std::string path) {
         return -1;
     }
 
-    return m_texture_collection.store_value(std::unique_ptr<Texture>(texture));
+    auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(texture));
+    texture->id = id;
+    return id;
 }
 
 int ObjectRepository::load_geometry(std::string path) {
@@ -78,5 +81,9 @@ int ObjectRepository::load_geometry(std::string path) {
 
     auto mesh = new Mesh {};
     obj_reader.extract_content(*mesh);
-    return m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
+
+    auto id = m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
+    mesh->id = id;
+
+    return id;
 }
