@@ -11,8 +11,6 @@ ObjectRepository::~ObjectRepository() {
 }
 
 RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
-    ObjReader obj_reader;
-
     auto texture_id = load_texture(texture_file);
     auto texture = m_texture_collection.get_value(texture_id);
 
@@ -25,10 +23,6 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
         .poly_color = object_color,
     });
     auto mesh = m_mesh_collection.get_value(mesh_id);
-
-    if (!obj_reader.read_file(obj_file)) {
-        return -1;
-    }
 
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
