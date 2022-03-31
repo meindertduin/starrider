@@ -7,8 +7,6 @@ using Math::V2D;
 
 namespace Graphics {
 
-Pixel* p_frame_buffer;
-
 A565Color **rgb_lookup;
 int lookup_levels = 0;
 
@@ -17,8 +15,6 @@ int min_clip_x {0};
 
 int m_width {0};
 int m_height {0};
-
-float *inv_z_buffer = nullptr;
 
 void init_rasterizer(int levels) {
     rgb_lookup = new A565Color*[levels];

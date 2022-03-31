@@ -33,6 +33,9 @@ struct RenderContext {
     std::vector<RenderListPoly> render_list;
     float perfect_dist;
     float piecewise_dist;
+
+    float *inv_z_buffer;
+    Pixel *p_frame_buffer;
 };
 
 constexpr void camera_transform(const Matrix4x4 &vp, RenderListPoly &list_poly) {
