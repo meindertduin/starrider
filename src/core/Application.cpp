@@ -3,9 +3,9 @@
 #include "Application.h"
 #include "../graphics/Core.h"
 #include "../graphics/Renderer.h"
-#include "../graphics/RenderPipeline.h"
 #include "../graphics/Texture.h"
 #include "../graphics/Font.h"
+#include "../graphics/RenderPipeline.h"
 #include "../graphics/ObjectRepository.h"
 
 #include "../math/Core.h"
@@ -17,6 +17,10 @@ std::shared_ptr<Application> Application::sp_instance = std::shared_ptr<Applicat
 
 Application::Application() {
     m_fps = 60;
+}
+
+Application::~Application() {
+    delete[] m_rc.inv_z_buffer;
 }
 
 std::shared_ptr<Application> Application::get_instance() {
@@ -49,12 +53,22 @@ void Application::run() {
     Renderer renderer;
     Graphics::RenderPipeline render_pipeline {&renderer};
 
-    Graphics::RenderContext rc = {
-        .attributes = Graphics::RCAttributeMipMapped | Graphics::RCAttributeINVZBuffer | Graphics::RCAttributeTextureHybrid | Graphics::RCAttributeZSort,
-        .mip_z_dist = 200,
-        .perfect_dist = 20,
-        .piecewise_dist = 40,
-    };
+    auto win_width = m_window.get_width();
+    auto win_height = m_window.get_height();
+
+    m_rc.attributes = RCAttributeMipMapped | RCAttributeINVZBuffer | RCAttributeTextureHybrid | RCAttributeZSort;
+    m_rc.mip_z_dist = 200;
+    m_rc.perfect_dist = 20;
+    m_rc.piecewise_dist = 40;
+
+    m_rc.inv_z_buffer = new float[win_width * win_height];
+    m_rc.frame_buffer = renderer.get_framebuffer();
+
+    m_rc.min_clip_x = 0;
+    m_rc.max_clip_x = win_width;
+
+    m_rc.min_clip_y = 0;
+    m_rc.max_clip_y = win_height;
 
     reset_materials();
     Graphics::reset_lights();
@@ -80,7 +94,7 @@ void Application::run() {
     plateau.transform = Transform(V4D(0, -5, 0));
 
     objects.push_back(object);
-    objects.push_back(plateau);
+    // objects.push_back(plateau);
 
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
@@ -92,7 +106,7 @@ void Application::run() {
 
         poll_window_events();
 
-        render_pipeline.render_objects(*p_camera, objects, rc);
+        render_pipeline.render_objects(*p_camera, objects, m_rc);
 
         string time_text = std::to_string(dt) + "MS";
         renderer.render_text(time_text, ttf_font, {20, 52});
@@ -133,6 +147,15 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
+                auto screen_buffer = m_window.get_screen_bitmap();
+                if (m_rc.max_clip_x != screen_buffer->w || m_rc.max_clip_y != screen_buffer->h) {
+                    delete[] m_rc.inv_z_buffer;
+
+                    m_rc.max_clip_x = screen_buffer->w,
+                    m_rc.max_clip_y = screen_buffer->h,
+                    m_rc.inv_z_buffer = new float[screen_buffer->w * screen_buffer->h];
+                }
+
                 p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);
                 emit_event(event, event.event_type);
             }

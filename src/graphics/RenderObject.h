@@ -252,4 +252,44 @@ constexpr bool render_polygon_avg_sort(const RenderListPoly &a, const RenderList
         (b.trans_verts[0].v.z * b.trans_verts[1].v.z * b.trans_verts[2].v.z);
 }
 
+union Pixel {
+    struct {
+        uint32_t blue : 8;
+        uint32_t green : 8;
+        uint32_t red : 8;
+        uint32_t alpha : 8;
+
+    };
+    uint32_t value;
+};
+
+constexpr const uint32_t RCAttributeNoBuffer =          1 << 0;
+constexpr const uint32_t RCAttributeZSort =             1 << 1;
+constexpr const uint32_t RCAttributeINVZBuffer =        1 << 2;
+constexpr const uint32_t RCAttributeMipMapped =         1 << 3;
+constexpr const uint32_t RCAttributeAlhpa =             1 << 4;
+
+constexpr const uint32_t RCAttributeTextureAffine =     1 << 5;
+constexpr const uint32_t RCAttributeTextureCorrect =    1 << 6;
+constexpr const uint32_t RCAttributeTexturePiecewise =  1 << 7;
+constexpr const uint32_t RCAttributeTextureHybrid =     1 << 8;
+
+struct RenderContext {
+    int attributes;
+    int mip_z_dist;
+    std::vector<RenderListPoly> render_list;
+    float perfect_dist;
+    float piecewise_dist;
+
+    float *inv_z_buffer;
+    Pixel *frame_buffer;
+
+    int min_clip_x;
+    int max_clip_x;
+
+    int min_clip_y;
+    int max_clip_y;
+};
+
+
 

@@ -10,17 +10,6 @@
 
 using Math::Point2D;
 
-union Pixel {
-    struct {
-        uint32_t blue : 8;
-        uint32_t green : 8;
-        uint32_t red : 8;
-        uint32_t alpha : 8;
-
-    };
-    uint32_t value;
-};
-
 constexpr void pixel_blend(Pixel &pixel, const Pixel &other) {
     float u_alpha = (float) pixel.alpha / (float) 0xFF;
 

@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Events.h"
 #include "../graphics/Camera.h"
+#include "../graphics/RenderObject.h"
 #include <memory>
 
 #include "Cursor.h"
@@ -14,7 +15,7 @@ struct AppSettings {
 
 class Application : public MultiEventSubject<WindowEvent> {
 public:
-    ~Application() = default;
+    ~Application();
     Application(const Application &other) = delete;
     Application(Application &&other) = delete;
 
@@ -37,6 +38,8 @@ private:
     std::unique_ptr<Camera> p_camera { nullptr };
     bool m_running;
     int m_fps;
+
+    RenderContext m_rc;
 
     void poll_window_events();
     void emit_mouse_motion_event();

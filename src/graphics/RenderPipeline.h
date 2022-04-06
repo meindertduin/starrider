@@ -15,29 +15,6 @@ enum class CoordSelect {
     Local_To_Trans,
     Trans_Only,
 };
-
-constexpr const uint32_t RCAttributeNoBuffer =          1 << 0;
-constexpr const uint32_t RCAttributeZSort =             1 << 1;
-constexpr const uint32_t RCAttributeINVZBuffer =        1 << 2;
-constexpr const uint32_t RCAttributeMipMapped =         1 << 3;
-constexpr const uint32_t RCAttributeAlhpa =             1 << 4;
-
-constexpr const uint32_t RCAttributeTextureAffine =     1 << 5;
-constexpr const uint32_t RCAttributeTextureCorrect =    1 << 6;
-constexpr const uint32_t RCAttributeTexturePiecewise =  1 << 7;
-constexpr const uint32_t RCAttributeTextureHybrid =     1 << 8;
-
-struct RenderContext {
-    int attributes;
-    int mip_z_dist;
-    std::vector<RenderListPoly> render_list;
-    float perfect_dist;
-    float piecewise_dist;
-
-    float *inv_z_buffer;
-    Pixel *p_frame_buffer;
-};
-
 constexpr void camera_transform(const Matrix4x4 &vp, RenderListPoly &list_poly) {
     list_poly.trans_verts[0].v = vp.transform(list_poly.trans_verts[0].v);
     list_poly.trans_verts[1].v = vp.transform(list_poly.trans_verts[1].v);
