@@ -449,8 +449,7 @@ void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly, RenderConte
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
         auto bottom_to_middle = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
-
-        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
+       scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
         auto middle_to_top = PTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};

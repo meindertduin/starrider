@@ -62,7 +62,6 @@ void Application::run() {
     m_rc.piecewise_dist = 40;
 
     m_rc.inv_z_buffer = new float[win_width * win_height];
-    m_rc.frame_buffer = renderer.get_framebuffer();
 
     m_rc.min_clip_x = 0;
     m_rc.max_clip_x = win_width;
@@ -94,7 +93,7 @@ void Application::run() {
     plateau.transform = Transform(V4D(0, -5, 0));
 
     objects.push_back(object);
-    // objects.push_back(plateau);
+    objects.push_back(plateau);
 
     TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
@@ -147,13 +146,12 @@ void Application::poll_window_events() {
         switch(event.event_type) {
             case WindowEventType::WinExpose:
             {
-                auto screen_buffer = m_window.get_screen_bitmap();
-                if (m_rc.max_clip_x != screen_buffer->w || m_rc.max_clip_y != screen_buffer->h) {
+                if (m_rc.max_clip_x != event.body.expose_event.width || m_rc.max_clip_y != event.body.expose_event.height) {
                     delete[] m_rc.inv_z_buffer;
 
-                    m_rc.max_clip_x = screen_buffer->w,
-                    m_rc.max_clip_y = screen_buffer->h,
-                    m_rc.inv_z_buffer = new float[screen_buffer->w * screen_buffer->h];
+                    m_rc.max_clip_x = event.body.expose_event.width;
+                    m_rc.max_clip_y = event.body.expose_event.height;
+                    m_rc.inv_z_buffer = new float[event.body.expose_event.width * event.body.expose_event.height];
                 }
 
                 p_camera->set_viewport(event.body.expose_event.width, event.body.expose_event.height);

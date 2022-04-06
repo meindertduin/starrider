@@ -17,9 +17,8 @@ RenderPipeline::RenderPipeline(Renderer *renderer) : p_renderer(renderer) {
 
 void RenderPipeline::render_objects(const Camera &camera, std::vector<RenderObject> renderables, RenderContext &rc) {
     rc.frame_buffer = p_renderer->get_framebuffer();
-    rc.max_clip_x = p_renderer->m_width;
-    rc.max_clip_y = p_renderer->m_height;
 
+    std::fill(rc.inv_z_buffer, rc.inv_z_buffer + rc.max_clip_x * rc.max_clip_y, 0);
     p_renderer->clear_screen();
 
     auto vp = camera.get_view_projection();
