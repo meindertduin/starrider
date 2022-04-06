@@ -231,7 +231,7 @@ void draw_perspective_textured_triangle_fsinvzb(RenderListPoly &poly, RenderCont
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    auto bottom_to_top = PTFSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = PTFSINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
         auto bottom_to_middle = PTFSINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
@@ -445,19 +445,19 @@ void draw_perspective_textured_triangle_iinvzb(RenderListPoly &poly, RenderConte
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    auto bottom_to_top = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
+    PTIINVZBEdge bottom_to_top = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        auto bottom_to_middle = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
-       scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
+        PTIINVZBEdge bottom_to_middle = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        auto middle_to_top = PTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
+        PTIINVZBEdge middle_to_top = PTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        auto bottom_to_middle = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
-        auto middle_to_top = PTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
+        PTIINVZBEdge bottom_to_middle = PTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        PTIINVZBEdge middle_to_top = PTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -1428,20 +1428,20 @@ void draw_piecewise_textured_triangle_iinvzb(RenderListPoly &poly, RenderContext
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    PPTIINVZBEdge bottom_to_top = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = PPTIINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        PPTIINVZBEdge bottom_to_middle = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = PPTIINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        PPTIINVZBEdge middle_to_top = PPTIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = PPTIINVZBEdge{poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        PPTIINVZBEdge bottom_to_middle = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        PPTIINVZBEdge middle_to_top = PPTIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = PPTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = PPTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -1518,6 +1518,8 @@ void scan_edges(PPTIINVZBEdge &long_edge, PPTIINVZBEdge &short_edge, bool handed
         for(int x = x_start + 1; x < x_end; x++) {
             if (iz > iz_ptr[x]) {
                 auto pixel = poly.texture->get_pixel_by_shift(iu * poly.texture->width -1 + 0.5f, iv * poly.texture->height -1 + 0.5f);
+                pixel.rgb565_from_16bit(r, g, b);
+
                 auto current_pixel = (screen_buffer_ptr + x);
 
                 auto red = (uint32_t)((alpha * (r << 3) * i) + ((1 - alpha) * (current_pixel->red))) & 0x000000FF;
@@ -1583,20 +1585,20 @@ void draw_piecewise_textured_triangle_iinvzb(RenderListPoly &poly, float alpha, 
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    PPTIINVZBEdge bottom_to_top = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = PPTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        PPTIINVZBEdge bottom_to_middle = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = PPTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, alpha, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        PPTIINVZBEdge middle_to_top = PPTIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = PPTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, alpha, rc);
     } else {
-        PPTIINVZBEdge bottom_to_middle = PPTIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        PPTIINVZBEdge middle_to_top = PPTIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = PPTIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = PPTIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, alpha, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, alpha, rc);
@@ -1789,20 +1791,20 @@ void draw_piecewise_textured_triangle_fs(RenderListPoly &poly, RenderContext &rc
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    PPTFSEdge bottom_to_top = PPTFSEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = PPTFSEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        PPTFSEdge bottom_to_middle = PPTFSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = PPTFSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        PPTFSEdge middle_to_top = PPTFSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = PPTFSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        PPTFSEdge bottom_to_middle = PPTFSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        PPTFSEdge middle_to_top = PPTFSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = PPTFSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = PPTFSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -2004,20 +2006,20 @@ void draw_piecewise_textured_triangle_i(RenderListPoly &poly, RenderContext &rc)
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    PPTIEdge bottom_to_top = PPTIEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = PPTIEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        PPTIEdge bottom_to_middle = PPTIEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = PPTIEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        PPTIEdge middle_to_top = PPTIEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = PPTIEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        PPTIEdge bottom_to_middle = PPTIEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        PPTIEdge middle_to_top = PPTIEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = PPTIEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = PPTIEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -2212,20 +2214,20 @@ void draw_affine_textured_triangle_fsinvzb(RenderListPoly &poly, RenderContext &
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    ATFSINVZBEdge bottom_to_top = ATFSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = ATFSINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        ATFSINVZBEdge bottom_to_middle = ATFSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = ATFSINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        ATFSINVZBEdge middle_to_top = ATFSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = ATFSINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        ATFSINVZBEdge bottom_to_middle = ATFSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        ATFSINVZBEdge middle_to_top = ATFSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = ATFSINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = ATFSINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -2424,20 +2426,20 @@ void draw_affine_textured_triangle_iinvzb(RenderListPoly &poly, RenderContext &r
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    ATIINVZBEdge bottom_to_top = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        ATIINVZBEdge bottom_to_middle = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        ATIINVZBEdge middle_to_top = ATIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = ATIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        ATIINVZBEdge bottom_to_middle = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        ATIINVZBEdge middle_to_top = ATIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = ATIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -2569,20 +2571,20 @@ void draw_affine_textured_triangle_iinvzb(RenderListPoly &poly, float alpha, Ren
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    ATIINVZBEdge bottom_to_top = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        ATIINVZBEdge bottom_to_middle = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, alpha, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        ATIINVZBEdge middle_to_top = ATIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = ATIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, alpha, rc);
     } else {
-        ATIINVZBEdge bottom_to_middle = ATIINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        ATIINVZBEdge middle_to_top = ATIINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = ATIINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = ATIINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, alpha, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, alpha, rc);
@@ -2734,20 +2736,20 @@ void draw_affine_textured_triangle_fs(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    ATFSEdge bottom_to_top = ATFSEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = ATFSEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        ATFSEdge bottom_to_middle = ATFSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = ATFSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        ATFSEdge middle_to_top = ATFSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = ATFSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        ATFSEdge bottom_to_middle = ATFSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        ATFSEdge middle_to_top = ATFSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = ATFSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = ATFSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -2912,20 +2914,20 @@ void draw_affine_textured_triangle_i(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    ATIEdge bottom_to_top = ATIEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = ATIEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        ATIEdge bottom_to_middle = ATIEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = ATIEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        ATIEdge middle_to_top = ATIEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = ATIEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        ATIEdge bottom_to_middle = ATIEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        ATIEdge middle_to_top = ATIEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = ATIEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = ATIEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3036,20 +3038,20 @@ void draw_triangle_s(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    SEdge bottom_to_top = SEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = SEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        SEdge bottom_to_middle = SEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = SEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        SEdge middle_to_top = SEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = SEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        SEdge bottom_to_middle = SEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        SEdge middle_to_top = SEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = SEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = SEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3162,20 +3164,20 @@ void draw_triangle_fs(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    FSEdge bottom_to_top = FSEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = FSEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        FSEdge bottom_to_middle = FSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = FSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        FSEdge middle_to_top = FSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = FSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        FSEdge bottom_to_middle = FSEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        FSEdge middle_to_top = FSEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = FSEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = FSEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3301,20 +3303,20 @@ void draw_triangle_i(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    IEdge bottom_to_top = IEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = IEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        IEdge bottom_to_middle = IEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = IEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        IEdge middle_to_top = IEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = IEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        IEdge bottom_to_middle = IEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        IEdge middle_to_top = IEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = IEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = IEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3454,20 +3456,20 @@ void draw_triangle_sinvzb(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    SINVZBEdge bottom_to_top = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = SINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        SINVZBEdge bottom_to_middle = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = SINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        SINVZBEdge middle_to_top = SINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = SINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        SINVZBEdge bottom_to_middle = SINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        SINVZBEdge middle_to_top = SINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = SINVZBEdge {poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = SINVZBEdge {poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3614,20 +3616,20 @@ void draw_triangle_fsinvzb(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    FSINVZBEdge bottom_to_top = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = FSINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        FSINVZBEdge bottom_to_middle = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = FSINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        FSINVZBEdge middle_to_top = FSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = FSINVZBEdge{poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        FSINVZBEdge bottom_to_middle = FSINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        FSINVZBEdge middle_to_top = FSINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = FSINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = FSINVZBEdge{poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
@@ -3779,20 +3781,20 @@ void draw_triangle_iinvzb(RenderListPoly &poly, RenderContext &rc) {
 
     bool handedness =  (dx1 * dy2 - dx2 * dy1) >= 0.0f;
 
-    IINVZBEdge bottom_to_top = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v2], rc);
+    auto bottom_to_top = IINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v2], rc};
 
     if (Math::f_cmp(poly.trans_verts[v0].v.y, poly.trans_verts[v1].v.y)) {
-        IINVZBEdge bottom_to_middle = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
+        auto bottom_to_middle = IINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
     }
     else if (Math::f_cmp(poly.trans_verts[v1].v.y, poly.trans_verts[v2].v.y)) {
-        IINVZBEdge middle_to_top = IINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto middle_to_top = IINVZBEdge{poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
     } else {
-        IINVZBEdge bottom_to_middle = IINVZBEdge(poly.trans_verts[v0], poly.trans_verts[v1], rc);
-        IINVZBEdge middle_to_top = IINVZBEdge(poly.trans_verts[v1], poly.trans_verts[v2], rc);
+        auto bottom_to_middle = IINVZBEdge{poly.trans_verts[v0], poly.trans_verts[v1], rc};
+        auto middle_to_top = IINVZBEdge{poly.trans_verts[v1], poly.trans_verts[v2], rc};
 
         scan_edges(bottom_to_top, bottom_to_middle, handedness, poly.color, poly, rc);
         scan_edges(bottom_to_top, middle_to_top, handedness, poly.color, poly, rc);
