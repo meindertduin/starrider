@@ -12,7 +12,6 @@ set(SOURCES
     src/main.cpp
     src/core/Window.cpp
     src/graphics/Renderer.cpp
-    src/graphics/Core.cpp
     src/graphics/Rasterizer.cpp
     src/io/BmpReader.cpp
     src/graphics/Camera.cpp

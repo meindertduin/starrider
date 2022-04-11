@@ -12,8 +12,6 @@
 #include "../math/Vector.h"
 #include "../math/Quaternion.h"
 
-float saturate(float val);
-
 using Math::Matrix4x4;
 using Math::V4D;
 using Math::Quat_Type;

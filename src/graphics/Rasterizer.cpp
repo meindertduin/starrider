@@ -3,7 +3,7 @@
 
 using Math::V2D;
 
-#define SWAP(a, b, t) { t = a; a = b; b = t;}
+#define SWAP(a, b, t) { t = a; a = b; b = t; }
 
 namespace Graphics {
 
