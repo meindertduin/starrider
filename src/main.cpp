@@ -12,7 +12,7 @@ int main() {
 
         Logger::initialize("log.txt");
 
-        if (!ttf_init())
+        if (!Graphics::ttf_init())
             throw std::runtime_error("TTF could not be initialized");
         auto app = Application::get_instance();
 
@@ -22,7 +22,7 @@ int main() {
         });
 
         app->run();
-        ttf_quit();
+        Graphics::ttf_quit();
         Graphics::cleanup_rasterizer();
     } catch(const std::exception) {
         return EXIT_FAILURE;

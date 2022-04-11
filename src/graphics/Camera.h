@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "../core/Events.h"
 
+namespace Graphics {
 class Camera : public EventObserver<WindowEvent> {
 public:
     Camera();
@@ -25,3 +26,4 @@ public:
 private:
     V4D y_axis = V4D(0, 1, 0);
 };
+}

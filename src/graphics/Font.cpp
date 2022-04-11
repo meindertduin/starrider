@@ -2,6 +2,8 @@
 #include "Font.h"
 #include <iostream>
 
+namespace Graphics {
+
 FT_Library library;
 
 bool ttf_init() {
@@ -67,4 +69,5 @@ Glyph TTFFont::get_glyph(char c) const {
 
 int TTFFont::get_font_size() const {
     return m_font_size;
+}
 }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 
+namespace Graphics {
 
 template<class T>
 class ObjCollection {
@@ -60,3 +61,4 @@ private:
 
     std::vector<RenderObject> m_game_objects;
 };
+}

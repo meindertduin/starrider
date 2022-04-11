@@ -4,6 +4,8 @@
 #include "../core/Window.h"
 #include "Renderer.h"
 
+namespace Graphics {
+
 Renderer::Renderer() {
     p_app = Application::get_instance();
     p_window = p_app->get_window();
@@ -183,3 +185,4 @@ void Renderer::render_text(std::string text, const TTFFont &font, const Point &p
     }
 }
 
+}

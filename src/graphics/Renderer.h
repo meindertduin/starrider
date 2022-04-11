@@ -8,6 +8,7 @@
 
 #include <memory>
 
+namespace Graphics {
 using Math::Point2D;
 
 constexpr void pixel_blend(Pixel &pixel, const Pixel &other) {
@@ -53,3 +54,4 @@ private:
     void create_framebuffer();
     Pixel get_pixel(int x_pos, int y_pos);
 };
+}

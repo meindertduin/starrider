@@ -10,6 +10,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+namespace Graphics {
+
 bool ttf_init();
 void ttf_quit();
 
@@ -34,3 +36,4 @@ private:
 
     Texture from_char(char c);
 };
+}

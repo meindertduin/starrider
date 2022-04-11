@@ -2,6 +2,8 @@
 
 #include "../io/ObjReader.h"
 
+namespace Graphics {
+
 ObjectRepository::ObjectRepository() : m_texture_collection(128), m_mesh_collection(128) {}
 
 ObjectRepository::~ObjectRepository() {
@@ -87,4 +89,5 @@ int ObjectRepository::load_mesh(std::string path, MeshAttributes attributes) {
     mesh->id = id;
 
     return id;
+}
 }

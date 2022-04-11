@@ -65,23 +65,23 @@ bool ObjReader::read_file(string path) {
     return true;
 }
 
-void ObjReader::extract_content(Mesh &result, MeshAttributes attributes) {
+void ObjReader::extract_content(Graphics::Mesh &result, Graphics::MeshAttributes attributes) {
     result.vertex_count = m_vertices.size();
     result.text_count = m_tex_coords.size();
 
-    result.vertices = new Vertex4D[result.vertex_count];
-    result.text_coords = new Point2D[m_tex_coords.size()];
+    result.vertices = new Graphics::Vertex4D[result.vertex_count];
+    result.text_coords = new Graphics::Point2D[m_tex_coords.size()];
 
     for (int i = 0; i < result.vertex_count; i++) {
         result.vertices[i].v = m_vertices[i];
-        result.vertices[i].attributes = VertexAttributePoint;
+        result.vertices[i].attributes = Graphics::VertexAttributePoint;
     }
 
     std::copy(m_tex_coords.begin(), m_tex_coords.end(), result.text_coords);
 
-    std::vector<Polygon> polygons;
+    std::vector<Graphics::Polygon> polygons;
     for (int i = 0; i < m_indices.size(); i += 3) {
-        Polygon polygon;
+        Graphics::Polygon polygon;
         polygon.vertices = result.vertices;
         polygon.text_coords = result.text_coords;
 
@@ -97,17 +97,17 @@ void ObjReader::extract_content(Mesh &result, MeshAttributes attributes) {
                 polygon.vertices[current_index.vertex_index].t = result.text_coords[current_index.tex_coord_index];
                 polygon.text[j] = current_index.tex_coord_index;
 
-                polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeTexture;
+                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeTexture;
             }
 
             if (has_normal_indices) {
                 polygon.vertices[current_index.vertex_index].n = m_normals[current_index.normal_index];
-                polygon.vertices[current_index.vertex_index].attributes |= VertexAttributeNormal;
+                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeNormal;
             }
         }
 
-        if (polygon.attributes & PolyAttributeShadeModeGouraud ||
-                polygon.attributes & PolyAttributeShadeModeIntensityGourad) {
+        if (polygon.attributes & Graphics::PolyAttributeShadeModeGouraud ||
+                polygon.attributes & Graphics::PolyAttributeShadeModeIntensityGourad) {
 
             auto line1 = result.vertices[polygon.vert[0]].v
                 - result.vertices[polygon.vert[1]].v;
@@ -131,12 +131,12 @@ void ObjReader::extract_content(Mesh &result, MeshAttributes attributes) {
     }
 }
 
-int ObjReader::compute_vertex_normals(Mesh &object) {
-    int polys_touch_vertices[ObjectMaxVertices];
-    memset((void*)polys_touch_vertices, 0, sizeof(int) * ObjectMaxVertices);
+int ObjReader::compute_vertex_normals(Graphics::Mesh &object) {
+    int polys_touch_vertices[Graphics::ObjectMaxVertices];
+    memset((void*)polys_touch_vertices, 0, sizeof(int) * Graphics::ObjectMaxVertices);
 
     for (int poly = 0; poly < object.polygons.size(); poly++) {
-        if (object.polygons[poly].attributes & PolyAttributeShadeModeGouraud) {
+        if (object.polygons[poly].attributes & Graphics::PolyAttributeShadeModeGouraud) {
             int vi0 = object.polygons[poly].vert[0];
             int vi1 = object.polygons[poly].vert[1];
             int vi2 = object.polygons[poly].vert[2];

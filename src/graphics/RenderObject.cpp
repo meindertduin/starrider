@@ -1,5 +1,7 @@
 #include "RenderObject.h"
 
+namespace Graphics {
+
 Material_Type g_materials[MaxMaterials];
 
 void reset_materials() {
@@ -31,4 +33,5 @@ int RenderObject_Type::set_frame(int frame) {
     this->transformed_vertices = &(this->head_transformed_vertices[frame * this->vertex_count]);
 
     return 1;
+}
 }

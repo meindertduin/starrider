@@ -2,6 +2,8 @@
 #include "Core.h"
 #include <exception>
 
+namespace Graphics {
+
 Texture::Texture(const Texture &other) : pixels(nullptr),
     height(other.height), width(other.width) {
     if (other.pixels != nullptr) {
@@ -161,4 +163,5 @@ void Texture::set_pitch_shift() {
         default:
            std::runtime_error("Only widths in orders of 2^n until 256 are supported.");
     }
+}
 }

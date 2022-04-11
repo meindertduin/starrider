@@ -4,6 +4,8 @@
 #include "../math/Vector.h"
 #include "Texture.h"
 
+namespace Graphics {
+
 using Math::Point4D;
 using Math::Point2D;
 using Math::V4D;
@@ -291,5 +293,5 @@ struct RenderContext {
     int max_clip_y;
 };
 
-
+}
 

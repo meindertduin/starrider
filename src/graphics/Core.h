@@ -16,6 +16,8 @@ using Math::Matrix4x4;
 using Math::V4D;
 using Math::Quat_Type;
 
+namespace Graphics {
+
 constexpr float fast_abs(float value) {
     return value > 0 ? value : -value;
 }
@@ -224,3 +226,4 @@ struct Transform {
         return *this;
     }
 };
+}

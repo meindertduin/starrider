@@ -6,6 +6,7 @@
 
 #include <cstring>
 
+namespace Graphics {
 enum class Format;
 
 struct Rect {
@@ -56,3 +57,4 @@ private:
 };
 
 
+}

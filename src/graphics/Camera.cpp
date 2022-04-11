@@ -5,6 +5,7 @@
 #include "../math/Core.h"
 #include "../math/Matrix.h"
 
+namespace Graphics {
 Camera::Camera() {
     m_zfar = 1000.0f;
     m_znear = 1.0f;
@@ -82,3 +83,4 @@ Matrix4x4 Camera::get_view_projection() const {
     return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix();
 }
 
+}
