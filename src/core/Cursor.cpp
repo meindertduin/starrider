@@ -2,7 +2,7 @@
 #include "Window.h"
 
 #include <stdio.h>
-#include "../graphics/XLib.h"
+#include "../platform/x11/XLib.h"
 
 namespace Core {
 

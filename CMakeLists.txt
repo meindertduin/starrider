@@ -25,7 +25,6 @@ set(SOURCES
     src/core/Cursor.cpp
     src/graphics/Texture.cpp
     src/graphics/Font.cpp
-    src/graphics/XLib.cpp
     src/graphics/RenderObject.cpp
     src/graphics/ObjectRepository.cpp
     src/graphics/Lighting.cpp
@@ -35,6 +34,7 @@ set(SOURCES
     src/math/Vector.cpp
     src/math/Quaternion.cpp
     src/math/Parametric.cpp
+    src/platform/x11/XLib.cpp
 )
 
 set(HEADERS include)

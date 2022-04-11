@@ -3,7 +3,7 @@
 #include "Application.h"
 
 #include "KeyMap.h"
-#include "../graphics/XLib.h"
+#include "../platform/x11/XLib.h"
 
 GWindow::GWindow() {
 

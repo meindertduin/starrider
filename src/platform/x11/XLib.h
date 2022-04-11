@@ -1,6 +1,6 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
-#include "../core/Events.h"
+#include "../../core/Events.h"
 
 namespace XLib {
 
