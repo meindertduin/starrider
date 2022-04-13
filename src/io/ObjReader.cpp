@@ -30,7 +30,9 @@ bool ObjReader::read_file(string path) {
             float x, y, z;
             ss >> x >> y >> z;
 
-            m_vertices.push_back(V4D(x, y, z));
+            // Wavefront .obj files are exported for a right handed coordinate system.
+            // Thats why the x-axis is inversed for our left handed coordinate engine.
+            m_vertices.push_back(V4D(x * -1.0f, y, z));
         }
 
         if (first_token == "vt") {
@@ -43,7 +45,10 @@ bool ObjReader::read_file(string path) {
         if (first_token == "vn") {
             float x, y, z;
             ss >> x >> y >> z;
-            m_normals.push_back(V4D(x, y, z, 0)); // normals dont have positions so w == 0
+
+            // Wavefront .obj files are exported for a right handed coordinate system.
+            // Thats why the normal x-axis is inversed for our left handed coordinate engine.
+            m_normals.push_back(V4D(x * -1.0f, y, z, 0)); // normals dont have positions so w == 0
         }
 
         if (first_token == "f") {
@@ -54,9 +59,11 @@ bool ObjReader::read_file(string path) {
                 tokens.push_back(value);
 
             for (int i = 0; i < tokens.size() - 3; i++) {
-                m_indices.push_back(parse_object_index(tokens[1]));
-                m_indices.push_back(parse_object_index(tokens[2 + i]));
+                // Wavefront .obj files are exported for a right handed coordinate system.
+                // Therefore we load load the faces in reverse order to have the face to the outside rather than the inside.
                 m_indices.push_back(parse_object_index(tokens[3 + i]));
+                m_indices.push_back(parse_object_index(tokens[2 + i]));
+                m_indices.push_back(parse_object_index(tokens[1]));
             }
         }
     }
@@ -95,6 +102,7 @@ void ObjReader::extract_content(Graphics::Mesh &result, Graphics::MeshAttributes
 
             if (has_tex_coords) {
                 polygon.vertices[current_index.vertex_index].t = result.text_coords[current_index.tex_coord_index];
+
                 polygon.text[j] = current_index.tex_coord_index;
 
                 polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeTexture;
@@ -125,6 +133,12 @@ void ObjReader::extract_content(Graphics::Mesh &result, Graphics::MeshAttributes
     }
 
     result.polygons = polygons;
+
+    // Wavefront .obj files output the uv coordinate system with the y-axis starting at the bottom.
+    // This engine however expects y = 0 to start at the top. So the y values of textures have to be inversed.
+    for (int i = 0; i < result.text_count; i++) {
+        result.text_coords[i].y = 1.0f - result.text_coords[i].y;
+    }
 
     if (!has_normal_indices) {
         compute_vertex_normals(result);
@@ -195,6 +209,7 @@ ObjIndex ObjReader::parse_object_index(string token) {
             has_normal_indices = true;
             break;
         }
+
         i++;
     }
 
