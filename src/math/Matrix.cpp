@@ -443,25 +443,25 @@ Matrix4x4_Type mat_4x4_translation(float x, float y, float z) {
 Matrix4x4_Type mat_4x4_rotation_x(float x) {
     return Matrix4x4_Type {
         1, 0, 0, 0,
-        0, fast_cos(x), fast_sin(x), 0,
-        0, -fast_sin(x), fast_cos(x), 0,
+        0, fast_cos(x), -fast_sin(x), 0,
+        0, fast_sin(x), fast_cos(x), 0,
         0, 0, 0, 1
     };
 }
 
 Matrix4x4_Type mat_4x4_rotation_y(float y) {
     return Matrix4x4_Type {
-        fast_cos(y), 0, -fast_sin(y), 0,
+        fast_cos(y), 0, fast_sin(y), 0,
         0, 1, 0, 0,
-        fast_sin(y), 0, fast_cos(y), 0,
+        -fast_sin(y), 0, fast_cos(y), 0,
         0, 0, 0, 1,
     };
 }
 
 Matrix4x4_Type mat_4x4_rotation_z(float z) {
     return Matrix4x4_Type {
-        fast_cos(z), fast_sin(z), 0, 0,
-        -fast_sin(z), fast_cos(z), 0, 0,
+        fast_cos(z), -fast_sin(z), 0, 0,
+        fast_sin(z), fast_cos(z), 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1
     };
@@ -486,9 +486,9 @@ Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up) {
 
 Matrix4x4_Type mat_4x4_rotation(const V4D_Type &forward, const V4D_Type &up, const V4D_Type &right) {
      return Matrix4x4_Type {
-         right.x, right.y, right.z, 0,
-         up.x, up.y, up.z, 0,
-         forward.x, forward.y, forward.z, 0,
+         right.x, up.x, forward.x, 0,
+         right.y, up.y, forward.y, 0,
+         right.z, up.z, forward.z, 0,
          0, 0, 0, 1
      };
 }

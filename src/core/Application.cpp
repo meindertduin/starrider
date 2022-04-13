@@ -117,6 +117,9 @@ void Application::run() {
         renderer.render_framebuffer();
         objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
+        // objects[0].transform.rotate(Quat_Type(Math::mat_4x4_rotation_y(dt / 1000.0f)));
+
+
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
 
