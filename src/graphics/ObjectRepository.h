@@ -54,10 +54,12 @@ public:
     RenderObject create_game_object(std::string obj_file, std::string texture_fil);
 
     int load_texture(std::string path);
-    int load_mesh(std::string path, MeshAttributes attributes);
+    int load_mesh_from_obj(std::string path, MeshAttributes attributes);
 private:
     ObjCollection<Texture> m_texture_collection;
     ObjCollection<Mesh> m_mesh_collection;
+
+    int compute_vertex_normals(Graphics::Mesh &object);
 
     std::vector<RenderObject> m_game_objects;
 };

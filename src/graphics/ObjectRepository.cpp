@@ -18,7 +18,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
 
     auto object_color = A565Color(0xFF, 0, 0, 0);
 
-    auto mesh_id = load_mesh(obj_file, {
+    auto mesh_id = load_mesh_from_obj(obj_file, {
         .poly_state = PolyStateActive,
         .poly_attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
             PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud | PolyAttributeShadeModeTexture,
@@ -75,7 +75,7 @@ int ObjectRepository::load_texture(std::string path) {
     return id;
 }
 
-int ObjectRepository::load_mesh(std::string path, MeshAttributes attributes) {
+int ObjectRepository::load_mesh_from_obj(std::string path, MeshAttributes attributes) {
     ObjReader obj_reader;
 
     if (!obj_reader.read_file(path)) {
@@ -83,11 +83,116 @@ int ObjectRepository::load_mesh(std::string path, MeshAttributes attributes) {
     }
 
     auto mesh = new Mesh {};
-    obj_reader.extract_content(*mesh, attributes);
+
+    mesh->vertex_count = obj_reader.m_vertices.size();
+    mesh->text_count = obj_reader.m_tex_coords.size();
+
+    mesh->vertices = new Graphics::Vertex4D[mesh->vertex_count];
+    mesh->text_coords = new Graphics::Point2D[obj_reader.m_tex_coords.size()];
+
+    for (int i = 0; i < mesh->vertex_count; i++) {
+        mesh->vertices[i].v = obj_reader.m_vertices[i];
+        mesh->vertices[i].attributes = Graphics::VertexAttributePoint;
+    }
+
+    std::copy(obj_reader.m_tex_coords.begin(), obj_reader.m_tex_coords.end(), mesh->text_coords);
+
+    std::vector<Graphics::Polygon> polygons;
+    for (int i = 0; i < obj_reader.m_indices.size(); i += 3) {
+        Graphics::Polygon polygon;
+        polygon.vertices = mesh->vertices;
+        polygon.text_coords = mesh->text_coords;
+
+        polygon.state = attributes.poly_state;
+
+        polygon.attributes = attributes.poly_attributes;
+
+        for (int j = 0; j < 3; j++) {
+            auto current_index = obj_reader.m_indices[i + j];
+            polygon.vert[j] = current_index.vertex_index;
+
+            if (obj_reader.has_tex_coords) {
+                polygon.vertices[current_index.vertex_index].t = mesh->text_coords[current_index.tex_coord_index];
+
+                polygon.text[j] = current_index.tex_coord_index;
+
+                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeTexture;
+            }
+
+            if (obj_reader.has_normal_indices) {
+                polygon.vertices[current_index.vertex_index].n = obj_reader.m_normals[current_index.normal_index];
+                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeNormal;
+            }
+        }
+
+        if (polygon.attributes & Graphics::PolyAttributeShadeModeGouraud ||
+                polygon.attributes & Graphics::PolyAttributeShadeModeIntensityGourad) {
+
+            auto line1 = mesh->vertices[polygon.vert[0]].v
+                - mesh->vertices[polygon.vert[1]].v;
+
+            auto line2 = mesh->vertices[polygon.vert[0]].v
+                - mesh->vertices[polygon.vert[2]].v;
+
+            polygon.n_length = line1.cross(line2).length();
+            polygon.text_coords = mesh->text_coords;
+        }
+
+        polygon.color = attributes.poly_color;
+
+        polygons.push_back(polygon);
+    }
+
+    mesh->polygons = polygons;
+
+    if (!obj_reader.has_normal_indices) {
+        compute_vertex_normals(*mesh);
+    }
 
     auto id = m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
     mesh->id = id;
 
     return id;
 }
+
+int ObjectRepository::compute_vertex_normals(Graphics::Mesh &object) {
+    int polys_touch_vertices[Graphics::ObjectMaxVertices];
+    memset((void*)polys_touch_vertices, 0, sizeof(int) * Graphics::ObjectMaxVertices);
+
+    for (int poly = 0; poly < object.polygons.size(); poly++) {
+        if (object.polygons[poly].attributes & Graphics::PolyAttributeShadeModeGouraud) {
+            int vi0 = object.polygons[poly].vert[0];
+            int vi1 = object.polygons[poly].vert[1];
+            int vi2 = object.polygons[poly].vert[2];
+
+            auto line1 = object.vertices[vi0].v
+                - object.vertices[vi1].v;
+
+            auto line2 = object.vertices[vi0].v
+                - object.vertices[vi2].v;
+
+            auto n = line1.cross(line2);
+
+            object.polygons[poly].n_length = n.length();
+
+            polys_touch_vertices[vi0]++;
+            polys_touch_vertices[vi1]++;
+            polys_touch_vertices[vi2]++;
+
+            object.vertices[vi0].n += n;
+            object.vertices[vi1].n += n;
+            object.vertices[vi2].n += n;
+        }
+    }
+
+    for (int vertex = 0; vertex < object.vertex_count; vertex++) {
+        if (polys_touch_vertices[vertex] >= 1) {
+            object.vertices[vertex].n /= polys_touch_vertices[vertex];
+            object.vertices[vertex].n.normalise();
+        }
+    }
+
+    return 1;
+}
+
 }

@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "../graphics/Core.h"
-#include "../graphics/RenderObject.h"
 #include "../math/Vector.h"
 
 using std::string;
@@ -20,9 +19,7 @@ class ObjReader {
 public:
     ObjReader();
     bool read_file(string path);
-    void extract_content(Graphics::Mesh &result, Graphics::MeshAttributes attributes);
-    void create_render_object(Graphics::RenderObject &object, Graphics::Texture *texture);
-private:
+
     vector<V4D> m_vertices;
     vector<Math::V2D> m_tex_coords;
     vector<ObjIndex> m_indices;
@@ -30,8 +27,7 @@ private:
 
     bool has_tex_coords = false;
     bool has_normal_indices = false;
-
+private:
     ObjIndex parse_object_index(string token);
-    int compute_vertex_normals(Graphics::Mesh &object);
 };
 
