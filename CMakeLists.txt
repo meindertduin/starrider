@@ -14,15 +14,16 @@ set(SOURCES
     src/graphics/Renderer.cpp
     src/graphics/Rasterizer.cpp
     src/io/BmpReader.cpp
-    src/graphics/Camera.cpp
     src/io/ObjReader.cpp
     src/io/Logger.cpp
+    src/io/MdeReader.cpp
     src/graphics/RenderPipeline.cpp
     src/entity/Entity.cpp
     src/core/Application.cpp
     src/core/Events.cpp
     src/core/Time.cpp
     src/core/Cursor.cpp
+    src/graphics/Camera.cpp
     src/graphics/Texture.cpp
     src/graphics/Font.cpp
     src/graphics/RenderObject.cpp
