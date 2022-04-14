@@ -64,6 +64,146 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     return object;
 }
 
+RenderObject ObjectRepository::create_render_object(std::string mde_file, std::string texture_file) {
+    auto texture_id = load_texture(texture_file);
+    auto texture = m_texture_collection.get_value(texture_id);
+
+    auto object_color = A565Color(0xFF, 0, 0, 0);
+
+    load_mesh_from_mde(mde_file, {
+        .poly_state = PolyStateActive,
+        .poly_attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
+            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud | PolyAttributeShadeModeTexture,
+        .poly_color = object_color,
+    });
+
+
+    auto mesh = m_mde_files.find(mde_file)->second;
+
+    auto objects_count = m_game_objects.size();
+    RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
+
+    object.textures.push_back(texture);
+    object.mip_levels = std::log(texture->width) / std::log(2) + 1;
+
+    for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
+        auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);
+        object.textures.push_back(quarter_texture);
+        auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
+        quarter_texture->id = id;
+    }
+
+    // TODO abstract the object creation
+    object.state = ObjectStateActive | ObjectStateVisible;
+    object.attributes |= ObjectAttributeSingleFrame;
+    object.curr_frame = 0;
+    object.frames_count = 1;
+
+    object.vertex_count = mesh->vertex_count;
+    object.local_vertices = mesh->vertices;
+    object.alpha = 1.0f;
+
+    object.transformed_vertices = new Vertex4D[mesh->vertex_count];
+
+    object.text_count = mesh->text_count;
+    object.texture_coords = mesh->text_coords;
+
+    object.head_local_vertices = &object.local_vertices[0];
+    object.head_transformed_vertices = &object.transformed_vertices[0];
+
+    object.color = object_color;
+    object.polygons = std::move(mesh->polygons);
+
+    m_game_objects.push_back(object);
+
+    return object;
+}
+
+std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttributes attributes) {
+    // create a new mesh from mde file if it does not exist
+    if (m_mde_files.find(path) == m_mde_files.end()) {
+        MdeReader reader;
+
+        MdeFile file;
+        reader.read_file(path, file);
+
+        auto mesh = new Mesh {};
+        mesh->vertex_count = file.header.num_verts;
+        mesh->text_count = file.header.num_textcoords;
+
+        mesh->vertices = new Vertex4D[file.header.num_verts * file.header.num_frames];
+        mesh->text_coords = new Point2D[file.header.num_textcoords];
+        std::vector<Graphics::Polygon> polygons;
+
+        auto verts_ptr = file.verts.get();
+
+        for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
+            for (int ivert = 0; ivert < file.header.num_verts; ivert++) {
+                auto current_vert = mesh->vertices[ivert * iframe];
+                auto mde_vert = verts_ptr[ivert * iframe];
+
+                current_vert.v = V4D {mde_vert.v[0], mde_vert.v[1], mde_vert.v[2], 0} ;
+                current_vert.attributes = Graphics::VertexAttributePoint;
+            }
+        }
+
+        auto text_coords_ptr = reinterpret_cast<Point2D*>(file.text_coords.get());
+        std::copy(text_coords_ptr, text_coords_ptr + file.header.num_textcoords * sizeof(MdeTextCoord), mesh->text_coords);
+
+        for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
+            for (int ipoly = 0; ipoly < file.header.num_polys; ipoly++) {
+                Polygon polygon;
+                auto mde_poly = file.polys.get()[iframe * ipoly];
+
+                polygon.vertices = mesh->vertices;
+                polygon.text_coords = mesh->text_coords;
+
+                for (int j = 0; j < 3; j++) {
+                    polygon.vert[j] = mde_poly.v_index[j];
+                    polygon.state = attributes.poly_state;
+
+                    polygon.attributes = attributes.poly_attributes;
+
+                    if (file.header.num_textcoords > 0) {
+                        polygon.vertices[mde_poly.v_index[j] * file.header.num_frames].t = mesh->text_coords[mde_poly.t_index[j]];
+
+                        polygon.text[j] = mde_poly.t_index[j];
+                        polygon.vertices[mde_poly.v_index[j] * file.header.num_frames].attributes |= Graphics::VertexAttributeTexture;
+                    }
+
+                    // TODO extract the normal indices
+                }
+
+                if (polygon.attributes & Graphics::PolyAttributeShadeModeGouraud ||
+                        polygon.attributes & Graphics::PolyAttributeShadeModeIntensityGourad) {
+
+                    auto line1 = mesh->vertices[polygon.vert[0]].v
+                        - mesh->vertices[polygon.vert[1]].v;
+
+                    auto line2 = mesh->vertices[polygon.vert[0]].v
+                        - mesh->vertices[polygon.vert[2]].v;
+
+                    polygon.n_length = line1.cross(line2).length();
+                    polygon.text_coords = mesh->text_coords;
+                }
+
+                polygon.color = attributes.poly_color;
+
+                polygons.push_back(polygon);
+            }
+        }
+
+        mesh->polygons = polygons;
+
+        // TODO: add way for checking normals
+        compute_vertex_normals(*mesh);
+
+        m_mde_files.insert(std::pair<std::string, Mesh*>(path, mesh));
+    }
+
+    return path;
+}
+
 int ObjectRepository::load_texture(std::string path) {
     auto texture = new Texture();
     if (!texture->load_from_bmp(path)) {

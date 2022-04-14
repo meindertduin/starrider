@@ -1,9 +1,11 @@
 #pragma once
 
-#include "RenderObject.h"
-
 #include <vector>
 #include <string>
+#include <unordered_map>
+
+#include "../io/MdeReader.h"
+#include "RenderObject.h"
 
 namespace Graphics {
 
@@ -51,13 +53,18 @@ public:
     ObjectRepository& operator=(const ObjectRepository &other) = delete;
     ObjectRepository& operator=(ObjectRepository &&other) = delete;
 
-    RenderObject create_game_object(std::string obj_file, std::string texture_fil);
+    RenderObject create_game_object(std::string obj_file, std::string texture_file);
+    RenderObject create_render_object(std::string mde_file, std::string texture_file);
 
     int load_texture(std::string path);
     int load_mesh_from_obj(std::string path, MeshAttributes attributes);
+
+    std::string load_mesh_from_mde(std::string path, MeshAttributes attributes);
 private:
     ObjCollection<Texture> m_texture_collection;
     ObjCollection<Mesh> m_mesh_collection;
+
+    std::unordered_map<std::string, Mesh*> m_mde_files;
 
     int compute_vertex_normals(Graphics::Mesh &object);
 

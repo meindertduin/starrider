@@ -22,7 +22,6 @@ struct MdeHeader {
     int offset_polys;
     int offset_frames;
     int offset_end;
-
 };
 
 

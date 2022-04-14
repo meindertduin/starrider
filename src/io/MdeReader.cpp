@@ -61,7 +61,11 @@ bool MdeReader::read_file(std::string path, MdeFile &result) {
     m_ifs >> header;
 
     // Read the skins
-    // TODO: implement
+    m_ifs.seekg(header.offset_skins, std::ios_base::beg);
+
+    result.skins = std::unique_ptr<char[64]>(new char[header.num_skins][64]);
+
+    m_ifs.read(reinterpret_cast<char*>(result.skins.get()), sizeof(char) * 64 * header.num_skins);
 
     // Read the vert data
     m_ifs.seekg(header.offset_verts, std::ios_base::beg);
