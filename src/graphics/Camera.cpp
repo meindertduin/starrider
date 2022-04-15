@@ -80,7 +80,7 @@ Matrix4x4 Camera::get_view_projection() const {
     V4D camera_pos = m_transform.pos * -1;
     auto camera_trans = Math::mat_4x4_translation(camera_pos.x, camera_pos.y, camera_pos.z);
 
-    return  camera_trans * m_transform.rot.conjugated().to_rotation_matrix();
+    return  camera_trans * m_transform.rot.to_rotation_matrix();
 }
 
 }
