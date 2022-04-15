@@ -60,6 +60,8 @@ bool MdeReader::read_file(std::string path, MdeFile &result) {
     MdeHeader header;
     m_ifs >> header;
 
+    result.header = header;
+
     // Read the skins
     m_ifs.seekg(header.offset_skins, std::ios_base::beg);
 

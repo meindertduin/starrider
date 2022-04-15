@@ -139,16 +139,16 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
 
         for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
             for (int ivert = 0; ivert < file.header.num_verts; ivert++) {
-                auto current_vert = mesh->vertices[ivert * iframe];
+                auto current_vert = &mesh->vertices[ivert * iframe];
                 auto mde_vert = verts_ptr[ivert * iframe];
 
-                current_vert.v = V4D {mde_vert.v[0], mde_vert.v[1], mde_vert.v[2], 0} ;
-                current_vert.attributes = Graphics::VertexAttributePoint;
+                current_vert->v = V4D {mde_vert.v[0], mde_vert.v[1], mde_vert.v[2], 0} ;
+                current_vert->attributes = Graphics::VertexAttributePoint;
             }
         }
 
         auto text_coords_ptr = reinterpret_cast<Point2D*>(file.text_coords.get());
-        std::copy(text_coords_ptr, text_coords_ptr + file.header.num_textcoords * sizeof(MdeTextCoord), mesh->text_coords);
+        std::copy(text_coords_ptr, text_coords_ptr + file.header.num_textcoords, mesh->text_coords);
 
         for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
             for (int ipoly = 0; ipoly < file.header.num_polys; ipoly++) {

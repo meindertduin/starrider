@@ -133,11 +133,11 @@ bool write_mde_data(string output_path, vector<vector<MdeVert>> &total_verts, ve
     header.num_frames = total_verts.size();
 
     header.offset_skins = sizeof(MdeHeader);
-    header.offset_verts = header.num_skins * sizeof(char) * 64;
-    header.offset_polys = header.num_textcoords * sizeof(MdeTextCoord);
-    header.offset_textcoords = header.num_verts * sizeof (MdeVert) * header.num_frames;
-    header.offset_frames = header.num_polys * sizeof(MdePoly) * header.num_frames;
-    header.offset_end = header.frame_size * header.num_frames;
+    header.offset_verts = header.offset_skins + header.num_skins * sizeof(char) * 64;
+    header.offset_textcoords = header.offset_verts + header.num_verts * sizeof (MdeVert) * header.num_frames;
+    header.offset_polys = header.offset_textcoords + header.num_textcoords * sizeof(MdeTextCoord);
+    header.offset_frames = header.offset_polys + header.num_polys * sizeof(MdePoly) * header.num_frames;
+    header.offset_end = header.offset_frames + header.frame_size * header.num_frames;
 
     std::ofstream fs(output_path);
     fs << header;

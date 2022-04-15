@@ -90,7 +90,7 @@ void Application::run() {
     std::vector<Graphics::RenderObject> objects;
     Graphics::ObjectRepository object_repository;
 
-    auto object = object_repository.create_game_object("assets/cube.obj", "assets/cube.bmp");
+    auto object = object_repository.create_render_object("assets/test.mde", "assets/cube.bmp");
     auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/bricks.bmp");
 
     object.transform = Graphics::Transform(V4D(0, 0, 3));
