@@ -192,6 +192,7 @@ typedef struct MeshType {
     Point2D *text_coords;
 
     std::vector<Polygon> polygons;
+    std::vector<std::string> skins;
 
     MeshType() = default;
     MeshType(const MeshType &other) {

@@ -13,12 +13,12 @@
 using std::string;
 using std::vector;
 
-int convert_obj_files(std::string dir, std::string output_path);
+int convert_obj_files(std::string dir, std::string output_path, vector<string> skin_name);
 bool ends_width(const std::string &full_string, const std::string &ending);
 std::vector<std::string> get_obj_file_paths(std::string path);
 
 bool read_obj_files(vector<string> file_paths, vector<vector<MdeVert>> &total_verts, vector<vector<MdePoly>> &total_polys, vector<MdeTextCoord> &text_coords, vector<MdeFrame> &frames);
-bool write_mde_data(string output_path, vector<vector<MdeVert>> &total_verts, vector<vector<MdePoly>> &total_polys, vector<MdeTextCoord> &text_coords, vector<MdeFrame> &frames);
+bool write_mde_data(string output_path, vector<string> skin_name, vector<vector<MdeVert>> &total_verts, vector<vector<MdePoly>> &total_polys, vector<MdeTextCoord> &text_coords, vector<MdeFrame> &frames);
 
 int main(int argc, char *argv[]) {
     std::vector<std::string> argument_inputs;
@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 
     std::string input_dir;
     std::string output_path;
+    vector<string> skin_names;
 
     for (int i = 1; i < argument_inputs.size(); i++) {
         if (argument_inputs[i] == "-i") {
@@ -37,15 +38,19 @@ int main(int argc, char *argv[]) {
         if (argument_inputs[i] == "-o") {
             output_path = argument_inputs[i + 1];
         }
+
+        if (argument_inputs[i] == "-s") {
+            skin_names.push_back(argument_inputs[i + 1]);
+        }
     }
 
-    convert_obj_files(input_dir, output_path);
+    convert_obj_files(input_dir, output_path, skin_names);
 
     return 0;
 }
 
 
-int convert_obj_files(std::string path, std::string output_path) {
+int convert_obj_files(std::string path, std::string output_path, vector<string> skin_names) {
     auto file_paths = get_obj_file_paths(path);
 
     std::vector<std::vector<MdeVert>> total_verts;
@@ -54,7 +59,7 @@ int convert_obj_files(std::string path, std::string output_path) {
     std::vector<MdeFrame> frames;
 
     read_obj_files(file_paths, total_verts, total_polys, text_coords, frames);
-    write_mde_data(output_path, total_verts, total_polys, text_coords, frames);
+    write_mde_data(output_path, skin_names, total_verts, total_polys, text_coords, frames);
 
     return 0;
 }
@@ -117,7 +122,7 @@ bool read_obj_files(vector<string> file_paths, vector<vector<MdeVert>> &total_ve
     return true;
 }
 
-bool write_mde_data(string output_path, vector<vector<MdeVert>> &total_verts, vector<vector<MdePoly>> &total_polys,
+bool write_mde_data(string output_path, vector<string> skin_names, vector<vector<MdeVert>> &total_verts, vector<vector<MdePoly>> &total_polys,
         vector<MdeTextCoord> &text_coords, vector<MdeFrame> &frames)
 {
     MdeHeader header;
@@ -126,7 +131,7 @@ bool write_mde_data(string output_path, vector<vector<MdeVert>> &total_verts, ve
     header.skin_size = 0;
     header.frame_size = sizeof(MdeFrame);
 
-    header.num_skins = 0;
+    header.num_skins = skin_names.size();
     header.num_verts = total_verts[0].size();
     header.num_textcoords = text_coords.size();
     header.num_polys = total_polys[0].size();
@@ -142,7 +147,9 @@ bool write_mde_data(string output_path, vector<vector<MdeVert>> &total_verts, ve
     std::ofstream fs(output_path);
     fs << header;
 
-    // TODO write out the skin paths
+    for (const auto &skin_name : skin_names) {
+        fs.write(skin_name.c_str(), sizeof(char) * 64);
+    }
 
     for (auto &verts : total_verts) {
         fs.write(reinterpret_cast<char*>(&verts[0]), verts.size() * sizeof(MdeVert));

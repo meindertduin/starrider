@@ -54,7 +54,7 @@ public:
     ObjectRepository& operator=(ObjectRepository &&other) = delete;
 
     RenderObject create_game_object(std::string obj_file, std::string texture_file);
-    RenderObject create_render_object(std::string mde_file, std::string texture_file);
+    RenderObject create_render_object(std::string mde_file);
 
     int load_texture(std::string path);
     int load_mesh_from_obj(std::string path, MeshAttributes attributes);

@@ -64,10 +64,7 @@ RenderObject ObjectRepository::create_game_object(std::string obj_file, std::str
     return object;
 }
 
-RenderObject ObjectRepository::create_render_object(std::string mde_file, std::string texture_file) {
-    auto texture_id = load_texture(texture_file);
-    auto texture = m_texture_collection.get_value(texture_id);
-
+RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     auto object_color = A565Color(0xFF, 0, 0, 0);
 
     load_mesh_from_mde(mde_file, {
@@ -79,6 +76,9 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file, std::s
 
 
     auto mesh = m_mde_files.find(mde_file)->second;
+
+    auto texture_id = load_texture("assets/" + mesh->skins[0]);
+    auto texture = m_texture_collection.get_value(texture_id);
 
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
@@ -128,11 +128,16 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
         reader.read_file(path, file);
 
         auto mesh = new Mesh {};
+
+        for(int i = 0; i < file.header.num_skins; i++)
+            mesh->skins.push_back(std::string(file.skins.get()[i]));
+
         mesh->vertex_count = file.header.num_verts;
         mesh->text_count = file.header.num_textcoords;
 
         mesh->vertices = new Vertex4D[file.header.num_verts * file.header.num_frames];
         mesh->text_coords = new Point2D[file.header.num_textcoords];
+
         std::vector<Graphics::Polygon> polygons;
 
         auto verts_ptr = file.verts.get();
