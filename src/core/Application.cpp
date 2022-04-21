@@ -91,7 +91,7 @@ void Application::run() {
     Graphics::ObjectRepository object_repository;
 
     auto object = object_repository.create_render_object("assets/test.mde");
-    auto plateau = object_repository.create_game_object("assets/plateau.obj", "assets/bricks.bmp");
+    auto plateau = object_repository.create_render_object("assets/plateau.mde");
 
     object.transform = Graphics::Transform(V4D(0, 0, 3));
     plateau.transform = Graphics::Transform(V4D(0, -5, 0));

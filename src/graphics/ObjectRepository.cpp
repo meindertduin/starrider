@@ -74,10 +74,9 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
         .poly_color = object_color,
     });
 
-
     auto mesh = m_mde_files.find(mde_file)->second;
 
-    auto texture_id = load_texture("assets/" + mesh->skins[0]);
+    auto texture_id = load_texture("assets/bricks.bmp");
     auto texture = m_texture_collection.get_value(texture_id);
 
     auto objects_count = m_game_objects.size();
@@ -144,8 +143,9 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
 
         for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
             for (int ivert = 0; ivert < file.header.num_verts; ivert++) {
-                auto current_vert = &mesh->vertices[ivert * iframe];
-                auto mde_vert = verts_ptr[ivert * iframe];
+                auto vert_index = ivert + file.header.num_verts * iframe;
+                auto current_vert = &mesh->vertices[vert_index];
+                auto mde_vert = verts_ptr[vert_index];
 
                 current_vert->v = V4D {mde_vert.v[0], mde_vert.v[1], mde_vert.v[2], 0} ;
                 current_vert->attributes = Graphics::VertexAttributePoint;
@@ -155,10 +155,12 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
         auto text_coords_ptr = reinterpret_cast<Point2D*>(file.text_coords.get());
         std::copy(text_coords_ptr, text_coords_ptr + file.header.num_textcoords, mesh->text_coords);
 
+        auto polys_ptr = file.polys.get();
+
         for (int iframe = 0; iframe < file.header.num_frames; iframe++) {
             for (int ipoly = 0; ipoly < file.header.num_polys; ipoly++) {
                 Polygon polygon;
-                auto mde_poly = file.polys.get()[iframe * ipoly];
+                auto mde_poly = polys_ptr[ipoly];
 
                 polygon.vertices = mesh->vertices;
                 polygon.text_coords = mesh->text_coords;

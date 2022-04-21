@@ -151,6 +151,9 @@ bool write_mde_data(string output_path, vector<string> skin_names, vector<vector
         fs.write(skin_name.c_str(), sizeof(char) * 64);
     }
 
+    printf("%f\n", total_verts[0][0].v[0]);
+    printf("%d\n", header.num_verts);
+
     for (auto &verts : total_verts) {
         fs.write(reinterpret_cast<char*>(&verts[0]), verts.size() * sizeof(MdeVert));
     }
