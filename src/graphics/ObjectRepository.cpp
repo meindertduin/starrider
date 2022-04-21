@@ -2,14 +2,19 @@
 
 #include "../io/ObjReader.h"
 
+#include <error.h>
+
 namespace Graphics {
 
-ObjectRepository::ObjectRepository() : m_texture_collection(128), m_mesh_collection(128) {}
+ObjectRepository::ObjectRepository() {}
 
 ObjectRepository::~ObjectRepository() {
-    for (auto object : m_game_objects) {
+    for (auto object : m_game_objects)
         delete[] object.transformed_vertices;
-    }
+
+    for (auto &mip_textures : m_textures)
+        for (auto texture : mip_textures.second)
+            delete texture;
 }
 
 RenderObject ObjectRepository::create_render_object(std::string mde_file) {
@@ -24,21 +29,12 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
 
     auto mesh = m_mde_files.find(mde_file)->second;
 
-    auto texture_id = load_texture("assets/bricks.bmp");
-    auto texture = m_texture_collection.get_value(texture_id);
-
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    object.textures.push_back(texture);
-    object.mip_levels = std::log(texture->width) / std::log(2) + 1;
+    object.textures = load_mip_texture("assets/bricks.bmp");
 
-    for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
-        auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);
-        object.textures.push_back(quarter_texture);
-        auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
-        quarter_texture->id = id;
-    }
+    object.mip_levels = object.textures.size();
 
     // TODO abstract the object creation
     object.state = ObjectStateActive | ObjectStateVisible;
@@ -159,95 +155,32 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
     return path;
 }
 
-int ObjectRepository::load_texture(std::string path) {
-    auto texture = new Texture();
-    if (!texture->load_from_bmp(path)) {
-        return -1;
-    }
+std::vector<Texture*> ObjectRepository::load_mip_texture(std::string path) {
+    auto mip_textures_pair = m_textures.find(path);
 
-    auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(texture));
-    texture->id = id;
-    return id;
-}
+    if (mip_textures_pair == m_textures.end()) {
+        std::vector<Texture*> mip_textures;
 
-int ObjectRepository::load_mesh_from_obj(std::string path, MeshAttributes attributes) {
-    ObjReader obj_reader;
-
-    if (!obj_reader.read_file(path)) {
-        return -1;
-    }
-
-    auto mesh = new Mesh {};
-
-    mesh->vertex_count = obj_reader.m_vertices.size();
-    mesh->text_count = obj_reader.m_tex_coords.size();
-
-    mesh->vertices = new Graphics::Vertex4D[mesh->vertex_count];
-    mesh->text_coords = new Graphics::Point2D[obj_reader.m_tex_coords.size()];
-
-    for (int i = 0; i < mesh->vertex_count; i++) {
-        mesh->vertices[i].v = obj_reader.m_vertices[i];
-        mesh->vertices[i].attributes = Graphics::VertexAttributePoint;
-    }
-
-    std::copy(obj_reader.m_tex_coords.begin(), obj_reader.m_tex_coords.end(), mesh->text_coords);
-
-    std::vector<Graphics::Polygon> polygons;
-    for (int i = 0; i < obj_reader.m_indices.size(); i += 3) {
-        Graphics::Polygon polygon;
-        polygon.vertices = mesh->vertices;
-        polygon.text_coords = mesh->text_coords;
-
-        polygon.state = attributes.poly_state;
-
-        polygon.attributes = attributes.poly_attributes;
-
-        for (int j = 0; j < 3; j++) {
-            auto current_index = obj_reader.m_indices[i + j];
-            polygon.vert[j] = current_index.vertex_index;
-
-            if (obj_reader.has_tex_coords) {
-                polygon.vertices[current_index.vertex_index].t = mesh->text_coords[current_index.tex_coord_index];
-
-                polygon.text[j] = current_index.tex_coord_index;
-
-                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeTexture;
-            }
-
-            if (obj_reader.has_normal_indices) {
-                polygon.vertices[current_index.vertex_index].n = obj_reader.m_normals[current_index.normal_index];
-                polygon.vertices[current_index.vertex_index].attributes |= Graphics::VertexAttributeNormal;
-            }
+        auto root_texture = new Texture();
+        if (!root_texture->load_from_bmp(path)) {
+            throw std::runtime_error("Could not load bmp from file");
         }
 
-        if (polygon.attributes & Graphics::PolyAttributeShadeModeGouraud ||
-                polygon.attributes & Graphics::PolyAttributeShadeModeIntensityGourad) {
+        mip_textures.push_back(root_texture);
 
-            auto line1 = mesh->vertices[polygon.vert[0]].v
-                - mesh->vertices[polygon.vert[1]].v;
+        auto mip_levels = std::log(root_texture->width) / std::log(2) + 1;
 
-            auto line2 = mesh->vertices[polygon.vert[0]].v
-                - mesh->vertices[polygon.vert[2]].v;
-
-            polygon.n_length = line1.cross(line2).length();
-            polygon.text_coords = mesh->text_coords;
+        for (int mip_level = 1; mip_level < mip_levels; mip_level++) {
+            auto quarter_texture = mip_textures[mip_level - 1]->quarter_size(1.01f);
+            mip_textures.push_back(quarter_texture);
         }
 
-        polygon.color = attributes.poly_color;
+        m_textures.insert(std::pair<std::string, std::vector<Texture*>>(path, mip_textures));
 
-        polygons.push_back(polygon);
+        return mip_textures;
     }
 
-    mesh->polygons = polygons;
-
-    if (!obj_reader.has_normal_indices) {
-        compute_vertex_normals(*mesh);
-    }
-
-    auto id = m_mesh_collection.store_value(std::unique_ptr<MeshType>(mesh));
-    mesh->id = id;
-
-    return id;
+    return mip_textures_pair->second;
 }
 
 int ObjectRepository::compute_vertex_normals(Graphics::Mesh &object) {

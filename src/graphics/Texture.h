@@ -18,7 +18,6 @@ struct Rect {
 
 class Texture {
 public:
-    int id;
     Texture() = default;
     Texture(int width, int height, A565Color* data);
     Texture(int width, int height, A565Color*&& data);
