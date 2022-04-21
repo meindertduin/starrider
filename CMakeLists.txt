@@ -40,7 +40,7 @@ set(SOURCES
 
 set(HEADERS include)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wextra -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wextra -fno-omit-frame-pointer -D__extern_always_inline=inline -D_XOPEN_SOURCE_EXTENDED")
 
 include_directories(
     src

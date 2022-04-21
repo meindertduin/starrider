@@ -12,58 +12,6 @@ ObjectRepository::~ObjectRepository() {
     }
 }
 
-RenderObject ObjectRepository::create_game_object(std::string obj_file, std::string texture_file) {
-    auto texture_id = load_texture(texture_file);
-    auto texture = m_texture_collection.get_value(texture_id);
-
-    auto object_color = A565Color(0xFF, 0, 0, 0);
-
-    auto mesh_id = load_mesh_from_obj(obj_file, {
-        .poly_state = PolyStateActive,
-        .poly_attributes = PolyAttributeTwoSided | PolyAttributeRGB24 |
-            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud | PolyAttributeShadeModeTexture,
-        .poly_color = object_color,
-    });
-    auto mesh = m_mesh_collection.get_value(mesh_id);
-
-    auto objects_count = m_game_objects.size();
-    RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
-
-    object.textures.push_back(texture);
-    object.mip_levels = std::log(texture->width) / std::log(2) + 1;
-
-    for (int mip_level = 1; mip_level < object.mip_levels; mip_level++) {
-        auto quarter_texture = object.textures[mip_level - 1]->quarter_size(1.01f);
-        object.textures.push_back(quarter_texture);
-        auto id = m_texture_collection.store_value(std::unique_ptr<Texture>(quarter_texture));
-        quarter_texture->id = id;
-    }
-
-    // TODO abstract the object creation
-    object.state = ObjectStateActive | ObjectStateVisible;
-    object.attributes |= ObjectAttributeSingleFrame;
-    object.curr_frame = 0;
-    object.frames_count = 1;
-
-    object.vertex_count = mesh->vertex_count;
-    object.local_vertices = mesh->vertices;
-    object.alpha = 1.0f;
-
-    object.transformed_vertices = new Vertex4D[mesh->vertex_count];
-
-    object.text_count = mesh->text_count;
-    object.texture_coords = mesh->text_coords;
-
-    object.head_local_vertices = &object.local_vertices[0];
-    object.head_transformed_vertices = &object.transformed_vertices[0];
-
-    object.color = object_color;
-    object.polygons = std::move(mesh->polygons);
-
-    m_game_objects.push_back(object);
-    return object;
-}
-
 RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     auto object_color = A565Color(0xFF, 0, 0, 0);
 
