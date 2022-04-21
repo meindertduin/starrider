@@ -7,6 +7,7 @@
 #include "../graphics/Font.h"
 #include "../graphics/RenderPipeline.h"
 #include "../graphics/ObjectRepository.h"
+#include "../io/MapReader.h"
 
 #include "../math/Core.h"
 
@@ -98,6 +99,11 @@ void Application::run() {
 
     objects.push_back(object);
     objects.push_back(plateau);
+
+    MapReader map_reader;
+    MapFile mapfile;
+
+    map_reader.read_file("assets/terrain.map", mapfile);
 
     Graphics::TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;

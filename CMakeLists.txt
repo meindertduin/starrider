@@ -17,6 +17,7 @@ set(SOURCES
     src/io/ObjReader.cpp
     src/io/Logger.cpp
     src/io/MdeReader.cpp
+    src/io/MapReader.cpp
     src/graphics/RenderPipeline.cpp
     src/entity/Entity.cpp
     src/core/Application.cpp
