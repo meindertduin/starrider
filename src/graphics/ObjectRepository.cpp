@@ -38,9 +38,15 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
 
     // TODO abstract the object creation
     object.state = ObjectStateActive | ObjectStateVisible;
-    object.attributes |= ObjectAttributeSingleFrame;
+    object.frames_count = mesh->frames_count;
+
+    if (mesh->frames_count > 1) {
+        object.attributes |= ObjectAttributeMultiFrame;
+    } else {
+        object.attributes |= ObjectAttributeSingleFrame;
+    }
+
     object.curr_frame = 0;
-    object.frames_count = 1;
 
     object.vertex_count = mesh->vertex_count;
     object.local_vertices = mesh->vertices;
@@ -74,6 +80,8 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
 
         for(int i = 0; i < file.header.num_skins; i++)
             mesh->skins.push_back(std::string(file.skins.get()[i]));
+
+        mesh->frames_count = file.header.num_frames;
 
         mesh->vertex_count = file.header.num_verts;
         mesh->text_count = file.header.num_textcoords;

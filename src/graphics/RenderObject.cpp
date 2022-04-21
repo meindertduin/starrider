@@ -23,8 +23,6 @@ int RenderObject_Type::set_frame(int frame) {
 
     if (frame < 0) {
         frame = 0;
-    } else {
-        frame = this->frames_count - 1;
     }
 
     this->curr_frame = frame;
@@ -34,4 +32,16 @@ int RenderObject_Type::set_frame(int frame) {
 
     return 1;
 }
+
+void RenderObject::next_frame() {
+    if (curr_frame < frames_count) {
+        this->set_frame(curr_frame + 1);
+        curr_frame++;
+        return;
+    }
+
+    this->set_frame(0);
+    curr_frame = 0;
+}
+
 }

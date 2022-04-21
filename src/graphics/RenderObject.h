@@ -181,12 +181,16 @@ typedef struct RenderObject_Type {
     RenderObject_Type(int id) : id(id) {}
 
     int set_frame(int frame);
+
+    // This function may reset the frames
+    void next_frame();
 } RenderObject;
 
 typedef struct MeshType {
     int id;
     int vertex_count;
     Vertex4D *vertices;
+    int frames_count;
 
     int text_count;
     Point2D *text_coords;
