@@ -88,7 +88,7 @@ void backface_removal_object(RenderObject& object, const Camera &camera) {
         auto camera_ray =  camera.m_transform.pos - object.transformed_vertices[poly.vert[0]].v;
         poly.normal = line1.cross(line2);
 
-        if (object.state & PolyAttributeTwoSided) {
+        if (poly.state & PolyAttributeTwoSided) {
             if (poly.normal.dot(camera_ray) < 0.0f) {
                 poly.state |= PolyStateBackface;
             } else if(poly.state & PolyStateBackface) {

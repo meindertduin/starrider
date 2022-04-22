@@ -73,155 +73,68 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     return object;
 }
 
-RenderObject ObjectRepository::create_terrain_object(std::string path) {
-    auto object_color = A565Color(0xFF, 0, 0, 0);
-
-    load_mesh_from_map(path, {
-        .poly_state = PolyStateActive,
-        .poly_attributes = PolyAttributeRGB24 |
-            PolyAttributeShadeModeIntensityGourad | PolyAttributeShadeModeGouraud | PolyAttributeShadeModeTexture,
-        .poly_color = object_color,
-    });
-
-    auto mesh = m_mde_files.find(path)->second;
-
-    auto objects_count = m_game_objects.size();
-    RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
-
-    object.textures = load_mip_texture("assets/bricks.bmp");
-
-    object.mip_levels = object.textures.size();
-
-    // TODO abstract the object creation
-    object.state = ObjectStateActive | ObjectStateVisible;
-    object.frames_count = mesh->frames_count;
-
-    if (mesh->frames_count > 1) {
-        object.attributes |= ObjectAttributeMultiFrame;
-    } else {
-        object.attributes |= ObjectAttributeSingleFrame;
-    }
-
-    object.curr_frame = 0;
-
-    object.vertex_count = mesh->vertex_count;
-    object.local_vertices = mesh->vertices;
-    object.alpha = 1.0f;
-
-    object.transformed_vertices = new Vertex4D[mesh->vertex_count];
-
-    object.text_count = mesh->text_count;
-    object.texture_coords = mesh->text_coords;
-
-    object.head_local_vertices = &object.local_vertices[0];
-    object.head_transformed_vertices = &object.transformed_vertices[0];
-
-    object.color = object_color;
-    object.polygons = std::move(mesh->polygons);
-
-    m_game_objects.push_back(object);
-
-    return object;
+RenderObject ObjectRepository::create_terraint_object(std::string path) {
 }
 
 string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attributes) {
-    if (m_mde_files.find(path) == m_mde_files.end()) {
-        MapReader map_reader;
-        MapFile mapfile;
+    MapReader map_reader;
+    MapFile mapfile;
 
-        map_reader.read_file(path, mapfile);
+    map_reader.read_file(path, mapfile);
 
-        auto mesh = new Mesh {};
+    auto mesh = new Mesh {};
 
-        mesh->frames_count = 1;
+    mesh->frames_count = 1;
 
-        mesh->vertex_count = mapfile.width * mapfile.farth;
-        mesh->vertices = new Vertex4D[mesh->vertex_count];
+    mesh->vertex_count = mapfile.width * mapfile.farth;
+    mesh->vertices = new Vertex4D[mesh->vertex_count];
 
-        vector<Polygon> polygons;
+    vector<Polygon> polygons;
 
-        mesh->text_count = 4;
-        mesh->text_coords = new Point2D[4];
+    mesh->text_count = 4;
+    mesh->text_coords = new Point2D[4];
 
-        mesh->text_coords[0] = Point2D { 0, 0 };
-        mesh->text_coords[1] = Point2D { 1, 0 };
-        mesh->text_coords[2] = Point2D { 0, 1 };
-        mesh->text_coords[3] = Point2D { 1, 1 };
+    mesh->text_coords[0] = Point2D { 0, 0 };
+    mesh->text_coords[1] = Point2D { 1, 0 };
+    mesh->text_coords[2] = Point2D { 0, 1 };
+    mesh->text_coords[3] = Point2D { 1, 1 };
 
-        for (int y = 0; y < mapfile.farth; y ++) {
-            for (int x = 0; x < mapfile.width; x++) {
-                auto v = &mesh->vertices[x + mapfile.farth * y];
-                v->v = Point4D(x, mapfile.ter_codes[x + mapfile.width *y].height, y);
-                v->attributes = Graphics::VertexAttributePoint;
+    for (int y = 0; y < mapfile.farth; y ++) {
+        for (int x = 0; x < mapfile.width; x++) {
+            auto v = &mesh->vertices[x + mapfile.farth * y];
+            v->v = Point4D(x, mapfile[x + mapfile.width *y], y);
+            v->attributes = Graphics::VertexAttributePoint;
 
-            }
         }
-
-        for (int y = 0; y < mapfile.farth - 1; y++) {
-            for (int x = 0; x < mapfile.width - 1; x++) {
-                for (int ipoly = 0; ipoly < 2; ipoly++) {
-                    Polygon polygon;
-
-                    polygon.vertices = mesh->vertices;
-
-                    polygon.text_coords = mesh->text_coords;
-                    polygon.text_coords = mesh->text_coords;
-
-                    if (ipoly == 0) {
-                        polygon.vert[2] = x + mapfile.width * y;
-                        polygon.vert[1] = x + mapfile.width * y + 1;
-                        polygon.vert[0] = x + mapfile.width * (y + 1);
-
-                        polygon.text[2] = 0;
-                        polygon.text[1] = 1;
-                        polygon.text[0] = 2;
-                    } else {
-                        polygon.vert[0] = x + mapfile.width * y + 1;
-                        polygon.vert[1] = x + mapfile.width * (y + 1);
-                        polygon.vert[2] = x + mapfile.width * (y + 1) + 1;
-
-                        polygon.text[0] = 1;
-                        polygon.text[1] = 2;
-                        polygon.text[2] = 3;
-                    }
-
-
-                    polygon.vertices[polygon.vert[0]].t = mesh->text_coords[polygon.text[0]];
-                    polygon.vertices[polygon.vert[1]].t = mesh->text_coords[polygon.text[1]];
-                    polygon.vertices[polygon.vert[2]].t = mesh->text_coords[polygon.text[2]];
-
-                    polygon.attributes = attributes.poly_attributes;
-                    polygon.state = attributes.poly_state;
-
-                    if (polygon.attributes & Graphics::PolyAttributeShadeModeGouraud ||
-                            polygon.attributes & Graphics::PolyAttributeShadeModeIntensityGourad) {
-
-                        auto line1 = mesh->vertices[polygon.vert[0]].v
-                            - mesh->vertices[polygon.vert[1]].v;
-
-                        auto line2 = mesh->vertices[polygon.vert[0]].v
-                            - mesh->vertices[polygon.vert[2]].v;
-
-                        polygon.n_length = line1.cross(line2).length();
-                        polygon.text_coords = mesh->text_coords;
-                    }
-
-                    polygon.color = attributes.poly_color;
-
-                    polygons.push_back(polygon);
-                }
-            }
-        }
-
-        mesh->polygons = polygons;
-
-        // TODO: add way for checking normals
-        compute_vertex_normals(*mesh);
-
-        m_mde_files.insert(std::pair<std::string, Mesh*>(path, mesh));
     }
 
-    return path;
+    for (int y = 0; y < mapfile.farth; y++) {
+        for (int x = 0; x < mapfile.width; x++) {
+            Polygon poly1;
+            Polygon poly2;
+
+            poly1.vertices = mesh->vertices;
+
+            poly1.vert[0] = x + mapfile.width * y;
+            poly1.vert[1] = x + mapfile.width * y + 1;
+            poly1.vert[2] = x + mapfile.width * (y + 1);
+
+            poly1.text[0] = 0;
+            poly1.text[1] = 1;
+            poly1.text[2] = 2;
+
+            poly2.vert[0] = x + mapfile.width * y;
+            poly2.vert[1] = x + mapfile.width * (y + 1);
+            poly2.vert[2] = x + mapfile.width * (y + 1) + 1;
+
+            poly2.text[0] = 1;
+            poly2.text[1] = 2;
+            poly2.text[2] = 3;
+
+            poly1.attributes = attributes.poly_attributes;
+            poly2.attributes = attributes.poly_attributes;
+        }
+    }
 }
 
 

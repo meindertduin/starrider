@@ -7,7 +7,6 @@
 #include "../graphics/Font.h"
 #include "../graphics/RenderPipeline.h"
 #include "../graphics/ObjectRepository.h"
-#include "../io/MapReader.h"
 
 #include "../math/Core.h"
 
@@ -21,7 +20,7 @@ Application::Application() {
 }
 
 Application::~Application() {
-    delete[] m_rc.inv_z_buffer;
+   delete[] m_rc.inv_z_buffer;
 }
 
 std::shared_ptr<Application> Application::get_instance() {
@@ -62,7 +61,7 @@ void Application::run() {
         | Graphics::RCAttributeTextureHybrid
         | Graphics::RCAttributeZSort;
 
-    m_rc.mip_z_dist = 200;
+    m_rc.mip_z_dist = 40;
     m_rc.perfect_dist = 20;
     m_rc.piecewise_dist = 40;
 
@@ -78,7 +77,7 @@ void Application::run() {
     Graphics::reset_lights();
 
     Graphics::create_base_amb_light(0, Graphics::RGBA { 25, 25, 25, 255 });
-    Graphics::create_base_dir_light(1, Graphics::RGBA { 255, 255, 255, 255 }, V4D(1, 0, 0).normalized());
+    Graphics::create_base_dir_light(1, Graphics::RGBA { 255, 255, 255, 255 }, V4D(1, 1, 0).normalized());
 
     //create_base_point_light(2, RGBA { 225, 225, 225, 255 }, V4D(0, 1, 0), 0, 0, 0.2f);
 
@@ -92,18 +91,13 @@ void Application::run() {
     Graphics::ObjectRepository object_repository;
 
     auto object = object_repository.create_render_object("assets/test.mde");
-    auto plateau = object_repository.create_render_object("assets/plateau.mde");
+    auto plateau = object_repository.create_terrain_object("assets/terrain.map");
 
-    object.transform = Graphics::Transform(V4D(0, 0, 3));
+    // object.transform = Graphics::Transform(V4D(0, 0, 3));
     plateau.transform = Graphics::Transform(V4D(0, -5, 0));
 
-    objects.push_back(object);
+    // objects.push_back(object);
     objects.push_back(plateau);
-
-    MapReader map_reader;
-    MapFile mapfile;
-
-    map_reader.read_file("assets/terrain.map", mapfile);
 
     Graphics::TTFFont ttf_font("assets/alagard.ttf", 24);
     int dt = 0;
