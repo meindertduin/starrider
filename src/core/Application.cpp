@@ -61,7 +61,7 @@ void Application::run() {
         | Graphics::RCAttributeTextureHybrid
         | Graphics::RCAttributeZSort;
 
-    m_rc.mip_z_dist = 40;
+    m_rc.mip_z_dist = 30;
     m_rc.perfect_dist = 20;
     m_rc.piecewise_dist = 40;
 
@@ -77,7 +77,7 @@ void Application::run() {
     Graphics::reset_lights();
 
     Graphics::create_base_amb_light(0, Graphics::RGBA { 25, 25, 25, 255 });
-    Graphics::create_base_dir_light(1, Graphics::RGBA { 255, 255, 255, 255 }, V4D(1, 1, 0).normalized());
+    Graphics::create_base_dir_light(1, Graphics::RGBA { 125, 125, 125, 125 }, V4D(1, 1, 0).normalized());
 
     //create_base_point_light(2, RGBA { 225, 225, 225, 255 }, V4D(0, 1, 0), 0, 0, 0.2f);
 
@@ -93,10 +93,10 @@ void Application::run() {
     auto object = object_repository.create_render_object("assets/test.mde");
     auto plateau = object_repository.create_terrain_object("assets/terrain.map");
 
-    // object.transform = Graphics::Transform(V4D(0, 0, 3));
+    object.transform = Graphics::Transform(V4D(10, 0, 10));
     plateau.transform = Graphics::Transform(V4D(0, -5, 0));
 
-    // objects.push_back(object);
+    objects.push_back(object);
     objects.push_back(plateau);
 
     Graphics::TTFFont ttf_font("assets/alagard.ttf", 24);
@@ -115,10 +115,7 @@ void Application::run() {
         renderer.render_text(time_text, ttf_font, {20, 52});
 
         renderer.render_framebuffer();
-        // objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
-
-
-        // objects[0].transform.rotate(Quat_Type(Math::mat_4x4_rotation_y(dt / 1000.0f)));
+        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;

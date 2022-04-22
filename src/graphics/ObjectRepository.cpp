@@ -37,7 +37,7 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    object.textures = load_mip_texture("assets/bricks.bmp");
+    object.textures = load_mip_texture("assets/grass.bmp");
 
     object.mip_levels = object.textures.size();
 
@@ -88,7 +88,7 @@ RenderObject ObjectRepository::create_terrain_object(std::string path) {
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    object.textures = load_mip_texture("assets/bricks.bmp");
+    object.textures = load_mip_texture("assets/grass.bmp");
 
     object.mip_levels = object.textures.size();
 
@@ -138,7 +138,7 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
         mesh->vertex_count = mapfile.width * mapfile.farth;
         mesh->vertices = new Vertex4D[mesh->vertex_count];
 
-        vector<Polygon> polygons;
+        vector<Polygon> polygons(mapfile.width * mapfile.farth * 2);
 
         mesh->text_count = 4;
         mesh->text_coords = new Point2D[4];
@@ -151,9 +151,8 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
         for (int y = 0; y < mapfile.farth; y ++) {
             for (int x = 0; x < mapfile.width; x++) {
                 auto v = &mesh->vertices[x + mapfile.farth * y];
-                v->v = Point4D(x, mapfile.ter_codes[x + mapfile.width *y].height, y);
+                v->v = Point4D(x, mapfile.ter_codes[x + mapfile.width *y].height / 5.0f, y);
                 v->attributes = Graphics::VertexAttributePoint;
-
             }
         }
 
