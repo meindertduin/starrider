@@ -151,7 +151,7 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
 
         for (int y = 0; y < mapfile.farth; y ++) {
             for (int x = 0; x < mapfile.width; x++) {
-                auto v = &mesh->vertices[x + mapfile.farth * y];
+                auto v = &mesh->vertices[x + mapfile.width * y];
                 v->v = Point4D(x, mapfile.ter_codes[x + mapfile.width *y].height / 5.0f, y);
                 v->attributes = Graphics::VertexAttributePoint;
             }

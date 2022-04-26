@@ -90,13 +90,13 @@ void Application::run() {
     std::vector<Graphics::RenderObject> objects;
     Graphics::ObjectRepository object_repository;
 
-    auto object = object_repository.create_render_object("assets/test.mde");
+    // auto object = object_repository.create_render_object("assets/test.mde");
     auto plateau = object_repository.create_terrain_object("assets/terrain.map");
 
-    object.transform = Graphics::Transform(V4D(10, 0, 10));
+    // object.transform = Graphics::Transform(V4D(10, 0, 10));
     plateau.transform = Graphics::Transform(V4D(0, -5, 0));
 
-    objects.push_back(object);
+    // objects.push_back(object);
     objects.push_back(plateau);
 
     Graphics::TTFFont ttf_font("assets/alagard.ttf", 24);
@@ -115,7 +115,7 @@ void Application::run() {
         renderer.render_text(time_text, ttf_font, {20, 52});
 
         renderer.render_framebuffer();
-        objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
+        // objects[0].transform.rotate(Quat_Type(V4D(0, 1, 0), Math::deg_to_rad(1)));
 
         dt = static_cast<int>(get_program_ticks_ms() - cycle_start);
         int cycle_delay = (1000.0f / (float)m_fps) - dt;
