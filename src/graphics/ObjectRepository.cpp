@@ -138,7 +138,8 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
         mesh->vertex_count = mapfile.width * mapfile.farth;
         mesh->vertices = new Vertex4D[mesh->vertex_count];
 
-        vector<Polygon> polygons(mapfile.width * mapfile.farth * 2);
+        vector<Polygon> polygons;
+        polygons.reserve((mapfile.width -1) * (mapfile.farth -1) * 2);
 
         mesh->text_count = 4;
         mesh->text_coords = new Point2D[4];
@@ -162,8 +163,6 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
                     Polygon polygon;
 
                     polygon.vertices = mesh->vertices;
-
-                    polygon.text_coords = mesh->text_coords;
                     polygon.text_coords = mesh->text_coords;
 
                     if (ipoly == 0) {
@@ -183,7 +182,6 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
                         polygon.text[1] = 2;
                         polygon.text[2] = 3;
                     }
-
 
                     polygon.vertices[polygon.vert[0]].t = mesh->text_coords[polygon.text[0]];
                     polygon.vertices[polygon.vert[1]].t = mesh->text_coords[polygon.text[1]];
@@ -212,7 +210,7 @@ string ObjectRepository::load_mesh_from_map(string path, MeshAttributes attribut
             }
         }
 
-        mesh->polygons = polygons;
+        mesh->polygons = std::move(polygons);
 
         // TODO: add way for checking normals
         compute_vertex_normals(*mesh);
