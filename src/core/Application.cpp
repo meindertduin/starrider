@@ -76,8 +76,8 @@ void Application::run() {
     Graphics::reset_materials();
     Graphics::reset_lights();
 
-    Graphics::create_base_amb_light(0, Graphics::RGBA { 25, 25, 25, 255 });
-    Graphics::create_base_dir_light(1, Graphics::RGBA { 125, 125, 125, 125 }, V4D(1, 1, 0).normalized());
+    Graphics::create_base_amb_light(0, Graphics::RGBA { 70, 70, 70, 255 });
+    Graphics::create_base_dir_light(1, Graphics::RGBA { 200, 200, 200, 255 }, V4D(1, 1, 0).normalized());
 
     //create_base_point_light(2, RGBA { 225, 225, 225, 255 }, V4D(0, 1, 0), 0, 0, 0.2f);
 

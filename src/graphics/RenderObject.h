@@ -145,46 +145,63 @@ typedef struct RenderListPoly_Type {
     Vertex4D trans_verts[3];
 } RenderListPoly;
 
-typedef struct RenderObject_Type {
-    int id;
-    uint16_t state;
-    uint16_t attributes;
+struct StaticRenderObject {
+    int state;
+    int attributes;
+
+    int vertex_count;
+    int text_count;
+    int mip_levels;
+
+    std::vector<Texture*> textures;
 
     float alpha;
-
-    int mati;
+    A565Color color;
 
     Transform transform;
 
-    std::vector<Texture*> textures;
-    int mip_levels;
+    Vertex4D *local_vertices;
+    Point2D *texture_coords;
 
-    A565Color color;
+    std::vector<Polygon> polygons;
+};
 
-    int vertex_count;
+typedef struct RenderObject_Type : public StaticRenderObject {
+    uint16_t state;
+    uint16_t attributes;
+
+    int mati;
+
     int frames_count;
-    int text_count;
     int curr_frame;
 
-    Vertex4D *local_vertices;
     Vertex4D *transformed_vertices;
 
     Vertex4D *head_local_vertices;
     Vertex4D *head_transformed_vertices;
-
-    // TODO: check if these are still needed when we have
-    // them stored in the vertex
-    Point2D *texture_coords;
-
-    std::vector<Polygon> polygons;
-
-    RenderObject_Type(int id) : id(id) {}
 
     int set_frame(int frame);
 
     // This function may reset the frames
     void next_frame();
 } RenderObject;
+
+
+struct TerrainTile {
+    int x_pos;
+    int y_pos;
+
+    std::vector<int> polygon_indices;
+};
+
+struct TerrainObject {
+    int grid_width;
+    int grid_height;
+
+    StaticRenderObject object;
+
+    std::vector<TerrainTile> tiles;
+};
 
 typedef struct MeshType {
     int id;
@@ -297,6 +314,5 @@ struct RenderContext {
     int min_clip_y;
     int max_clip_y;
 };
-
 }
 
