@@ -61,7 +61,7 @@ void Application::run() {
         | Graphics::RCAttributeTextureHybrid
         | Graphics::RCAttributeZSort;
 
-    m_rc.mip_z_dist = 30;
+    m_rc.mip_z_dist = 80;
     m_rc.perfect_dist = 20;
     m_rc.piecewise_dist = 40;
 
@@ -91,7 +91,7 @@ void Application::run() {
     Graphics::ObjectRepository object_repository;
 
     // auto object = object_repository.create_render_object("assets/test.mde");
-    auto plateau = object_repository.create_terrain_object("assets/terrain.map");
+    auto plateau = object_repository.create_render_object("assets/valley.mde");
 
     // object.transform = Graphics::Transform(V4D(10, 0, 10));
     plateau.transform = Graphics::Transform(V4D(0, -5, 0));

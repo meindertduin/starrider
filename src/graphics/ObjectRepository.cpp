@@ -37,7 +37,7 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     auto objects_count = m_game_objects.size();
     RenderObject object { static_cast<int>(objects_count > 0 ? objects_count - 1 : 0) };
 
-    object.textures = load_mip_texture("assets/grass.bmp");
+    object.textures = load_mip_texture("assets/" + mesh->skins[0]);
 
     object.mip_levels = object.textures.size();
 
