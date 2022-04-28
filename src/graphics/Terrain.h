@@ -21,6 +21,4 @@ struct TerrainObject {
     std::vector<TerrainTile> tiles;
 };
 
-
-
 }
