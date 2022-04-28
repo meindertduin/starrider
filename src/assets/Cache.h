@@ -23,7 +23,7 @@ namespace Assets {
                     const AssetOptions &options);
 
             Graphics::Mesh* get_mesh(std::string name);
-            void set_mesh(std::string name, Graphics::Mesh&& mesh);
+            void set_mesh(std::string name, Graphics::Mesh *mesh);
             void release_mesh(std::string name);
 
             std::vector<Graphics::Texture*> get_textures(std::string name);
@@ -32,7 +32,7 @@ namespace Assets {
 
         private:
             std::unordered_map<std::string, std::vector<Graphics::Texture*>> m_textures;
-            std::unordered_map<std::string, Graphics::Mesh> m_meshes;
+            std::unordered_map<std::string, Graphics::Mesh*> m_meshes;
 
             std::vector<std::pair<Asset::Type, AssetLoader>> m_loaders;
     };

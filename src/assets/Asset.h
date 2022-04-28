@@ -5,7 +5,21 @@
 namespace Assets {
 
     struct AssetOptions {
-        bool mipmap;
+        union {
+            struct {
+                int mipmap;
+                int padding;
+            } texture_options;
+
+            struct {
+                uint32_t poly_state : 16;
+                uint32_t poly_attributes : 16;
+
+                uint32_t poly_color;
+            } mesh_options;
+
+            uint32_t values[2];
+        };
     };
 
     class Asset final {

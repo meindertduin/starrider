@@ -57,20 +57,10 @@ public:
     ObjectRepository& operator=(ObjectRepository &&other) = delete;
 
     RenderObject create_render_object(std::string mde_file);
-    RenderObject create_terrain_object(std::string path);
 
     std::vector<Texture*> load_mip_texture(std::string path);
-
-    std::string load_mesh_from_mde(std::string path, MeshAttributes attributes);
-    string load_mesh_from_map(string path, MeshAttributes attributes);
-
 private:
     Assets::Cache m_cache;
-
-    std::unordered_map<std::string, Mesh*> m_mde_files;
-
-    std::unordered_map<std::string, std::vector<Texture*>> m_skins;
-    std::array<vector<Texture*>, 32> m_textures;
 
     int compute_vertex_normals(Graphics::Mesh &object);
 
