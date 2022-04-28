@@ -22,11 +22,11 @@ namespace Assets {
             void load_asset(Asset::Type asset_type, const std::string &filename,
                     const AssetOptions &options);
 
-            Graphics::Mesh* get_mesh(std::string name);
+            Graphics::Mesh* get_mesh(std::string name) const;
             void set_mesh(std::string name, Graphics::Mesh *mesh);
             void release_mesh(std::string name);
 
-            std::vector<Graphics::Texture*> get_textures(std::string name);
+            std::vector<Graphics::Texture*> get_textures(std::string name) const;
             void set_textures(std::string name, std::vector<Graphics::Texture*> textures);
             void release_textures(std::string name);
 

@@ -16,7 +16,7 @@ namespace Assets {
         }
     }
 
-    Graphics::Mesh* Cache::get_mesh(std::string name) {
+    Graphics::Mesh* Cache::get_mesh(std::string name) const {
         auto pair = m_meshes.find(name);
 
         return pair->second;
@@ -30,7 +30,7 @@ namespace Assets {
         m_meshes.erase(name);
     }
 
-    std::vector<Graphics::Texture*> Cache::get_textures(std::string name) {
+    std::vector<Graphics::Texture*> Cache::get_textures(std::string name) const {
         auto pair = m_textures.find(name);
 
         return pair->second;
