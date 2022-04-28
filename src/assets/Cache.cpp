@@ -19,12 +19,6 @@ namespace Assets {
     Graphics::Mesh* Cache::get_mesh(std::string name) {
         auto pair = m_meshes.find(name);
 
-        if (pair == m_meshes.end()) {
-            load_asset(Asset::Type::Mde, name, { false });
-
-            return m_meshes.find(name)->second;
-        }
-
         return pair->second;
     }
 
@@ -38,12 +32,6 @@ namespace Assets {
 
     std::vector<Graphics::Texture*> Cache::get_textures(std::string name) {
         auto pair = m_textures.find(name);
-
-        if (pair == m_textures.end()) {
-            load_asset(Asset::Type::Texture, name, { true });
-
-            return m_textures.find(name)->second;
-        }
 
         return pair->second;
     }
