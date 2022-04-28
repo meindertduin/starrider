@@ -12,6 +12,7 @@ namespace Assets {
     class Cache final {
         public:
             Cache();
+            ~Cache();
 
             Cache(const Cache &cache) = delete;
             Cache(Cache &&cache) = delete;

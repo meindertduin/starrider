@@ -6,6 +6,15 @@ namespace Assets {
         m_loaders.push_back(std::make_pair(Asset::Type::Mde, &load_mde_file));
     }
 
+    Cache::~Cache() {
+        for (auto mesh_pair : m_meshes)
+            delete mesh_pair.second;
+
+        for (auto mip_textures : m_textures)
+            for (auto texture : mip_textures.second)
+                delete texture;
+    }
+
     void Cache::load_asset(Asset::Type asset_type, const std::string &filename,
             const AssetOptions &options)
     {
