@@ -3,6 +3,8 @@
 
 #include <math.h>
 
+#include <vector>
+
 namespace Math {
     int ParLine2D::get_intersect(ParLine2D_Type &other, float &t, float &t_other) const {
         float det = v.x * other.v.y - v.y * other.v.x;
@@ -54,5 +56,29 @@ namespace Math {
         } else {
             return PAR_LINE_INTERSECT_OUT_SEGMENT;
         }
+    }
+
+    Box_Type::Box_Type(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z) :
+        min_x(min_x), max_x(max_x), min_y(min_y), max_y(max_y), min_z(min_z), max_z(max_z) {  }
+
+    int Box_Type::point_in_box(const Point3D &p) const {
+        // p is inside
+        if (p.x > min_x && p.x < max_x &&
+                p.y > min_y && p.y < max_y
+                && p.z > min_z && p.z < max_z)
+        {
+            return 1;
+        }
+
+        // p is outside
+        if (p.x < min_x || p.x > max_x ||
+                p.y < min_y || p.y > max_y ||
+                p.z < min_z || p.y > max_z)
+        {
+            return -1;
+        }
+
+        // p is exactly on the box border
+        return 0;
     }
 }

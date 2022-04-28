@@ -30,6 +30,7 @@ set(SOURCES
     src/graphics/RenderObject.cpp
     src/graphics/ObjectRepository.cpp
     src/graphics/Lighting.cpp
+    src/graphics/Terrain.cpp
     src/math/Matrix.cpp
     src/math/Core.cpp
     src/math/Polar.cpp

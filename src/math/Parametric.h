@@ -74,4 +74,23 @@ typedef struct Plane3D_Type {
     int get_intersect(ParLine3D &line, float &t, Point3D &p_intersect) const;
 
 } Plane3D, *Plane3D_Ptr;
+
+typedef struct Box_Type {
+    float min_x;
+    float max_x;
+    float min_y;
+    float max_y;
+    float min_z;
+    float max_z;
+
+    Box_Type() = default;
+    Box_Type(float min_x, float max_x, float min_y, float max_y, float min_z, float max_z);
+
+    /*
+     * Returns 0 if the point lies exactly on the box
+     * Returns -1 if the point lies outside the plane
+     * Returns 1 if the point lies within the box
+     * */
+    int point_in_box(const Point3D &p) const;
+} Box, *Box_Ptr;
 }

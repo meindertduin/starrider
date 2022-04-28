@@ -149,6 +149,8 @@ struct StaticRenderObject {
     int state;
     int attributes;
 
+    float radius;
+
     int vertex_count;
     int text_count;
     int mip_levels;
@@ -186,22 +188,6 @@ typedef struct RenderObject_Type : public StaticRenderObject {
     void next_frame();
 } RenderObject;
 
-
-struct TerrainTile {
-    int x_pos;
-    int y_pos;
-
-    std::vector<int> polygon_indices;
-};
-
-struct TerrainObject {
-    int grid_width;
-    int grid_height;
-
-    StaticRenderObject object;
-
-    std::vector<TerrainTile> tiles;
-};
 
 typedef struct MeshType {
     int id;
