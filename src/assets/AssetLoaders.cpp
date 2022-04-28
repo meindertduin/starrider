@@ -25,7 +25,7 @@ namespace Assets {
             mip_textures.push_back(quarter_texture);
         }
 
-        // cache.set_textures(filename, mip_textures);
+        cache.set_textures(filename, mip_textures);
 
         return true;
     }

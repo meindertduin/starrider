@@ -320,31 +320,7 @@ std::string  ObjectRepository::load_mesh_from_mde(std::string path, MeshAttribut
 }
 
 std::vector<Texture*> ObjectRepository::load_mip_texture(std::string path) {
-    auto mip_textures_pair = m_skins.find(path);
-
-    if (mip_textures_pair == m_skins.end()) {
-        std::vector<Texture*> mip_textures;
-
-        auto root_texture = new Texture();
-        if (!root_texture->load_from_bmp(path)) {
-            throw std::runtime_error("Could not load bmp from file");
-        }
-
-        mip_textures.push_back(root_texture);
-
-        auto mip_levels = std::log(root_texture->width) / std::log(2) + 1;
-
-        for (int mip_level = 1; mip_level < mip_levels; mip_level++) {
-            auto quarter_texture = mip_textures[mip_level - 1]->quarter_size(1.01f);
-            mip_textures.push_back(quarter_texture);
-        }
-
-        m_skins.insert(std::pair<std::string, std::vector<Texture*>>(path, mip_textures));
-
-        return mip_textures;
-    }
-
-    return mip_textures_pair->second;
+    return m_cache.get_textures(path);
 }
 
 int ObjectRepository::compute_vertex_normals(Graphics::Mesh &object) {

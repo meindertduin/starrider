@@ -19,16 +19,16 @@ namespace Assets {
             Cache& operator=(const Cache &cache) = delete;
             Cache& operator=(Cache &&cache) = delete;
 
-            void load_asset(Asset::Type asset_type, const std::string name,
-                    const std::string &filename, const AssetOptions &options);
+            void load_asset(Asset::Type asset_type, const std::string &filename,
+                    const AssetOptions &options);
 
-            const Graphics::Mesh* get_mesh(std::string name) const;
+            Graphics::Mesh* get_mesh(std::string name);
             void set_mesh(std::string name, Graphics::Mesh&& mesh);
             void release_mesh(std::string name);
 
-            const Graphics::Texture* get_texture(std::string name) const;
+            std::vector<Graphics::Texture*> get_textures(std::string name);
             void set_textures(std::string name, std::vector<Graphics::Texture*> textures);
-            void release_texture(std::string name);
+            void release_textures(std::string name);
 
         private:
             std::unordered_map<std::string, std::vector<Graphics::Texture*>> m_textures;
