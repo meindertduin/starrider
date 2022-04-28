@@ -3,6 +3,8 @@
 #include "../io/ObjReader.h"
 #include "../io/MapReader.h"
 
+#include "../assets/Cache.h"
+
 #include <error.h>
 
 namespace Graphics {

@@ -5,14 +5,10 @@
 namespace Assets {
 
     struct AssetOptions {
-
-    };
-
-    struct TextureOptions : public AssetOptions {
         bool mipmap;
     };
 
-    class Asset {
+    class Asset final {
         public:
             enum class Type {
                 Texture,

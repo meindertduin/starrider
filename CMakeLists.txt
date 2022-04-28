@@ -38,6 +38,8 @@ set(SOURCES
     src/math/Quaternion.cpp
     src/math/Parametric.cpp
     src/platform/x11/XLib.cpp
+    src/assets/Cache.cpp
+    src/assets/AssetLoaders.cpp
 )
 
 set(HEADERS include)

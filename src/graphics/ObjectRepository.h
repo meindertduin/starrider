@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "../io/MdeReader.h"
+#include "../assets/Cache.h"
 #include "RenderObject.h"
 
 namespace Graphics {
@@ -64,6 +65,8 @@ public:
     string load_mesh_from_map(string path, MeshAttributes attributes);
 
 private:
+    Assets::Cache m_cache;
+
     std::unordered_map<std::string, Mesh*> m_mde_files;
 
     std::unordered_map<std::string, std::vector<Texture*>> m_skins;
