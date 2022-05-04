@@ -7,9 +7,6 @@ namespace Assets {
     }
 
     Cache::~Cache() {
-        for (auto mip_textures : m_textures)
-            for (auto texture : mip_textures.second)
-                delete texture;
     }
 
     void Cache::load_asset(Asset::Type asset_type, const std::string &filename,
@@ -39,11 +36,17 @@ namespace Assets {
     std::vector<Graphics::Texture*> Cache::get_textures(std::string name) const {
         auto pair = m_textures.find(name);
 
-        return pair->second;
+        std::vector<Graphics::Texture*> textures;
+
+        for (auto &texture_ptr : pair->second) {
+            textures.push_back(texture_ptr.get());
+        }
+
+        return textures;
     }
 
-    void Cache::set_textures(std::string name, std::vector<Graphics::Texture*> textures) {
-        m_textures.insert(std::make_pair(name, textures));
+    void Cache::set_textures(std::string name, Graphics::MipTexturesList &&textures) {
+        m_textures.insert(std::make_pair(name, std::move(textures)));
     }
 
     void Cache::release_textures(std::string name) {

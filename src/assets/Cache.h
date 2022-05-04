@@ -29,11 +29,11 @@ namespace Assets {
             void release_mesh(std::string name);
 
             std::vector<Graphics::Texture*> get_textures(std::string name) const;
-            void set_textures(std::string name, std::vector<Graphics::Texture*> textures);
+            void set_textures(std::string name, Graphics::MipTexturesList &&textures);
             void release_textures(std::string name);
 
         private:
-            std::unordered_map<std::string, std::vector<Graphics::Texture*>> m_textures;
+            std::unordered_map<std::string, Graphics::MipTexturesList> m_textures;
             std::unordered_map<std::string, std::unique_ptr<Graphics::Mesh>> m_meshes;
 
             std::vector<std::pair<Asset::Type, AssetLoader>> m_loaders;

@@ -36,7 +36,7 @@ public:
 
     void set_data(int width, int height, A565Color* data);
 
-    Texture* quarter_size(float gamma);
+    std::unique_ptr<Texture> quarter_size(float gamma);
 
     constexpr A565Color get_pixel(int x_pos, int y_pos) const {
         return pixels[width * y_pos + x_pos];
@@ -55,5 +55,6 @@ private:
     void set_pitch_shift();
 };
 
+using MipTexturesList = std::vector<std::unique_ptr<Graphics::Texture>>;
 
 }

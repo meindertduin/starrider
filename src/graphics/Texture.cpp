@@ -99,7 +99,7 @@ void Texture::set_data(int width, int height, A565Color* data) {
     set_pitch_shift();
 }
 
-Texture* Texture::quarter_size(float gamma) {
+std::unique_ptr<Texture> Texture::quarter_size(float gamma) {
     int new_width = width * 0.5;
     int new_height = height * 0.5f;
 
@@ -131,7 +131,7 @@ Texture* Texture::quarter_size(float gamma) {
         }
     }
 
-    auto result = new Texture(new_width, new_height, data);
+    auto result = std::unique_ptr<Texture>(new Texture(new_width, new_height, data));
     delete[] data;
 
     return result;
