@@ -159,6 +159,6 @@ namespace Assets {
         // TODO: add way for checking normals
         compute_vertex_normals(*mesh);
 
-        cache.set_mesh(filename, mesh);
+        cache.set_mesh(filename, std::unique_ptr<Graphics::Mesh>(mesh));
     }
 }

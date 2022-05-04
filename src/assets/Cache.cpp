@@ -7,9 +7,6 @@ namespace Assets {
     }
 
     Cache::~Cache() {
-        for (auto mesh_pair : m_meshes)
-            delete mesh_pair.second;
-
         for (auto mip_textures : m_textures)
             for (auto texture : mip_textures.second)
                 delete texture;
@@ -28,11 +25,11 @@ namespace Assets {
     Graphics::Mesh* Cache::get_mesh(std::string name) const {
         auto pair = m_meshes.find(name);
 
-        return pair->second;
+        return pair->second.get();
     }
 
-    void Cache::set_mesh(std::string name, Graphics::Mesh* mesh) {
-        m_meshes.insert(std::make_pair(name, mesh));
+    void Cache::set_mesh(std::string name, std::unique_ptr<Graphics::Mesh> mesh) {
+        m_meshes.insert(std::make_pair(name, std::move(mesh)));
     }
 
     void Cache::release_mesh(std::string name) {
