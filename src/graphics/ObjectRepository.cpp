@@ -17,6 +17,8 @@ ObjectRepository::~ObjectRepository() {
 }
 
 RenderObject ObjectRepository::create_render_object(std::string mde_file) {
+    RenderObject object;
+
     auto object_color = A565Color(0xFF, 0, 0, 0);
 
     Assets::AssetOptions options;
@@ -29,7 +31,6 @@ RenderObject ObjectRepository::create_render_object(std::string mde_file) {
     auto mesh = m_cache.get_mesh(mde_file);
 
     auto objects_count = m_game_objects.size();
-    RenderObject object;
 
     object.textures = load_mip_texture("assets/" + mesh->skins[0]);
 

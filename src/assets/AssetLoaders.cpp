@@ -160,5 +160,7 @@ namespace Assets {
         compute_vertex_normals(*mesh);
 
         cache.set_mesh(filename, std::unique_ptr<Graphics::Mesh>(mesh));
+
+        return true;
     }
 }
